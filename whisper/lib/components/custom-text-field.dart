@@ -4,10 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants.dart';
 
 class CustomTextField extends StatelessWidget {
-  CustomTextField({required this.label,this.perfixIcon});
+  CustomTextField({required this.label, this.prefixIcon});
 
   String? label;
-  IconData? perfixIcon;
+  IconData? prefixIcon;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -26,7 +27,7 @@ class CustomTextField extends StatelessWidget {
           width: 50, // Custom width
           alignment: Alignment.center,
           child: FaIcon(
-            perfixIcon,
+            prefixIcon,
             color: secondNeutralColor,
             size: 24,
           ),
@@ -37,3 +38,6 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
+
+

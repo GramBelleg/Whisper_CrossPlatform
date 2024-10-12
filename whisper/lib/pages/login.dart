@@ -30,14 +30,14 @@ class Login extends StatelessWidget {
             ),
             CustomTextField(
               label: "Email",
-              perfixIcon: FontAwesomeIcons.envelope,
+              prefixIcon: FontAwesomeIcons.envelope,
             ),
             SizedBox(
               height: 10,
             ),
             CustomTextField(
               label: "Password",
-              perfixIcon: FontAwesomeIcons.lock,
+              prefixIcon: FontAwesomeIcons.lock,
             ),
             SizedBox(
               height: 10,
