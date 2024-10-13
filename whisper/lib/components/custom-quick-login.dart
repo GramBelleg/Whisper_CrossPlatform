@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../constants.dart';
+import '../constants/colors.dart';
 
 class CustomQuickLogin extends StatelessWidget {
   const CustomQuickLogin({super.key});

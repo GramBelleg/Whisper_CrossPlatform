@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../constants.dart';
+import '../constants/colors.dart';
 
 class CustomHighlightText extends StatelessWidget {
   CustomHighlightText({required this.callToActionText});
