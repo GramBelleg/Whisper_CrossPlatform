@@ -1,19 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/pages/signup.dart';
+import 'package:whisper/components/custom-phone-field.dart';
+import 'package:whisper/pages/login.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
-import '../components/custom-quick-login.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 import '../validators/form-validation/password-field-validation.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
-class Login extends StatelessWidget {
-  Login({super.key});
+class Signup extends StatefulWidget {
+  Signup({super.key});
 
-  static String id = "/Login";
+  static String id = "/Signup";
+
+  @override
+  State<Signup> createState() => _SignupState();
+}
+
+class _SignupState extends State<Signup> {
   GlobalKey<FormState> formKey = GlobalKey();
 
   void _submitForm() {
@@ -60,17 +67,23 @@ class Login extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              CustomAccessButton(
-                label: "Login",
-                onPressed: _submitForm,
+              CustomTextField(
+                label: "Re-Password",
+                prefixIcon: FontAwesomeIcons.lock,
+                isObscure: true,
+                isPassword: true,
+                validate: ValidatePasswordField,
               ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
-              Center(
-                child: CustomHighlightText(
-                  callToActionText: 'Forgot Password?',
-                ),
+              CustomPhoneField(),
+              SizedBox(
+                height: 10,
+              ),
+              CustomAccessButton(
+                label: "Signup",
+                onPressed: _submitForm,
               ),
               SizedBox(
                 height: 20,
@@ -79,34 +92,19 @@ class Login extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Don\'t have an acoount?',
+                    'Already a member? ',
                     style: TextStyle(
                       color: secondNeutralColor,
                     ),
                   ),
                   CustomHighlightText(
-                    callToActionText: "Register",
+                    callToActionText: "Login",
                     onTap: () {
-                      Navigator.pushNamed(context, Signup.id);
+                      Navigator.pushNamed(context, Login.id);
                     },
                   ),
                 ],
               ),
-              SizedBox(
-                height: 60,
-              ),
-              Center(
-                child: Text(
-                  'Or you can login using: ',
-                  style: TextStyle(
-                    color: secondNeutralColor,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              CustomQuickLogin(),
             ],
           ),
         ),

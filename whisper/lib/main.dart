@@ -6,6 +6,7 @@ import 'package:whisper/components/custom-quick-login.dart';
 import 'package:whisper/components/custom-text-field.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/signup.dart';
 
 void main() {
   runApp(Whisper());
@@ -20,6 +21,7 @@ class Whisper extends StatelessWidget {
       theme: ThemeData(fontFamily: 'ABeeZee'),
       routes: {
         Login.id: (context) => Login(),
+        Signup.id: (context) => Signup(),
       },
       home: Login(),
     );
