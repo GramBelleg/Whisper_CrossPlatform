@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/pages/chat-page.dart';
 
+import 'pages/mainchats-page.dart';
+
 void main() {
   runApp(Whisper());
 }
@@ -10,12 +12,12 @@ class Whisper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: ChatPage.id,
+      initialRoute: MainChats.id,
       theme: ThemeData(
         fontFamily: 'ABeeZee',
       ),
       routes: {
-        ChatPage.id: (context) => ChatPage(),
+        MainChats.id: (context) => MainChats(),
       },
     );
   }
