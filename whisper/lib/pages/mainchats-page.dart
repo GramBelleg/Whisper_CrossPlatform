@@ -28,6 +28,19 @@ class _MainChatsState extends State<MainChats> {
       body: DraggableHome(
         title: Row(
           children: [
+            GestureDetector(
+              onTap: () {
+                // Event when "Edit" is tapped
+                print('Edit tapped'); //To Do Replace with desired action
+              },
+              child: const Text(
+                "Edit",
+                style: TextStyle(
+                  color: Color(0xff8D6AEE),
+                  fontSize: 16,
+                ),
+              ),
+            ),
             const SizedBox(width: 20), // Space between "Edit" and "Chats"
             const Expanded(
               child: Center(
