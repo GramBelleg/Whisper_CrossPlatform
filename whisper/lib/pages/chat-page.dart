@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/recieved-message-card.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -23,9 +26,13 @@ class _ChatPageState extends State<ChatPage> {
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
   ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
+  late IO.Socket socket;
+  List<OwnMessageCard> messages = [];
+  List<RecievedMessageCard> recievedmessages = [];
   @override
   void initState() {
     super.initState();
+    connect();
     // Add a listener to the focusNode to hide the emoji picker when the text field is focused
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -33,6 +40,34 @@ class _ChatPageState extends State<ChatPage> {
           show = false; // Hide emoji picker when the text field is focused
         });
       }
+    });
+// Listen for incoming messages from the server
+    socket.on('receiveMessage', (data) {
+      print("Message received: $data");
+
+      // Update the UI with the received message
+      setState(() {
+        recievedmessages.add(RecievedMessageCard(
+          message:
+              data['message'], // Assuming the server sends { message, time }
+          time: data['time'],
+        ));
+      });
+    });
+
+    // Listen for loading existing messages
+    socket.on('loadMessages', (data) {
+      print("Loading messages: $data");
+
+      // Update the UI with the existing messages
+      setState(() {
+        for (var msg in data) {
+          recievedmessages.add(RecievedMessageCard(
+            message: msg['message'],
+            time: msg['time'],
+          ));
+        }
+      });
     });
   }
 
@@ -79,6 +114,57 @@ class _ChatPageState extends State<ChatPage> {
     // Check if the scroll controller is attached and has listeners
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  void connect() {
+    // Replace with your server's IP and port
+    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+
+    socket.connect();
+
+    // Listen for successful connection
+    socket.on('connect', (_) {
+      print("Connected to server");
+    });
+
+    // Listen for incoming messages from the server
+    socket.on('receiveMessage', (data) {
+      print("Message received: $data");
+
+      // You need to update your UI with the received message
+      // For example, you can add the message to a List and rebuild the chat
+    });
+
+    // Emit a test message when connected
+    socket.emit('/sendmessage', "Client connected");
+  }
+
+  void _sendMessage(String message) {
+    if (message.isNotEmpty) {
+      // Get the current time
+      DateTime now = DateTime.now();
+
+      // Format the time manually
+      String formattedTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+      // Emit the message via socket
+      socket.emit('/sendmessage', message);
+      print('Message sent: $message');
+
+      // Here you can update your UI with the new message
+      // For example, adding it to your chat messages list
+      setState(() {
+        messages.add(OwnMessageCard(
+          message: message,
+          time: formattedTime,
+          status: MessageStatus.sent, // Mark as sent
+        ));
+      });
     }
   }
 
@@ -177,7 +263,16 @@ class _ChatPageState extends State<ChatPage> {
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.cover,
               ),
-              ListView(), // Chat messages go here
+              Container(
+                height: MediaQuery.of(context).size.height - 145,
+                child: ListView.builder(
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final messageData = messages[index];
+                    return messageData;
+                  },
+                ),
+              ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Column(
@@ -264,11 +359,27 @@ class _ChatPageState extends State<ChatPage> {
                           child: CircleAvatar(
                             radius: 24,
                             backgroundColor: Color(0xff0A122F),
-                            child: FaIcon(
-                              _isTyping
-                                  ? FontAwesomeIcons.paperPlane
-                                  : FontAwesomeIcons.microphone,
-                              color: Color(0xff8D6AEE),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (_isTyping) {
+                                  // Send the message when typing
+                                  _sendMessage(_controller.text);
+                                  _controller
+                                      .clear(); // Clear the text field after sending
+                                  setState(() {
+                                    _isTyping = false; // Reset typing status
+                                  });
+                                } else {
+                                  // Handle microphone functionality here
+                                  print("Start voice message recording");
+                                }
+                              },
+                              child: FaIcon(
+                                _isTyping
+                                    ? FontAwesomeIcons.paperPlane
+                                    : FontAwesomeIcons.microphone,
+                                color: Color(0xff8D6AEE),
+                              ),
                             ),
                           ),
                         ),
@@ -357,8 +468,8 @@ class _ChatPageState extends State<ChatPage> {
                   iconCreation(
                       Icons.headset, "Audio", Colors.orange, _pickAudio),
                   Spacer(flex: 1),
-                  iconCreation(Icons.location_pin, "Location", Colors.teal,
-                      (){}),
+                  iconCreation(
+                      Icons.location_pin, "Location", Colors.teal, () {}),
                   Spacer(flex: 1),
                   iconCreation(Icons.person, "Contacts", Colors.blue, () {}),
                 ],

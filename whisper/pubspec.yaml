@@ -34,7 +34,8 @@ dependencies:
   image_picker: ^0.8.6
   permission_handler: ^10.0.0 # Check for the latest version
   font_awesome_flutter: ^10.7.0
-
+  socket_io_client: ^3.0.0
+  giphy_get: ^2.0.0
   flutter:
     sdk: flutter
 
