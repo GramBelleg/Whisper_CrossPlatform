@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-phone-field.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/services/signup-services.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
+import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../modules/user.dart';
 import '../validators/form-validation/password-field-validation.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class Signup extends StatefulWidget {
   Signup({super.key});
@@ -23,12 +25,51 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   GlobalKey<FormState> formKey = GlobalKey();
 
-  void _submitForm() {
+  // TextEditingControllers for each input field
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController rePasswordController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+  void _submitForm() async {
     if (formKey.currentState!.validate()) {
-      print("Form is valid!");
+      if (!ValidateRePassword(
+        passwordController.text,
+        rePasswordController.text,
+      )) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Passwords aren't the same"),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        User user = User(
+          email: emailController.text,
+          password: passwordController.text,
+          phone: phoneController.text,
+        );
+        try {
+          await SignupServices.addUser(user);
+        } catch (e) {
+          print(e);
+        }
+      }
+
+      // Perform signup logic here
     } else {
       print("Form is invalid!");
     }
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controllers to free up resources
+    emailController.dispose();
+    passwordController.dispose();
+    rePasswordController.dispose();
+    phoneController.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,7 +79,7 @@ class _SignupState extends State<Signup> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -53,6 +94,7 @@ class _SignupState extends State<Signup> {
                 isObscure: false,
                 isPassword: false,
                 validate: ValidateEmailField,
+                controller: emailController, // Pass the controller
               ),
               SizedBox(
                 height: 10,
@@ -63,6 +105,7 @@ class _SignupState extends State<Signup> {
                 isObscure: true,
                 isPassword: true,
                 validate: ValidatePasswordField,
+                controller: passwordController, // Pass the controller
               ),
               SizedBox(
                 height: 10,
@@ -73,11 +116,14 @@ class _SignupState extends State<Signup> {
                 isObscure: true,
                 isPassword: true,
                 validate: ValidatePasswordField,
+                controller: rePasswordController, // Pass the controller
               ),
               SizedBox(
                 height: 10,
               ),
-              CustomPhoneField(),
+              CustomPhoneField(
+                controller: phoneController, // Pass the controller
+              ),
               SizedBox(
                 height: 10,
               ),

@@ -12,8 +12,10 @@ class CustomTextField extends StatefulWidget {
     required this.isObscure,
     required this.isPassword,
     required this.validate,
+    this.controller,
   });
 
+  final TextEditingController? controller;
   String? label;
   IconData? prefixIcon;
   bool? isObscure;
@@ -34,6 +36,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: this.widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,
       style: TextStyle(

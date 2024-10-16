@@ -1,12 +1,12 @@
 class User {
   final String email;
   final String password;
-  final String phoneNumber;
+  final String phone;
 
   User({
     required this.email,
     required this.password,
-    required this.phoneNumber,
+    required this.phone,
   });
 
   // Method to convert User object to a Map
@@ -14,7 +14,7 @@ class User {
     return {
       'email': email,
       'password': password,
-      'phone_number': phoneNumber,
+      'phone': phone,
     };
   }
 
@@ -22,7 +22,7 @@ class User {
     return User(
       email: map['email'],
       password: map['password'],
-      phoneNumber: map['phone_number'],
+      phone: map['phone'],
     );
   }
 }

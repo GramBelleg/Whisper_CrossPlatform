@@ -5,7 +5,11 @@ import 'package:whisper/validators/form-validation/phone-field-validation.dart';
 import '../constants/colors.dart';
 
 class CustomPhoneField extends StatefulWidget {
-  const CustomPhoneField({super.key});
+  const CustomPhoneField({
+    this.controller,
+  });
+
+  final TextEditingController? controller;
 
   @override
   State<CustomPhoneField> createState() => _CustomPhoneFieldState();
@@ -15,6 +19,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
   @override
   Widget build(BuildContext context) {
     return IntlPhoneField(
+      controller: this.widget.controller,
       style: TextStyle(
         color: secondNeutralColor,
       ),
