@@ -1,7 +1,9 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -20,6 +22,7 @@ class _ChatPageState extends State<ChatPage> {
   bool show = false; // Tracks if the emoji picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
   ScrollController _scrollController = ScrollController();
+  final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
@@ -223,7 +226,12 @@ class _ChatPageState extends State<ChatPage> {
                                   ),
                                 ),
                                 suffixIcon: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        context: context,
+                                        builder: (builder) => buttonSheet());
+                                  },
                                   icon: const FaIcon(
                                     FontAwesomeIcons.paperclip,
                                     color: Color(0xff8D6AEE),
@@ -293,20 +301,21 @@ class _ChatPageState extends State<ChatPage> {
       setState(() {
         String currentText = _controller.text;
 
-        // Check if there is text to delete
         if (currentText.isNotEmpty) {
-          // Remove the last character safely
-          // Use runes to handle Unicode characters
+          // Remove the last character (handle Unicode characters with runes)
           var runes = currentText.runes.toList();
-          runes.removeLast(); // Remove the last character
+          runes.removeLast();
 
           // Update the controller's text
           _controller.text = String.fromCharCodes(runes);
 
-          // Update the cursor position to be at the end of the new text
+          // Update the cursor position
           _controller.selection = TextSelection.fromPosition(
               TextPosition(offset: _controller.text.length));
         }
+
+        // Check if text is empty after deleting and update `_isTyping`
+        _isTyping = _controller.text.isNotEmpty;
       });
     }, onEmojiSelected: (category, emoji) {
       setState(() {
@@ -318,5 +327,138 @@ class _ChatPageState extends State<ChatPage> {
             TextPosition(offset: _controller.text.length));
       });
     });
+  }
+
+  Widget buttonSheet() {
+    return Container(
+      height: MediaQuery.of(context).size.height / 3,
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        margin: EdgeInsets.all(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  iconCreation(Icons.insert_drive_file, "Document",
+                      Colors.indigo, _pickFile),
+                  Spacer(flex: 1),
+                  iconCreation(Icons.camera_alt, "Camera", Colors.pink,
+                      _pickImageFromCamera),
+                  Spacer(flex: 1),
+                  iconCreation(Icons.insert_photo, "Gallery", Colors.purple,
+                      _pickImageFromGallery),
+                ],
+              ),
+              Spacer(flex: 1),
+              Row(
+                children: [
+                  iconCreation(
+                      Icons.headset, "Audio", Colors.orange, _pickAudio),
+                  Spacer(flex: 1),
+                  iconCreation(Icons.location_pin, "Location", Colors.teal,
+                      (){}),
+                  Spacer(flex: 1),
+                  iconCreation(Icons.person, "Contacts", Colors.blue, () {}),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget iconCreation(IconData icon, String text, Color color, Function onTap) {
+    return InkWell(
+      onTap: () => onTap(), // Call the function passed as a parameter
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            child: Icon(
+              icon,
+              size: 29,
+              color: Colors.white,
+            ),
+            backgroundColor: color,
+          ),
+          Text(text),
+        ],
+      ),
+    );
+  }
+
+  void _pickFile() async {
+    // Use FilePicker to pick a file
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      // Get the selected file
+      String? filePath = result.files.single.path;
+      String? fileName = result.files.single.name;
+
+      // You can now send the file or show a message with the file name
+      print("File selected: $fileName at $filePath");
+
+      // Add logic to send the file or display it in the chat
+      // For example:
+      // _sendFile(filePath);
+    } else {
+      // User canceled the picker
+      print("File selection canceled");
+    }
+  }
+
+  void _pickImageFromCamera() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      // You can now send the captured image or show a message with the file name
+      print("Image captured: ${image.name} at ${image.path}");
+
+      // For example, you can send the image in the chat
+      // _sendImage(image.path);
+    } else {
+      print("Camera image selection canceled");
+    }
+  }
+
+  void _pickImageFromGallery() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      // You can now send the selected image or show a message with the file name
+      print("Image selected: ${image.name} at ${image.path}");
+
+      // For example, you can send the image in the chat
+      // _sendImage(image.path);
+    } else {
+      print("Gallery image selection canceled");
+    }
+  }
+
+  void _pickAudio() async {
+    // Use FilePicker to pick an audio file
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+    );
+
+    if (result != null) {
+      // Get the selected audio file
+      String? filePath = result.files.single.path;
+      String? fileName = result.files.single.name;
+
+      // You can now send the audio file or show a message with the file name
+      print("Audio selected: $fileName at $filePath");
+
+      // Add logic to send the audio or display it in the chat
+      // For example:
+      // _sendAudio(filePath);
+    } else {
+      // User canceled the picker
+      print("Audio selection canceled");
+    }
   }
 }

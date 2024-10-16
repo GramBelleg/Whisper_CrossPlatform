@@ -30,8 +30,11 @@ environment:
 dependencies:
   emoji_picker_flutter: ^3.1.0
   flutter_svg: ^1.0.0
- 
+  file_picker: ^5.0.0
+  image_picker: ^0.8.6
+  permission_handler: ^10.0.0 # Check for the latest version
   font_awesome_flutter: ^10.7.0
+
   flutter:
     sdk: flutter
 
