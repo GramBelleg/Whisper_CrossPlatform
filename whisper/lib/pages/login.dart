@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
@@ -70,6 +71,12 @@ class Login extends StatelessWidget {
               Center(
                 child: CustomHighlightText(
                   callToActionText: 'Forgot Password?',
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      ForgotPasswordEmail.id,
+                    );
+                  },
                 ),
               ),
               SizedBox(

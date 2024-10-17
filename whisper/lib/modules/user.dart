@@ -1,12 +1,12 @@
 class User {
-  final String email;
-  final String password;
-  final String phone;
+  final String? email;
+  final String? password;
+  final String? phone;
 
   User({
-    required this.email,
-    required this.password,
-    required this.phone,
+    this.email,
+    this.password,
+    this.phone,
   });
 
   // Method to convert User object to a Map

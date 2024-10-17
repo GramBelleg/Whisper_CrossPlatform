@@ -5,7 +5,10 @@ import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/components/custom-quick-login.dart';
 import 'package:whisper/components/custom-text-field.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/pages/confirmation-code.dart';
+import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/pages/signup.dart';
 
 void main() {
@@ -22,6 +25,9 @@ class Whisper extends StatelessWidget {
       routes: {
         Login.id: (context) => Login(),
         Signup.id: (context) => Signup(),
+        ForgotPasswordEmail.id: (context) => ForgotPasswordEmail(),
+        ConfirmationCode.id: (context) => ConfirmationCode(),
+        ResetPassword.id: (context) => ResetPassword(),
       },
       home: Login(),
     );

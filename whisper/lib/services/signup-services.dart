@@ -17,4 +17,14 @@ class SignupServices {
   static Future<void> deleteUser(String email) async {
     await _dbHelper.deleteUserByEmail(email);
   }
+
+  static Future<Map<String, dynamic>?> getUser(String email) async {
+    Map<String, dynamic>? user = await _dbHelper.getUserByEmail(email);
+    return user;
+  }
+
+  static Future<int> getConfirmationCodeByEmail(String email) async {
+    Map<String, dynamic>? user = await _dbHelper.getUserByEmail(email);
+    return 111111;
+  }
 }
