@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:whisper/validators/form-validation/phone-field-validation.dart';
+import '../controllers/phone-number-controller.dart';
 
 import '../constants/colors.dart';
+import '../validators/form-validation/phone-field-validation.dart';
 
 class CustomPhoneField extends StatefulWidget {
   const CustomPhoneField({
-    this.controller,
-  });
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
-  final TextEditingController? controller;
+  final CustomPhoneController controller;
 
   @override
   State<CustomPhoneField> createState() => _CustomPhoneFieldState();
@@ -17,12 +19,23 @@ class CustomPhoneField extends StatefulWidget {
 
 class _CustomPhoneFieldState extends State<CustomPhoneField> {
   @override
+  void initState() {
+    super.initState();
+    widget.controller.setCountryCode('+20');
+    widget.controller.setPhoneNumber('1');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return IntlPhoneField(
-      controller: this.widget.controller,
+      controller: widget.controller,
       style: TextStyle(
         color: secondNeutralColor,
       ),
+      onChanged: (phone) {
+        widget.controller.setCountryCode(phone.countryCode);
+        widget.controller.setPhoneNumber(phone.number);
+      },
       disableLengthCheck: false,
       dropdownTextStyle: TextStyle(
         color: secondNeutralColor,
@@ -53,7 +66,6 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
         ),
       ),
       initialCountryCode: 'EG',
-      initialValue: '1',
       validator: ValidateNumberField,
     );
   }

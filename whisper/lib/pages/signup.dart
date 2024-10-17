@@ -10,6 +10,7 @@ import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../controllers/phone-number-controller.dart';
 import '../modules/user.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
@@ -29,7 +30,7 @@ class _SignupState extends State<Signup> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController rePasswordController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  final CustomPhoneController phoneController = CustomPhoneController();
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
@@ -44,10 +45,15 @@ class _SignupState extends State<Signup> {
           ),
         );
       } else {
+        String fullPhoneNumber = phoneController
+            .getFullPhoneNumber();
+        String countryCode = phoneController.countryCode;
+        String phoneNumber = phoneController.phoneNumber;
+
         User user = User(
           email: emailController.text,
           password: passwordController.text,
-          phone: phoneController.text,
+          phone: fullPhoneNumber, // Use the complete phone number
         );
         try {
           await SignupServices.addUser(user);
@@ -55,8 +61,6 @@ class _SignupState extends State<Signup> {
           print(e);
         }
       }
-
-      // Perform signup logic here
     } else {
       print("Form is invalid!");
     }
@@ -68,7 +72,7 @@ class _SignupState extends State<Signup> {
     emailController.dispose();
     passwordController.dispose();
     rePasswordController.dispose();
-    phoneController.dispose();
+    phoneController.dispose(); // Dispose the custom controller
     super.dispose();
   }
 
@@ -94,7 +98,7 @@ class _SignupState extends State<Signup> {
                 isObscure: false,
                 isPassword: false,
                 validate: ValidateEmailField,
-                controller: emailController, // Pass the controller
+                controller: emailController,
               ),
               SizedBox(
                 height: 10,
@@ -105,7 +109,7 @@ class _SignupState extends State<Signup> {
                 isObscure: true,
                 isPassword: true,
                 validate: ValidatePasswordField,
-                controller: passwordController, // Pass the controller
+                controller: passwordController,
               ),
               SizedBox(
                 height: 10,
@@ -116,13 +120,13 @@ class _SignupState extends State<Signup> {
                 isObscure: true,
                 isPassword: true,
                 validate: ValidatePasswordField,
-                controller: rePasswordController, // Pass the controller
+                controller: rePasswordController,
               ),
               SizedBox(
                 height: 10,
               ),
               CustomPhoneField(
-                controller: phoneController, // Pass the controller
+                controller: phoneController, // Pass the custom controller
               ),
               SizedBox(
                 height: 10,
