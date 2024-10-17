@@ -1,9 +1,11 @@
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whisper/components/message.dart';
+import 'package:whisper/modules/button-sheet.dart';
+import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/own-message-card.dart';
 import 'package:whisper/modules/recieved-message-card.dart';
@@ -28,7 +30,7 @@ class _ChatPageState extends State<ChatPage> {
   ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
   late IO.Socket socket;
-  List<OwnMessageCard> messages = [];
+  List<Message> messages = [];
   List<RecievedMessageCard> recievedmessages = [];
   @override
   void initState() {
@@ -43,18 +45,6 @@ class _ChatPageState extends State<ChatPage> {
       }
     });
 // Listen for incoming messages from the server
-    socket.on('receiveMessage', (data) {
-      print("Message received: $data");
-
-      // Update the UI with the received message
-      setState(() {
-        recievedmessages.add(RecievedMessageCard(
-          message:
-              data['message'], // Assuming the server sends { message, time }
-          time: data['time'],
-        ));
-      });
-    });
 
     // Listen for loading existing messages
     socket.on('loadMessages', (data) {
@@ -133,15 +123,24 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     // Listen for incoming messages from the server
-    socket.on('receiveMessage', (data) {
+    socket.on('receive', (data) {
       print("Message received: $data");
+      //print("hey");
+      DateTime now = DateTime.now();
+      String formattedTime =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-      // You need to update your UI with the received message
-      // For example, you can add the message to a List and rebuild the chat
+      // Update the UI with the received message
+      setState(() {
+        messages.add(
+            Message(data.toString(), formattedTime, false, MessageStatus.sent));
+      });
     });
+    // You need to update your UI with the received message
+    // For example, you can add the message to a List and rebuild the chat
 
     // Emit a test message when connected
-    socket.emit('/sendmessage', "Client connected");
+    //socket.emit('/sendmessage', "Client connected");
   }
 
   void _sendMessage(String message) {
@@ -160,11 +159,7 @@ class _ChatPageState extends State<ChatPage> {
       // Here you can update your UI with the new message
       // For example, adding it to your chat messages list
       setState(() {
-        messages.add(OwnMessageCard(
-          message: message,
-          time: formattedTime,
-          status: MessageStatus.sent, // Mark as sent
-        ));
+        messages.add(Message(message, formattedTime, true, MessageStatus.sent));
       });
     }
   }
@@ -202,7 +197,7 @@ class _ChatPageState extends State<ChatPage> {
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("zeyad alaa el din said",
+                Text("bent",
                     style: TextStyle(fontSize: 19, color: Colors.white)),
                 Text("last seen today at 12:05",
                     style: TextStyle(fontSize: 13, color: Colors.white))
@@ -270,7 +265,14 @@ class _ChatPageState extends State<ChatPage> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final messageData = messages[index];
-                    return messageData;
+                    return messageData.sent
+                        ? OwnMessageCard(
+                            message: messageData.data,
+                            time: messageData.time,
+                            status: messageData.status,
+                          )
+                        : RecievedMessageCard(
+                            message: messageData.data, time: messageData.time);
                   },
                 ),
               ),
@@ -321,7 +323,15 @@ class _ChatPageState extends State<ChatPage> {
                                           backgroundColor: Colors.transparent,
                                           context: context,
                                           builder: (builder) =>
-                                              buttonSheetforemojies());
+                                              EmojiButtonSheet(
+                                                  onEmojiTap: () {
+                                                    // Hide the button sheet
+                                                    Navigator.pop(context);
+                                                    // Show the emoji picker
+                                                    _toggleEmojiPicker();
+                                                  },
+                                                  onStickerTap: () {},
+                                                  onGifTap: () {}));
                                     }
                                   },
                                   icon: FaIcon(
@@ -337,7 +347,13 @@ class _ChatPageState extends State<ChatPage> {
                                     showModalBottomSheet(
                                         backgroundColor: Colors.transparent,
                                         context: context,
-                                        builder: (builder) => buttonSheet());
+                                        builder: (builder) => FileButtonSheet(
+                                            onDocumentTap: _pickFile,
+                                            onCameraTap: _pickImageFromCamera,
+                                            onGalleryTap: _pickImageFromGallery,
+                                            onAudioTap: _pickAudio,
+                                            onLocationTap: () {},
+                                            onContactsTap: () {}));
                                   },
                                   icon: const FaIcon(
                                     FontAwesomeIcons.paperclip,
@@ -425,117 +441,6 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget buttonSheetforemojies() {
-    return Container(
-      height: MediaQuery.of(context).size.height / 5,
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        margin: EdgeInsets.all(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  iconCreation(
-                    FontAwesomeIcons.smile,
-                    "emoji",
-                    Colors.indigo,
-                    () {
-                      // Hide the button sheet
-                      Navigator.pop(context);
-                      // Show the emoji picker
-                      _toggleEmojiPicker();
-                    },
-                  ),
-                  Spacer(flex: 1),
-                  iconCreation(
-                    Icons.sticky_note_2,
-                    "sticker",
-                    Colors.pink,
-                    () {
-                      // Add sticker functionality here
-                    },
-                  ),
-                  Spacer(flex: 1),
-                  iconCreation(
-                    Icons.gif,
-                    "gif",
-                    Colors.purple,
-                    () {
-                      // Add gif functionality here
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buttonSheet() {
-    return Container(
-      height: MediaQuery.of(context).size.height / 3,
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        margin: EdgeInsets.all(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  iconCreation(Icons.insert_drive_file, "Document",
-                      Colors.indigo, _pickFile),
-                  Spacer(flex: 1),
-                  iconCreation(Icons.camera_alt, "Camera", Colors.pink,
-                      _pickImageFromCamera),
-                  Spacer(flex: 1),
-                  iconCreation(Icons.insert_photo, "Gallery", Colors.purple,
-                      _pickImageFromGallery),
-                ],
-              ),
-              Spacer(flex: 1),
-              Row(
-                children: [
-                  iconCreation(
-                      Icons.headset, "Audio", Colors.orange, _pickAudio),
-                  Spacer(flex: 1),
-                  iconCreation(
-                      Icons.location_pin, "Location", Colors.teal, () {}),
-                  Spacer(flex: 1),
-                  iconCreation(Icons.person, "Contacts", Colors.blue, () {}),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget iconCreation(IconData icon, String text, Color color, Function onTap) {
-    return InkWell(
-      onTap: () => onTap(), // Call the function passed as a parameter
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            child: Icon(
-              icon,
-              size: 29,
-              color: Colors.white,
-            ),
-            backgroundColor: color,
-          ),
-          Text(text),
-        ],
-      ),
-    );
-  }
-
   void _pickFile() async {
     // Use FilePicker to pick a file
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -606,33 +511,5 @@ class _ChatPageState extends State<ChatPage> {
       // User canceled the picker
       print("Audio selection canceled");
     }
-  }
-
-  Widget _iconButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            child: Icon(
-              icon,
-              size: 29,
-              color: Colors.white,
-            ),
-            backgroundColor: Color(0xff8D6AEE),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(color: Colors.white),
-          ),
-        ],
-      ),
-    );
   }
 }
