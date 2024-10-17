@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/own-message-card.dart';
 import 'package:whisper/modules/recieved-message-card.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -311,7 +312,18 @@ class _ChatPageState extends State<ChatPage> {
                                     const TextStyle(color: Colors.white54),
                                 contentPadding: const EdgeInsets.all(5),
                                 prefixIcon: IconButton(
-                                  onPressed: _toggleEmojiPicker,
+                                  onPressed: () {
+                                    if (show) {
+                                      focusNode.requestFocus();
+                                      show != show;
+                                    } else {
+                                      showModalBottomSheet(
+                                          backgroundColor: Colors.transparent,
+                                          context: context,
+                                          builder: (builder) =>
+                                              buttonSheetforemojies());
+                                    }
+                                  },
                                   icon: FaIcon(
                                     show
                                         ? FontAwesomeIcons.keyboard
@@ -359,22 +371,19 @@ class _ChatPageState extends State<ChatPage> {
                           child: CircleAvatar(
                             radius: 24,
                             backgroundColor: Color(0xff0A122F),
-                            child: GestureDetector(
-                              onTap: () {
+                            child: IconButton(
+                              onPressed: () {
                                 if (_isTyping) {
-                                  // Send the message when typing
+                                  print("hey");
                                   _sendMessage(_controller.text);
                                   _controller
                                       .clear(); // Clear the text field after sending
                                   setState(() {
                                     _isTyping = false; // Reset typing status
                                   });
-                                } else {
-                                  // Handle microphone functionality here
-                                  print("Start voice message recording");
-                                }
+                                } else {}
                               },
-                              child: FaIcon(
+                              icon: FaIcon(
                                 _isTyping
                                     ? FontAwesomeIcons.paperPlane
                                     : FontAwesomeIcons.microphone,
@@ -386,7 +395,16 @@ class _ChatPageState extends State<ChatPage> {
                       ],
                     ),
                     // Display emoji picker if `show` is true
-                    show ? emojiselect() : Container()
+                    show
+                        ? EmojiSelect(
+                            controller: _controller,
+                            scrollController: _scrollController,
+                            onTypingStatusChanged: (isTyping) {
+                              setState(() {
+                                _isTyping = isTyping;
+                              });
+                            })
+                        : Container()
                   ],
                 ),
               ),
@@ -407,37 +425,54 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget emojiselect() {
-    return EmojiPicker(onBackspacePressed: () {
-      setState(() {
-        String currentText = _controller.text;
-
-        if (currentText.isNotEmpty) {
-          // Remove the last character (handle Unicode characters with runes)
-          var runes = currentText.runes.toList();
-          runes.removeLast();
-
-          // Update the controller's text
-          _controller.text = String.fromCharCodes(runes);
-
-          // Update the cursor position
-          _controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: _controller.text.length));
-        }
-
-        // Check if text is empty after deleting and update `_isTyping`
-        _isTyping = _controller.text.isNotEmpty;
-      });
-    }, onEmojiSelected: (category, emoji) {
-      setState(() {
-        _controller.text += emoji.emoji; // Add emoji to text field
-        _scrollToBottom();
-        _isTyping = true; // Set typing status to true when an emoji is added
-        // Set the cursor to the end after adding the emoji
-        _controller.selection = TextSelection.fromPosition(
-            TextPosition(offset: _controller.text.length));
-      });
-    });
+  Widget buttonSheetforemojies() {
+    return Container(
+      height: MediaQuery.of(context).size.height / 5,
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        margin: EdgeInsets.all(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  iconCreation(
+                    FontAwesomeIcons.smile,
+                    "emoji",
+                    Colors.indigo,
+                    () {
+                      // Hide the button sheet
+                      Navigator.pop(context);
+                      // Show the emoji picker
+                      _toggleEmojiPicker();
+                    },
+                  ),
+                  Spacer(flex: 1),
+                  iconCreation(
+                    Icons.sticky_note_2,
+                    "sticker",
+                    Colors.pink,
+                    () {
+                      // Add sticker functionality here
+                    },
+                  ),
+                  Spacer(flex: 1),
+                  iconCreation(
+                    Icons.gif,
+                    "gif",
+                    Colors.purple,
+                    () {
+                      // Add gif functionality here
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget buttonSheet() {
@@ -571,5 +606,33 @@ class _ChatPageState extends State<ChatPage> {
       // User canceled the picker
       print("Audio selection canceled");
     }
+  }
+
+  Widget _iconButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            child: Icon(
+              icon,
+              size: 29,
+              color: Colors.white,
+            ),
+            backgroundColor: Color(0xff8D6AEE),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
   }
 }
