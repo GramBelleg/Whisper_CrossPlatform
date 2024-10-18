@@ -256,6 +256,21 @@ class _MainChatsState extends State<MainChats> {
             icon: Icons.volume_off,
             label: 'Mute',
           ),
+          SlidableAction(
+            onPressed: (_) {
+              setState(() {
+                if (chat['isPinned']) {
+                  chatList.unpinChat(chat);
+                } else {
+                  chatList.pinChat(chat);
+                }
+              });
+            },
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            icon: chat['isPinned'] ? Icons.push_pin : Icons.push_pin_outlined,
+            label: chat['isPinned'] ? 'Unpin' : 'Pin',
+          ),
         ],
       ),
       child: ChatCard(
@@ -267,6 +282,7 @@ class _MainChatsState extends State<MainChats> {
         isOnline: chat['isOnline'],
         isSent: chat['isSent'],
         messageType: chat['messageType'],
+        isPinned: chat['isPinned'],
       ),
     );
   }

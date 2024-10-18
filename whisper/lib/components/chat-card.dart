@@ -20,6 +20,7 @@ class ChatCard extends StatelessWidget {
   final bool isRead;
   final bool isSent;
   final bool isOnline;
+  final bool isPinned; // New property for pinned status
   final MessageType messageType;
   final int unreadCount;
 
@@ -32,6 +33,7 @@ class ChatCard extends StatelessWidget {
     this.isRead = false,
     this.isSent = true,
     this.isOnline = false,
+    this.isPinned = false, // Default to not pinned
     this.messageType = MessageType.text,
     this.unreadCount = 0,
   }) : super(key: key);
@@ -58,9 +60,17 @@ class ChatCard extends StatelessWidget {
           leading: _buildAvatar(),
           title: _buildUserName(),
           subtitle: _buildSubtitle(),
-          trailing: _buildTime(),
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildTime(),
+              const SizedBox(height: 8), // Add more space between time and pin
+              if (isPinned)
+                _buildPinIcon(), // Conditionally show pin icon below
+            ],
+          ),
           onTap: () {
-            // Handle tap event (e.g., navigate to chat details)
             print('Tapped on $userName');
           },
         ),
@@ -146,6 +156,14 @@ class ChatCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPinIcon() {
+    return Icon(
+      Icons.push_pin,
+      size: 16, // Adjust icon size
+      color: Colors.yellow, // Color of the pin icon
     );
   }
 

@@ -12,6 +12,7 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.text,
       'isArchived': false,
+      'isPinned': false, // New property for pinning
     },
     {
       'userName': 'Bob',
@@ -23,6 +24,7 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.image,
       'isArchived': false,
+      'isPinned': false, // New property for pinning
     },
     {
       'userName': 'Charlie',
@@ -34,11 +36,20 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.text,
       'isArchived': false,
+      'isPinned': false, // New property for pinning
     },
   ];
 
+  // Get the list of active chats with pinned chats at the top
   List<Map<String, dynamic>> get activeChats {
-    return _chatData.where((chat) => !chat['isArchived']).toList();
+    List<Map<String, dynamic>> activeChats =
+        _chatData.where((chat) => !chat['isArchived']).toList();
+    activeChats.sort((a, b) {
+      if (a['isPinned'] && !b['isPinned']) return -1;
+      if (!a['isPinned'] && b['isPinned']) return 1;
+      return 0; // Keep order if both are pinned or unpinned
+    });
+    return activeChats;
   }
 
   List<Map<String, dynamic>> get archivedChats {
@@ -47,7 +58,6 @@ class ChatList {
 
   void archiveChat(Map<String, dynamic> chat) {
     chat['isArchived'] = true; // Mark the chat as archived
-    // Optionally, you could log the action or perform additional logic here.
   }
 
   void addChat(Map<String, dynamic> chat) {
@@ -57,5 +67,13 @@ class ChatList {
 
   void deleteChat(Map<String, dynamic> chat) {
     _chatData.remove(chat); // Remove from active chats
+  }
+
+  void pinChat(Map<String, dynamic> chat) {
+    chat['isPinned'] = true; // Pin the chat
+  }
+
+  void unpinChat(Map<String, dynamic> chat) {
+    chat['isPinned'] = false; // Unpin the chat
   }
 }
