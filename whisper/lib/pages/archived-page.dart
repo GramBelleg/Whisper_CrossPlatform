@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../components/chat-card.dart';
-import '../components/chats.dart';
+import '../components/chats.dart'; // Ensure you import your ChatList class here
 
 class ArchivedChatsPage extends StatefulWidget {
   final List<Map<String, dynamic>> archivedChats;
-  final ChatList chatList; // Add this line
+  final ChatList chatList; // ChatList is passed to manage pinning
 
-  const ArchivedChatsPage(
-      {Key? key,
-      required this.archivedChats,
-      required this.chatList}) // Update constructor
-      : super(key: key);
+  const ArchivedChatsPage({
+    Key? key,
+    required this.archivedChats,
+    required this.chatList, // Update constructor
+  }) : super(key: key);
 
   @override
   _ArchivedChatsPageState createState() => _ArchivedChatsPageState();
@@ -52,6 +52,15 @@ class _ArchivedChatsPageState extends State<ArchivedChatsPage> {
       key: ValueKey(chat['userName']),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
+        dismissible: DismissiblePane(
+          onDismissed: () {
+            setState(() {
+              // Unarchive the chat
+              chat['isArchived'] = false;
+              _archivedChats.removeAt(index); // Remove from archived chats
+            });
+          },
+        ),
         children: [
           SlidableAction(
             onPressed: (_) {
@@ -70,12 +79,34 @@ class _ArchivedChatsPageState extends State<ArchivedChatsPage> {
                 // Unarchive the chat
                 chat['isArchived'] = false;
                 _archivedChats.removeAt(index); // Remove from archived chats
+                widget.chatList.unpinChat(chat);
               });
             },
             backgroundColor: Colors.green,
             foregroundColor: Colors.white,
             icon: Icons.unarchive,
             label: 'Unarchive',
+          ),
+        ],
+      ),
+      startActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (_) {
+              setState(() {
+                // Toggle pin status and update the chat
+                if (chat['isPinned']) {
+                  widget.chatList.unpinChat(chat);
+                } else {
+                  widget.chatList.pinChat(chat);
+                }
+              });
+            },
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            icon: chat['isPinned'] ? Icons.push_pin : Icons.push_pin_outlined,
+            label: chat['isPinned'] ? 'Unpin' : 'Pin',
           ),
         ],
       ),
@@ -88,6 +119,7 @@ class _ArchivedChatsPageState extends State<ArchivedChatsPage> {
         isOnline: chat['isOnline'],
         isSent: chat['isSent'],
         messageType: chat['messageType'],
+        isPinned: chat['isPinned'], // Pass the pinned status to ChatCard
       ),
     );
   }

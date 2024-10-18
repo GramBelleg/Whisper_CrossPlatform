@@ -40,20 +40,26 @@ class ChatList {
     },
   ];
 
-  // Get the list of active chats with pinned chats at the top
-  List<Map<String, dynamic>> get activeChats {
-    List<Map<String, dynamic>> activeChats =
-        _chatData.where((chat) => !chat['isArchived']).toList();
-    activeChats.sort((a, b) {
+  // Helper method to sort chats by pin status
+  List<Map<String, dynamic>> _sortChatsByPin(List<Map<String, dynamic>> chats) {
+    chats.sort((a, b) {
       if (a['isPinned'] && !b['isPinned']) return -1;
       if (!a['isPinned'] && b['isPinned']) return 1;
       return 0; // Keep order if both are pinned or unpinned
     });
-    return activeChats;
+    return chats;
+  }
+
+  List<Map<String, dynamic>> get activeChats {
+    List<Map<String, dynamic>> activeChats =
+        _chatData.where((chat) => !chat['isArchived']).toList();
+    return _sortChatsByPin(activeChats); // Reuse the sorting function
   }
 
   List<Map<String, dynamic>> get archivedChats {
-    return _chatData.where((chat) => chat['isArchived']).toList();
+    List<Map<String, dynamic>> archivedChats =
+        _chatData.where((chat) => chat['isArchived']).toList();
+    return _sortChatsByPin(archivedChats); // Reuse the sorting function
   }
 
   void archiveChat(Map<String, dynamic> chat) {
