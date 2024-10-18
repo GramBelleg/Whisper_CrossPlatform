@@ -65,8 +65,8 @@ flutter:
   assets:
     - assets/images/el-gayar.jpg
     - assets/images/chat-page-back-ground-image.svg
-    - whisper\assets\images\amr.png
-    - whisper\assets\images\IconStory.png
+    - assets/images/amr.png
+    - assets/images/IconStory.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

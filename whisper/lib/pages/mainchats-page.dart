@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:draggable_home/draggable_home.dart';
+
+import '../components/chat-card.dart';
 import '../components/tap-bar.dart';
 import '../components/stories-widget.dart';
 
@@ -15,6 +17,7 @@ class _MainChatsState extends State<MainChats> {
   int _selectedIndex = 0; // Initialize the selected index
   final ScrollController _scrollController =
       ScrollController(); // Create a ScrollController
+  final ChatList chatList = ChatList(); // Create an instance of ChatList
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +158,198 @@ class _MainChatsState extends State<MainChats> {
   }
 
   Widget _body() {
-    return Container();
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          const Center(
+            child: Text(
+              "Chats",
+              style: TextStyle(
+                color: Color(0xff8D6AEE),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ListView.builder(
+            physics:
+                const NeverScrollableScrollPhysics(), // Prevent scrolling of inner ListView
+            shrinkWrap: true, // Take up only the required height
+            itemCount: chatList
+                .chatData.length, // Use the length of the chat data list
+            itemBuilder: (context, index) {
+              final chat = chatList.chatData[index];
+              return ChatCard(
+                userName: chat['userName'],
+                lastMessage: chat['lastMessage'],
+                time: chat['time'],
+                avatarUrl: chat['avatarUrl'],
+                isRead: chat['isRead'],
+                isOnline: chat['isOnline'],
+                isSent: chat['isSent'],
+                messageType: chat['messageType'], // Pass the message type
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
+}
+
+class ChatList {
+  final List<Map<String, dynamic>> chatData = [
+    {
+      'userName': 'Alice',
+      'lastMessage': 'Hey! How are you?',
+      'time': '10:00 AM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Bob',
+      'lastMessage': 'Sent you a picture!',
+      'time': '11:00 AM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.image,
+    },
+    {
+      'userName': 'Charlie',
+      'lastMessage': 'Let’s catch up this weekend.',
+      'time': '12:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Diana',
+      'lastMessage': '🎥 Video call?',
+      'time': '1:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': true,
+      'isSent': false, // Add isSent property
+      'messageType': MessageType.video,
+    },
+    {
+      'userName': 'Ethan',
+      'lastMessage': 'Here is the document you requested.',
+      'time': '2:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Fiona',
+      'lastMessage': 'Let’s go for a run tomorrow.',
+      'time': '3:30 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': false, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'George',
+      'lastMessage': 'Are you joining the meeting?',
+      'time': '4:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Hannah',
+      'lastMessage': 'Just finished my assignment!',
+      'time': '5:15 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Ian',
+      'lastMessage': '🎉 Happy Birthday!',
+      'time': '6:30 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': false, // Add isSent property
+      'messageType': MessageType.gif,
+    },
+    {
+      'userName': 'Julia',
+      'lastMessage': 'Do you have time to chat later?',
+      'time': '7:45 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Kevin',
+      'lastMessage': 'Check out this funny video!',
+      'time': '8:30 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': false, // Add isSent property
+      'messageType': MessageType.video,
+    },
+    {
+      'userName': 'Liam',
+      'lastMessage': 'Got your message, will reply soon.',
+      'time': '9:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.text,
+    },
+    {
+      'userName': 'Mia',
+      'lastMessage': 'Audio message sent.',
+      'time': '10:00 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.soundRecord,
+    },
+    {
+      'userName': 'Nora',
+      'lastMessage': 'This message has been deleted.',
+      'time': '10:15 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': true,
+      'isOnline': false,
+      'isSent': true, // Add isSent property
+      'messageType': MessageType.deletedMessage,
+    },
+    {
+      'userName': 'Oliver',
+      'lastMessage': 'Look at this cool sticker!',
+      'time': '10:30 PM',
+      'avatarUrl': 'assets/images/el-gayar.jpg',
+      'isRead': false,
+      'isOnline': true,
+      'isSent': false, // Add isSent property
+      'messageType': MessageType.sticker,
+    },
+  ];
 }
