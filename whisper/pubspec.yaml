@@ -33,6 +33,7 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   draggable_home: ^1.0.5
   story: ^1.1.0
+  flutter_slidable: ^3.1.1
   flutter:
     sdk: flutter
 

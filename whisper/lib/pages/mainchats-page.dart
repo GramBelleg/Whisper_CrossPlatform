@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:draggable_home/draggable_home.dart';
-
+import 'package:flutter_slidable/flutter_slidable.dart';
 import '../components/chat-card.dart';
 import '../components/tap-bar.dart';
 import '../components/stories-widget.dart';
@@ -101,11 +101,11 @@ class _MainChatsState extends State<MainChats> {
       child: Column(
         children: [
           // Header title
-          Padding(
-            padding: const EdgeInsets.all(50.0), // Add padding around the title
+          const Padding(
+            padding: EdgeInsets.all(50.0), // Add padding around the title
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Text(
                   "Stories",
                   style: TextStyle(
@@ -181,19 +181,106 @@ class _MainChatsState extends State<MainChats> {
                 .chatData.length, // Use the length of the chat data list
             itemBuilder: (context, index) {
               final chat = chatList.chatData[index];
-              return ChatCard(
-                userName: chat['userName'],
-                lastMessage: chat['lastMessage'],
-                time: chat['time'],
-                avatarUrl: chat['avatarUrl'],
-                isRead: chat['isRead'],
-                isOnline: chat['isOnline'],
-                isSent: chat['isSent'],
-                messageType: chat['messageType'], // Pass the message type
-              );
+
+              // Pass a parameter indicating whether the chat is archived
+              bool isArchived = chat['isArchived'] ?? false;
+
+              // Call the new function to generate each Slidable chat card with the archived status
+              return _buildSlidableChatCard(chat, index, isArchived);
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSlidableChatCard(
+      Map<String, dynamic> chat, int index, bool isArchived) {
+    return Slidable(
+      key: ValueKey(chat['userName']), // Use a unique key for each Slidable
+
+      // Left Action Pane for Delete and Archive/Unarchive
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        dismissible: DismissiblePane(onDismissed: () {
+          if (isArchived) {
+            print('Unarchived ${chat['userName']}');
+          } else {
+            print('Archived ${chat['userName']}');
+          }
+          isArchived = !isArchived;
+        }),
+        children: [
+          SlidableAction(
+            onPressed: (_) {
+              // Handle delete action
+              setState(() {
+                chatList.chatData.removeAt(index); // Remove chat
+              });
+            },
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+          SlidableAction(
+            onPressed: (_) {
+              if (isArchived) {
+                // Handle unarchive action
+                print('Unarchived ${chat['userName']}');
+                // Implement the unarchive functionality as needed
+              } else {
+                // Handle archive action
+                print('Archived ${chat['userName']}');
+                // Implement the archive functionality as needed
+              }
+            },
+            backgroundColor: isArchived ? Colors.blue : Colors.green,
+            foregroundColor: Colors.white,
+            icon: isArchived ? Icons.unarchive : Icons.archive,
+            label: isArchived ? 'Unarchive' : 'Archive',
+          ),
+        ],
+      ),
+
+      // Right Action Pane for Pin and Mute
+      startActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (_) {
+              // Handle pin action
+              print('Pinned ${chat['userName']}');
+              // Implement the pin functionality as needed
+            },
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            icon: Icons.push_pin,
+            label: 'Pin',
+          ),
+          SlidableAction(
+            onPressed: (_) {
+              // Handle mute action
+              print('Muted ${chat['userName']}');
+              // Implement the mute functionality as needed
+            },
+            backgroundColor: Colors.grey,
+            foregroundColor: Colors.white,
+            icon: Icons.volume_off,
+            label: 'Mute',
+          ),
+        ],
+      ),
+
+      child: ChatCard(
+        userName: chat['userName'],
+        lastMessage: chat['lastMessage'],
+        time: chat['time'],
+        avatarUrl: chat['avatarUrl'],
+        isRead: chat['isRead'],
+        isOnline: chat['isOnline'],
+        isSent: chat['isSent'],
+        messageType: chat['messageType'], // Pass the message type
       ),
     );
   }
@@ -208,8 +295,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Bob',
@@ -218,8 +306,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.image,
+      'isArchived': false,
     },
     {
       'userName': 'Charlie',
@@ -228,8 +317,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Diana',
@@ -238,8 +328,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': true,
-      'isSent': false, // Add isSent property
+      'isSent': false,
       'messageType': MessageType.video,
+      'isArchived': false,
     },
     {
       'userName': 'Ethan',
@@ -248,8 +339,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Fiona',
@@ -258,8 +350,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': false, // Add isSent property
+      'isSent': false,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'George',
@@ -268,8 +361,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Hannah',
@@ -278,8 +372,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Ian',
@@ -288,8 +383,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': false, // Add isSent property
+      'isSent': false,
       'messageType': MessageType.gif,
+      'isArchived': false,
     },
     {
       'userName': 'Julia',
@@ -298,8 +394,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Kevin',
@@ -308,8 +405,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': false, // Add isSent property
+      'isSent': false,
       'messageType': MessageType.video,
+      'isArchived': false,
     },
     {
       'userName': 'Liam',
@@ -318,8 +416,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.text,
+      'isArchived': false,
     },
     {
       'userName': 'Mia',
@@ -328,8 +427,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.soundRecord,
+      'isArchived': false,
     },
     {
       'userName': 'Nora',
@@ -338,8 +438,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': true,
       'isOnline': false,
-      'isSent': true, // Add isSent property
+      'isSent': true,
       'messageType': MessageType.deletedMessage,
+      'isArchived': false,
     },
     {
       'userName': 'Oliver',
@@ -348,8 +449,9 @@ class ChatList {
       'avatarUrl': 'assets/images/el-gayar.jpg',
       'isRead': false,
       'isOnline': true,
-      'isSent': false, // Add isSent property
+      'isSent': false,
       'messageType': MessageType.sticker,
+      'isArchived': false,
     },
   ];
 }
