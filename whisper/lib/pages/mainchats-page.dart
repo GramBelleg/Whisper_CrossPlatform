@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../components/archived-button.dart';
 import '../components/chat-card.dart';
+import '../components/chats.dart';
 import '../components/tap-bar.dart';
 import '../components/stories-widget.dart';
+import 'archived-page.dart';
 
 class MainChats extends StatefulWidget {
-  static const String id = 'main_chats_page'; // Define the static id here
+  static const String id = 'main_chats_page';
   const MainChats({super.key});
 
   @override
@@ -14,10 +17,9 @@ class MainChats extends StatefulWidget {
 }
 
 class _MainChatsState extends State<MainChats> {
-  int _selectedIndex = 0; // Initialize the selected index
-  final ScrollController _scrollController =
-      ScrollController(); // Create a ScrollController
-  final ChatList chatList = ChatList(); // Create an instance of ChatList
+  int _selectedIndex = 0;
+  final ScrollController _scrollController = ScrollController();
+  final ChatList chatList = ChatList();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class _MainChatsState extends State<MainChats> {
         _selectedIndex,
         (index) {
           setState(() {
-            _selectedIndex = index; // Update the selected index
+            _selectedIndex = index;
           });
         },
       ),
@@ -35,18 +37,17 @@ class _MainChatsState extends State<MainChats> {
           children: [
             GestureDetector(
               onTap: () {
-                // Event when "Edit" is tapped
-                print('Edit tapped'); // Replace with desired action
+                print('Edit tapped');
               },
               child: const Text(
                 "Edit",
                 style: TextStyle(
-                  color: Color(0xff8D6AEE), // Edit text color
-                  fontSize: 16, // Edit text size
+                  color: Color(0xff8D6AEE),
+                  fontSize: 16,
                 ),
               ),
             ),
-            const SizedBox(width: 20), // Space between "Edit" and "Chats"
+            const SizedBox(width: 20),
             const Expanded(
               child: Center(
                 child: Text(
@@ -54,7 +55,7 @@ class _MainChatsState extends State<MainChats> {
                   style: TextStyle(
                     color: Color(0xff8D6AEE),
                     fontWeight: FontWeight.bold,
-                    fontSize: 24, // Increased font size
+                    fontSize: 24,
                   ),
                 ),
               ),
@@ -64,33 +65,31 @@ class _MainChatsState extends State<MainChats> {
         actions: [
           IconButton(
             icon: SizedBox(
-              width: 20.0, // Set custom width
-              height: 20.0, // Set custom height
+              width: 20.0,
+              height: 20.0,
               child: Image.asset(
                 "assets/images/IconStory.png",
                 fit: BoxFit.cover,
               ),
             ),
             onPressed: () {
-              // Scroll to the top of the body
               _scrollController.animateTo(
-                0, // Scroll to the top
-                duration:
-                    const Duration(milliseconds: 300), // Animation duration
-                curve: Curves.easeInOut, // Animation curve
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
               );
             },
           ),
         ],
-        headerWidget: headerWidget(context), // Call updated headerWidget
+        headerWidget: headerWidget(context),
         body: [
-          _body(), // Call the _body method for the draggable content
+          _body(),
         ],
         fullyStretchable: true,
         expandedBody: const StoryPage(userIndex: 0, withCloseIcon: false),
         backgroundColor: const Color(0xFF0A122F),
         appBarColor: const Color(0xFF0A122F),
-        scrollController: _scrollController, // Set the ScrollController
+        scrollController: _scrollController,
       ),
     );
   }
@@ -100,9 +99,8 @@ class _MainChatsState extends State<MainChats> {
       color: const Color(0xff8D6AEE),
       child: Column(
         children: [
-          // Header title
           const Padding(
-            padding: EdgeInsets.all(50.0), // Add padding around the title
+            padding: EdgeInsets.all(50.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -117,18 +115,16 @@ class _MainChatsState extends State<MainChats> {
               ],
             ),
           ),
-          // Story circles using 'stories_for_flutter'
           Flexible(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: sampleUsers.length, // Number of users
+              itemCount: sampleUsers.length,
               itemBuilder: (context, index) {
-                final user = sampleUsers[index]; // Get the current user
+                final user = sampleUsers[index];
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Navigate to the user's stories when tapped
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -139,12 +135,11 @@ class _MainChatsState extends State<MainChats> {
                     child: Column(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              user.imageUrl), // Display the user's image
+                          backgroundImage: NetworkImage(user.imageUrl),
                           radius: 30,
                         ),
                         const SizedBox(height: 5),
-                        Text(user.userName), // Display the user's name
+                        Text(user.userName),
                       ],
                     ),
                   ),
@@ -173,20 +168,36 @@ class _MainChatsState extends State<MainChats> {
             ),
           ),
           const SizedBox(height: 10),
+          // New Archived Chats Button, shown only if there are archived chats
+          if (chatList
+              .archivedChats.isNotEmpty) // Check if there are archived chats
+            ArchivedChatsButton(
+              archivedChats: chatList.archivedChats,
+              onTap: () async {
+                // Mark this as async
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ArchivedChatsPage(
+                      archivedChats: chatList.archivedChats,
+                      chatList: chatList, // Pass the ChatList instance here
+                    ),
+                  ),
+                );
+                // Optional: Handle result if needed
+                setState(() {
+                  // Refresh the UI after returning
+                  // You can add any additional logic if you need to handle specific results.
+                });
+              },
+            ),
+          const SizedBox(height: 10),
           ListView.builder(
-            physics:
-                const NeverScrollableScrollPhysics(), // Prevent scrolling of inner ListView
-            shrinkWrap: true, // Take up only the required height
-            itemCount: chatList
-                .chatData.length, // Use the length of the chat data list
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: chatList.activeChats.length,
             itemBuilder: (context, index) {
-              final chat = chatList.chatData[index];
-
-              // Pass a parameter indicating whether the chat is archived
-              bool isArchived = chat['isArchived'] ?? false;
-
-              // Call the new function to generate each Slidable chat card with the archived status
-              return _buildSlidableChatCard(chat, index, isArchived);
+              return _buildSlidableChatCard(chatList.activeChats[index], index);
             },
           ),
         ],
@@ -194,28 +205,25 @@ class _MainChatsState extends State<MainChats> {
     );
   }
 
-  Widget _buildSlidableChatCard(
-      Map<String, dynamic> chat, int index, bool isArchived) {
+// In _buildSlidableChatCard method
+  Widget _buildSlidableChatCard(Map<String, dynamic> chat, int index) {
     return Slidable(
-      key: ValueKey(chat['userName']), // Use a unique key for each Slidable
-
-      // Left Action Pane for Delete and Archive/Unarchive
+      key: ValueKey(chat['userName']),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
-        dismissible: DismissiblePane(onDismissed: () {
-          if (isArchived) {
-            print('Unarchived ${chat['userName']}');
-          } else {
-            print('Archived ${chat['userName']}');
-          }
-          isArchived = !isArchived;
-        }),
+        dismissible: DismissiblePane(
+          onDismissed: () {
+            setState(() {
+              // Call setState here to rebuild the UI
+              chatList.archiveChat(chat);
+            });
+          },
+        ),
         children: [
           SlidableAction(
             onPressed: (_) {
-              // Handle delete action
               setState(() {
-                chatList.chatData.removeAt(index); // Remove chat
+                chatList.deleteChat(chat);
               });
             },
             backgroundColor: Colors.red,
@@ -225,44 +233,23 @@ class _MainChatsState extends State<MainChats> {
           ),
           SlidableAction(
             onPressed: (_) {
-              if (isArchived) {
-                // Handle unarchive action
-                print('Unarchived ${chat['userName']}');
-                // Implement the unarchive functionality as needed
-              } else {
-                // Handle archive action
-                print('Archived ${chat['userName']}');
-                // Implement the archive functionality as needed
-              }
+              setState(() {
+                chatList.archiveChat(chat);
+              });
             },
-            backgroundColor: isArchived ? Colors.blue : Colors.green,
+            backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            icon: isArchived ? Icons.unarchive : Icons.archive,
-            label: isArchived ? 'Unarchive' : 'Archive',
+            icon: Icons.archive,
+            label: 'Archive',
           ),
         ],
       ),
-
-      // Right Action Pane for Pin and Mute
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
             onPressed: (_) {
-              // Handle pin action
-              print('Pinned ${chat['userName']}');
-              // Implement the pin functionality as needed
-            },
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-            icon: Icons.push_pin,
-            label: 'Pin',
-          ),
-          SlidableAction(
-            onPressed: (_) {
-              // Handle mute action
               print('Muted ${chat['userName']}');
-              // Implement the mute functionality as needed
             },
             backgroundColor: Colors.grey,
             foregroundColor: Colors.white,
@@ -271,7 +258,6 @@ class _MainChatsState extends State<MainChats> {
           ),
         ],
       ),
-
       child: ChatCard(
         userName: chat['userName'],
         lastMessage: chat['lastMessage'],
@@ -280,178 +266,8 @@ class _MainChatsState extends State<MainChats> {
         isRead: chat['isRead'],
         isOnline: chat['isOnline'],
         isSent: chat['isSent'],
-        messageType: chat['messageType'], // Pass the message type
+        messageType: chat['messageType'],
       ),
     );
   }
-}
-
-class ChatList {
-  final List<Map<String, dynamic>> chatData = [
-    {
-      'userName': 'Alice',
-      'lastMessage': 'Hey! How are you?',
-      'time': '10:00 AM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Bob',
-      'lastMessage': 'Sent you a picture!',
-      'time': '11:00 AM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': true,
-      'messageType': MessageType.image,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Charlie',
-      'lastMessage': 'Let’s catch up this weekend.',
-      'time': '12:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Diana',
-      'lastMessage': '🎥 Video call?',
-      'time': '1:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': true,
-      'isSent': false,
-      'messageType': MessageType.video,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Ethan',
-      'lastMessage': 'Here is the document you requested.',
-      'time': '2:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Fiona',
-      'lastMessage': 'Let’s go for a run tomorrow.',
-      'time': '3:30 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': false,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'George',
-      'lastMessage': 'Are you joining the meeting?',
-      'time': '4:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Hannah',
-      'lastMessage': 'Just finished my assignment!',
-      'time': '5:15 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Ian',
-      'lastMessage': '🎉 Happy Birthday!',
-      'time': '6:30 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': false,
-      'messageType': MessageType.gif,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Julia',
-      'lastMessage': 'Do you have time to chat later?',
-      'time': '7:45 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Kevin',
-      'lastMessage': 'Check out this funny video!',
-      'time': '8:30 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': false,
-      'messageType': MessageType.video,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Liam',
-      'lastMessage': 'Got your message, will reply soon.',
-      'time': '9:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.text,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Mia',
-      'lastMessage': 'Audio message sent.',
-      'time': '10:00 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': true,
-      'messageType': MessageType.soundRecord,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Nora',
-      'lastMessage': 'This message has been deleted.',
-      'time': '10:15 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': true,
-      'isOnline': false,
-      'isSent': true,
-      'messageType': MessageType.deletedMessage,
-      'isArchived': false,
-    },
-    {
-      'userName': 'Oliver',
-      'lastMessage': 'Look at this cool sticker!',
-      'time': '10:30 PM',
-      'avatarUrl': 'assets/images/el-gayar.jpg',
-      'isRead': false,
-      'isOnline': true,
-      'isSent': false,
-      'messageType': MessageType.sticker,
-      'isArchived': false,
-    },
-  ];
 }
