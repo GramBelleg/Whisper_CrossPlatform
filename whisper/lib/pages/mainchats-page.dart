@@ -7,6 +7,7 @@ import '../components/chats.dart';
 import '../components/tap-bar.dart';
 import '../components/stories-widget.dart';
 import 'archived-page.dart';
+import 'search-page.dart';
 
 class MainChats extends StatefulWidget {
   static const String id = 'main_chats_page';
@@ -86,7 +87,7 @@ class _MainChatsState extends State<MainChats> {
           _body(),
         ],
         fullyStretchable: true,
-        expandedBody: const StoryPage(userIndex: 0, withCloseIcon: false),
+        expandedBody: const SearchPage(), // Update this line
         backgroundColor: const Color(0xFF0A122F),
         appBarColor: const Color(0xFF0A122F),
         scrollController: _scrollController,
@@ -156,42 +157,64 @@ class _MainChatsState extends State<MainChats> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 10),
-          const Center(
-            child: Text(
-              "Chats",
-              style: TextStyle(
-                color: Color(0xff8D6AEE),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          const SizedBox(height: 0),
+          // Search Bar
+          GestureDetector(
+            onTap: () {
+              // Navigate to the search page when the search bar is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(60.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 2.0,
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.center, // Center the contents
+                  children: [
+                    Icon(Icons.search, color: Colors.grey),
+                    SizedBox(width: 10),
+                    Text(
+                      "Search",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           // New Archived Chats Button, shown only if there are archived chats
-          if (chatList
-              .archivedChats.isNotEmpty) // Check if there are archived chats
+          if (chatList.archivedChats.isNotEmpty)
             ArchivedChatsButton(
               archivedChats: chatList.archivedChats,
               onTap: () async {
-                // Mark this as async
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ArchivedChatsPage(
                       archivedChats: chatList.archivedChats,
-                      chatList: chatList, // Pass the ChatList instance here
+                      chatList: chatList,
                     ),
                   ),
                 );
-                // Optional: Handle result if needed
-                setState(() {
-                  // Refresh the UI after returning
-                  // You can add any additional logic if you need to handle specific results.
-                });
+                setState(() {});
               },
             ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 0),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -205,7 +228,6 @@ class _MainChatsState extends State<MainChats> {
     );
   }
 
-// In _buildSlidableChatCard method
   Widget _buildSlidableChatCard(Map<String, dynamic> chat, int index) {
     return Slidable(
       key: ValueKey(chat['userName']),
@@ -214,7 +236,6 @@ class _MainChatsState extends State<MainChats> {
         dismissible: DismissiblePane(
           onDismissed: () {
             setState(() {
-              // Call setState here to rebuild the UI
               chatList.archiveChat(chat);
             });
           },

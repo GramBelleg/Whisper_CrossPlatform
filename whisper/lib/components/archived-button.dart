@@ -17,7 +17,7 @@ class ArchivedChatsButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
           child: Row(
             children: [
               const CircleAvatar(
@@ -40,7 +40,7 @@ class ArchivedChatsButton extends StatelessWidget {
                     Text(
                       '${archivedChats.length} archived',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withOpacity(0.5),
                         fontSize: 14,
                       ),
                     ),
