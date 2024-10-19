@@ -98,7 +98,7 @@ class ChatCard extends StatelessWidget {
         width: 12,
         height: 12,
         decoration: BoxDecoration(
-          color: Colors.green,
+          color: Color(0xFF4CB9CF),
           shape: BoxShape.circle,
         ),
       ),
@@ -144,7 +144,7 @@ class ChatCard extends StatelessWidget {
             FontAwesomeIcons.checkDouble,
             size: 12, // Adjust size to fit better with time text
             color: isRead
-                ? Colors.green
+                ? Color(0xFF4CB9CF)
                 : Colors.grey, // Change color based on read status
           ),
         const SizedBox(width: 4), // Space between icon and time

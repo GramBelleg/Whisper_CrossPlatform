@@ -256,7 +256,6 @@ class _MainChatsState extends State<MainChats> {
             onPressed: (_) {
               setState(() {
                 chatList.archiveChat(chat);
-                chatList.unpinChat(chat);
               });
             },
             backgroundColor: Colors.blue,
