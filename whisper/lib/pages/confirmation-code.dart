@@ -8,6 +8,7 @@ import 'package:whisper/validators/reset-password-validation/confirmation-code-v
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../services/send-confirmation-code.dart';
 
 class ConfirmationCode extends StatefulWidget {
   ConfirmationCode({super.key});
@@ -65,14 +66,23 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
               SizedBox(
                 height: 20,
               ),
-              Center(
-                child: CustomHighlightText(
-                  callToActionText: "Resend code",
-                  onTap: () async {
-                    final email = await GetEmail();
-                    // sendConfirmationCode(email!, context);
-                  },
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomHighlightText(
+                    callToActionText: "Go back",
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  CustomHighlightText(
+                    callToActionText: "Resend code",
+                    onTap: () async {
+                      final email = await GetEmail();
+                      await sendConfirmationCode(email!, context);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

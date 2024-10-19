@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../services/send-reset-code.dart';
 
 class ForgotPasswordEmail extends StatelessWidget {
   ForgotPasswordEmail({super.key});
@@ -15,7 +17,10 @@ class ForgotPasswordEmail extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      // await sendConfirmationCode(_emailController.text, context);
+      await sendResetCode(
+        _emailController.text,
+        context,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -60,6 +65,14 @@ class ForgotPasswordEmail extends StatelessWidget {
               ),
               SizedBox(
                 height: 20,
+              ),
+              Center(
+                child: CustomHighlightText(
+                  callToActionText: "Go Back",
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
               ),
             ],
           ),

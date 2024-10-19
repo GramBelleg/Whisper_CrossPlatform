@@ -47,7 +47,7 @@ class _LoginState extends State<Login> {
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 64.0,),
         child: Form(
           key: this.formKey,
           child: ListView(
