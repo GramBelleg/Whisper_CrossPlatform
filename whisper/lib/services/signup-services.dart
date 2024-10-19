@@ -1,10 +1,10 @@
 import '../database-mock/database-helper.dart';
-import '../modules/user.dart';
+import '../modules/signup-credentials.dart';
 
 class SignupServices {
   static final DatabaseHelper _dbHelper = DatabaseHelper();
 
-  static Future<void> addUser(User user) async {
+  static Future<void> addUser(SignupCredentials user) async {
     await _dbHelper.insertUser(user.toMap());
     await fetchUsers();
   }

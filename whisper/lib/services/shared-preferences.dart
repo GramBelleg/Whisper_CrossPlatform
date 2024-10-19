@@ -12,3 +12,16 @@ Future<String?> GetEmail() async {
   print('Loaded email: $email');
   return email;
 }
+
+Future<void> SaveToken(String token) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('token', token);
+  print('Token saved: $token');
+}
+
+Future<String?> GetToken() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('token');
+  print('Loaded email: $token');
+  return token;
+}

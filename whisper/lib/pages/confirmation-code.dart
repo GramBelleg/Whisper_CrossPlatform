@@ -1,16 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/pages/confirmation-code.dart';
-import 'package:whisper/pages/reset-password.dart';
-
+import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/services/confirm-code.dart';
 import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/signup-services.dart';
-import 'package:whisper/validators/form-validation/email-field-validation.dart';
-import 'package:whisper/validators/form-validation/phone-field-validation.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
 import '../components/custom-access-button.dart';
-
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 
@@ -30,23 +25,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      // this is not an api, this is a function to get the email saved
-      // in the shared preferences
-      dynamic email = await GetEmail();
-      // the next line should be replaced with a real api
-      dynamic code = await SignupServices.getConfirmationCodeByEmail(email);
-      print(code);
-      print(_codeController.text);
-      if (_codeController.text == code.toString()) {
-        Navigator.pushNamed(context, ResetPassword.id);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Wrong Code"),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
+      await confirmCode(_codeController.text, context);
     }
   }
 
@@ -85,6 +64,15 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
               ),
               SizedBox(
                 height: 20,
+              ),
+              Center(
+                child: CustomHighlightText(
+                  callToActionText: "Resend code",
+                  onTap: () async {
+                    final email = await GetEmail();
+                    // sendConfirmationCode(email!, context);
+                  },
+                ),
               ),
             ],
           ),

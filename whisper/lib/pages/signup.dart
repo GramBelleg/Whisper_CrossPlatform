@@ -4,14 +4,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-phone-field.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/signup-services.dart';
+import 'package:whisper/services/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
+import 'package:whisper/validators/form-validation/name-field-validation.dart';
 import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 import '../controllers/phone-number-controller.dart';
-import '../modules/user.dart';
+import '../modules/signup-credentials.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
 class Signup extends StatefulWidget {
@@ -31,48 +33,37 @@ class _SignupState extends State<Signup> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController rePasswordController = TextEditingController();
   final CustomPhoneController phoneController = CustomPhoneController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
-      if (!ValidateRePassword(
-        passwordController.text,
-        rePasswordController.text,
-      )) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Passwords aren't the same"),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
-        String fullPhoneNumber = phoneController
-            .getFullPhoneNumber();
-        String countryCode = phoneController.countryCode;
-        String phoneNumber = phoneController.phoneNumber;
-
-        User user = User(
-          email: emailController.text,
-          password: passwordController.text,
-          phone: fullPhoneNumber, // Use the complete phone number
-        );
-        try {
-          await SignupServices.addUser(user);
-        } catch (e) {
-          print(e);
-        }
-      }
+      SignupCredentials user = SignupCredentials(
+        email: emailController.text,
+        password: passwordController.text,
+        confirmPassword: rePasswordController.text,
+        name: nameController.text,
+        userName: userNameController.text,
+        phoneNumber: phoneController.getFullPhoneNumber(),
+      );
+      await signup(user, context);
     } else {
-      print("Form is invalid!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Form is invalid'),
+        ),
+      );
     }
   }
 
   @override
   void dispose() {
-    // Dispose of the controllers to free up resources
     emailController.dispose();
     passwordController.dispose();
     rePasswordController.dispose();
-    phoneController.dispose(); // Dispose the custom controller
+    phoneController.dispose();
+    userNameController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -81,7 +72,7 @@ class _SignupState extends State<Signup> {
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 8.0),
         child: Form(
           key: formKey,
           child: ListView(
@@ -90,7 +81,7 @@ class _SignupState extends State<Signup> {
                 'assets/images/whisper-logo.png',
               ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               CustomTextField(
                 label: "Email",
@@ -99,6 +90,28 @@ class _SignupState extends State<Signup> {
                 isPassword: false,
                 validate: ValidateEmailField,
                 controller: emailController,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              CustomTextField(
+                label: "Name",
+                prefixIcon: FontAwesomeIcons.signature,
+                isObscure: false,
+                isPassword: false,
+                validate: ValidateNameField,
+                controller: nameController,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              CustomTextField(
+                label: "User Name",
+                prefixIcon: FontAwesomeIcons.envelope,
+                isObscure: false,
+                isPassword: false,
+                validate: ValidateNameField,
+                controller: userNameController,
               ),
               SizedBox(
                 height: 10,
@@ -129,7 +142,7 @@ class _SignupState extends State<Signup> {
                 controller: phoneController, // Pass the custom controller
               ),
               SizedBox(
-                height: 10,
+                height: 5,
               ),
               CustomAccessButton(
                 label: "Signup",

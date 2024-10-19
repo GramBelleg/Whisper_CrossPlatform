@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/modules/login-credentials.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
@@ -9,17 +10,33 @@ import '../components/custom-highlight-text.dart';
 import '../components/custom-quick-login.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../services/login.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   Login({super.key});
 
   static String id = "/Login";
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   GlobalKey<FormState> formKey = GlobalKey();
 
-  void _submitForm() {
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+
+  void _submitForm() async{
     if (formKey.currentState!.validate()) {
       print("Form is valid!");
+      LoginCredentials loginCred = LoginCredentials(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      await login(loginCred,context);
     } else {
       print("Form is invalid!");
     }
@@ -42,6 +59,7 @@ class Login extends StatelessWidget {
                 height: 20,
               ),
               CustomTextField(
+                controller: this.emailController,
                 label: "Email",
                 prefixIcon: FontAwesomeIcons.envelope,
                 isObscure: false,
@@ -52,6 +70,7 @@ class Login extends StatelessWidget {
                 height: 10,
               ),
               CustomTextField(
+                controller: this.passwordController,
                 label: "Password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,

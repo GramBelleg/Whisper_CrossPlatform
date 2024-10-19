@@ -1,12 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/pages/confirmation-code.dart';
-import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/signup-services.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
-
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 
@@ -19,21 +15,13 @@ class ForgotPasswordEmail extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      print("Form is valid!");
-      String email = _emailController.text;
-      dynamic userMap = await SignupServices.getUser(email);
-      print(userMap);
-      if (userMap != null) {
-        await SaveEmail(userMap['email']);
-        Navigator.pushNamed(context, ConfirmationCode.id);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("No user with this email"),
-          duration: Duration(seconds: 2),
-        ));
-      }
+      // await sendConfirmationCode(_emailController.text, context);
     } else {
-      print("Form is invalid!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Invalid form"),
+        ),
+      );
     }
   }
 

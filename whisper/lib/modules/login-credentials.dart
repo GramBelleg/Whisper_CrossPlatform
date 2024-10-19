@@ -1,12 +1,10 @@
-class User {
+class LoginCredentials {
   final String? email;
   final String? password;
-  final String? phone;
 
-  User({
+  LoginCredentials({
     this.email,
     this.password,
-    this.phone,
   });
 
   // Method to convert User object to a Map
@@ -14,15 +12,10 @@ class User {
     return {
       'email': email,
       'password': password,
-      'phone': phone,
     };
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      email: map['email'],
-      password: map['password'],
-      phone: map['phone'],
-    );
+  factory LoginCredentials.fromMap(Map<String, dynamic> map) {
+    return LoginCredentials(email: map['email'], password: map['password']);
   }
 }
