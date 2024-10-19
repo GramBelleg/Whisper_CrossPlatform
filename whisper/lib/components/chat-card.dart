@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../pages/chat-page.dart';
+
 // Define an enum for message types
 enum MessageType {
   text,
@@ -71,7 +73,15 @@ class ChatCard extends StatelessWidget {
             ],
           ),
           onTap: () {
-            print('Tapped on $userName');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatPage(
+                  userName: userName,
+                  userImage: avatarUrl,
+                ),
+              ),
+            );
           },
         ),
       ),

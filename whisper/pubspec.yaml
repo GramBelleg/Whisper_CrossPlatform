@@ -28,12 +28,20 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  emoji_picker_flutter: ^3.1.0
   flutter_svg: ^1.0.0
   flashy_tab_bar2: ^0.0.10
   font_awesome_flutter: ^10.7.0
   draggable_home: ^1.0.5
   story: ^1.1.0
   flutter_slidable: ^3.1.1
+  file_picker: ^5.0.0
+  image_picker: ^0.8.6
+  permission_handler: ^10.0.0 # Check for the latest version
+  socket_io_client: ^3.0.0
+  giphy_get: ^2.0.0
+  # audioplayers: ^6.1.0
+  # path_provider: ^2.0.11
 
   flutter:
     sdk: flutter
