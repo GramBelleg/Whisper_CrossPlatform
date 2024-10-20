@@ -107,7 +107,7 @@ class _SignupState extends State<Signup> {
               ),
               CustomTextField(
                 label: "User Name",
-                prefixIcon: FontAwesomeIcons.envelope,
+                prefixIcon: FontAwesomeIcons.user,
                 isObscure: false,
                 isPassword: false,
                 validate: ValidateNameField,

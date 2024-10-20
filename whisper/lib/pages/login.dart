@@ -29,14 +29,14 @@ class _LoginState extends State<Login> {
 
   final TextEditingController passwordController = TextEditingController();
 
-  void _submitForm() async{
+  void _submitForm() async {
     if (formKey.currentState!.validate()) {
       print("Form is valid!");
       LoginCredentials loginCred = LoginCredentials(
         email: emailController.text,
         password: passwordController.text,
       );
-      await login(loginCred,context);
+      await login(loginCred, context);
     } else {
       print("Form is invalid!");
     }
@@ -47,7 +47,10 @@ class _LoginState extends State<Login> {
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0,),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 64.0,
+          vertical: 32.0,
+        ),
         child: Form(
           key: this.formKey,
           child: ListView(
@@ -105,7 +108,7 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Don\'t have an acoount?',
+                    'Don\'t have an account?',
                     style: TextStyle(
                       color: secondNeutralColor,
                     ),

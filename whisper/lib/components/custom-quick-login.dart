@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/pages/login-with-facebook.dart';
+import 'package:whisper/pages/login-with-github.dart';
 
 import '../constants/colors.dart';
 
@@ -24,14 +26,18 @@ class CustomQuickLogin extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, LoginWithGithub.id);
+            },
             child: FaIcon(
               FontAwesomeIcons.github,
               color: secondNeutralColor,
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, LoginWithFacebook.id);
+            },
             child: FaIcon(
               FontAwesomeIcons.facebook,
               color: secondNeutralColor,
