@@ -53,14 +53,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ],
             ),
             actions: [
-              IconButton(
-                onPressed: () {
-                  // Add reply action here
-                },
-                icon: const Icon(
-                  Icons.reply,
-                ), // Reply icon
-              ),
+              if (widget.isSelected.length == 1) ...[
+                IconButton(
+                  onPressed: () {
+                    // Add reply action here
+                  },
+                  icon: const Icon(
+                    Icons.reply,
+                  ), // Reply icon
+                ),
+              ],
               IconButton(
                 onPressed: () {
                   // Add favorite action here
@@ -85,38 +87,40 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   Icons.forward,
                 ), // Forward icon
               ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  // Handle menu selection
-                  if (value == 'Info') {
-                    // Handle info action
-                  } else if (value == 'Pin') {
-                    // Handle pin action
-                  } else if (value == 'Edit') {
-                    // Handle edit action
-                  } else if (value == 'Copy') {
-                    // Handle copy action
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'Info',
-                    child: Text('Info'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'Pin',
-                    child: Text('Pin'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'Edit',
-                    child: Text('Edit'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'Copy',
-                    child: Text('Copy'),
-                  ),
-                ],
-              ),
+              if (widget.isSelected.length == 1) ...[
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    // Handle menu selection
+                    if (value == 'Info') {
+                      // Handle info action
+                    } else if (value == 'Pin') {
+                      // Handle pin action
+                    } else if (value == 'Edit') {
+                      // Handle edit action
+                    } else if (value == 'Copy') {
+                      // Handle copy action
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'Info',
+                      child: Text('Info'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'Pin',
+                      child: Text('Pin'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'Edit',
+                      child: Text('Edit'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'Copy',
+                      child: Text('Copy'),
+                    ),
+                  ],
+                ),
+              ],
             ],
           )
         : AppBar(

@@ -53,6 +53,7 @@ class _ChatPageState extends State<ChatPage> {
       if (focusNode.hasFocus) {
         setState(() {
           show = false; // Hide emoji picker when the text field is focused
+          isSelected.clear();
         });
       }
     });
@@ -131,6 +132,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     setState(() {
       show = !show; // Toggle the emoji picker
+      isSelected.clear();
     });
   }
 
@@ -288,7 +290,17 @@ class _ChatPageState extends State<ChatPage> {
                         ? GestureDetector(
                             onLongPress: () {
                               setState(() {
-                                isSelected.add(index);
+                                isSelected.add(
+                                    index); // Add the index to isSelected list
+                              });
+                            },
+                            onTap: () {
+                              setState(() {
+                                // Check if the index exists in the isSelected list
+                                if (isSelected.contains(index)) {
+                                  // If it exists, remove it
+                                  isSelected.remove(index);
+                                }
                               });
                             },
                             child: OwnMessageCard(
