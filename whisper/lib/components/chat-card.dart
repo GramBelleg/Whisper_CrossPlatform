@@ -25,6 +25,7 @@ class ChatCard extends StatelessWidget {
   final bool isPinned; // New property for pinned status
   final MessageType messageType;
   final int unreadCount;
+  final bool isMuted;
 
   const ChatCard({
     Key? key,
@@ -38,7 +39,12 @@ class ChatCard extends StatelessWidget {
     this.isPinned = false, // Default to not pinned
     this.messageType = MessageType.text,
     this.unreadCount = 0,
+    this.isMuted = false,
   }) : super(key: key);
+
+  // Define the custom color
+  final Color customColor =
+      const Color(0xFF4CB9CF); // This is the color you want
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +114,7 @@ class ChatCard extends StatelessWidget {
         width: 12,
         height: 12,
         decoration: BoxDecoration(
-          color: Color(0xFF4CB9CF),
+          color: customColor, // Apply custom color
           shape: BoxShape.circle,
         ),
       ),
@@ -116,9 +122,26 @@ class ChatCard extends StatelessWidget {
   }
 
   Widget _buildUserName() {
-    return Text(
-      userName,
-      style: TextStyle(color: Colors.white),
+    return Row(
+      mainAxisSize: MainAxisSize.min, // Shrink the row to its minimum width
+      children: [
+        Text(
+          userName,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold, // Similar to your image
+          ),
+          overflow: TextOverflow.ellipsis, // Handle overflow gracefully
+        ),
+        if (isMuted) // Conditionally show the mute icon
+          const SizedBox(width: 4), // Small space between the name and icon
+        if (isMuted)
+          Icon(
+            Icons.volume_off,
+            size: 16, // Adjust size to fit next to the name
+            color: customColor, // Mute icon color as requested
+          ),
+      ],
     );
   }
 
@@ -154,7 +177,7 @@ class ChatCard extends StatelessWidget {
             FontAwesomeIcons.checkDouble,
             size: 12, // Adjust size to fit better with time text
             color: isRead
-                ? Color(0xFF4CB9CF)
+                ? customColor // Apply custom color for read status
                 : Colors.grey, // Change color based on read status
           ),
         const SizedBox(width: 4), // Space between icon and time
@@ -179,7 +202,6 @@ class ChatCard extends StatelessWidget {
 
   Widget _buildLastMessage() {
     String messageText;
-
     // Generate message text based on the message type
     switch (messageType) {
       case MessageType.image:
@@ -205,12 +227,19 @@ class ChatCard extends StatelessWidget {
         messageText = lastMessage;
         break;
     }
-
     return Text(
       messageText,
       style: TextStyle(
-        color: const Color.fromRGBO(141, 150, 163, 1),
+        color: customColor, // Apply custom color to the message types
       ),
+    );
+  }
+
+  Widget _buildMuteIcon() {
+    return Icon(
+      Icons.volume_mute,
+      size: 16, // Adjust icon size
+      color: Colors.yellow, // Color of the pin icon
     );
   }
 }

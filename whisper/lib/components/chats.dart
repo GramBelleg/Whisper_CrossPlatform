@@ -12,7 +12,8 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.text,
       'isArchived': false,
-      'isPinned': false, // New property for pinning
+      'isPinned': false, // Property for pinning
+      'isMuted': false, // New property for mute status
     },
     {
       'userName': 'Bob',
@@ -24,7 +25,8 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.image,
       'isArchived': false,
-      'isPinned': false, // New property for pinning
+      'isPinned': false, // Property for pinning
+      'isMuted': true, // New property for mute status
     },
     {
       'userName': 'Charlie',
@@ -36,7 +38,8 @@ class ChatList {
       'isSent': true,
       'messageType': MessageType.text,
       'isArchived': false,
-      'isPinned': false, // New property for pinning
+      'isPinned': false, // Property for pinning
+      'isMuted': false, // New property for mute status
     },
   ];
 
@@ -81,5 +84,15 @@ class ChatList {
 
   void unpinChat(Map<String, dynamic> chat) {
     chat['isPinned'] = false; // Unpin the chat
+  }
+
+  // New method to mute a chat
+  void muteChat(Map<String, dynamic> chat) {
+    chat['isMuted'] = true; // Mute the chat
+  }
+
+  // New method to unmute a chat
+  void unmuteChat(Map<String, dynamic> chat) {
+    chat['isMuted'] = false; // Unmute the chat
   }
 }
