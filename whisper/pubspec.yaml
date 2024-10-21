@@ -2,7 +2,7 @@ name: whisper
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -30,19 +30,21 @@ environment:
 dependencies:
   emoji_picker_flutter: ^3.1.0
   flutter_svg: ^1.0.0
+  flashy_tab_bar2: ^0.0.10
+  font_awesome_flutter: ^10.7.0
+  draggable_home: ^1.0.5
+  story: ^1.1.0
+  flutter_slidable: ^3.1.1
   file_picker: ^5.0.0
   image_picker: ^0.8.6
   permission_handler: ^10.0.0 # Check for the latest version
-  font_awesome_flutter: ^10.7.0
   socket_io_client: ^3.0.0
   giphy_get: ^2.0.0
-
   # audioplayers: ^6.1.0
-  # path_provider: ^2.0.11 
+  # path_provider: ^2.0.11
 
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,7 +66,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -74,6 +75,8 @@ flutter:
   assets:
     - assets/images/el-gayar.jpg
     - assets/images/chat-page-back-ground-image.svg
+    - assets/images/amr.png
+    - assets/images/IconStory.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
