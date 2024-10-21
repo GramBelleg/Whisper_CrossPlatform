@@ -10,6 +10,7 @@ import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/login-with-facebook.dart';
 import 'package:whisper/pages/login-with-github.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/logout-after-reset-password.dart';
 import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/pages/signup.dart';
 
@@ -32,6 +33,7 @@ class Whisper extends StatelessWidget {
         ResetPassword.id: (context) => ResetPassword(),
         LoginWithFacebook.id: (context) => LoginWithFacebook(),
         LoginWithGithub.id: (context) => LoginWithGithub(),
+        LogoutAfterResetPassword.id: (context) => LogoutAfterResetPassword(),
       },
       // home: LoginWithFacebook(),
     );

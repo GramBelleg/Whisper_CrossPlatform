@@ -2,29 +2,27 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:whisper/modules/reset-password-credentials.dart';
-import 'package:whisper/pages/logout-after-reset-password.dart';
+import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
-Future<void> resetPassword(
-    ResetPasswordCredentials resetPassCred, BuildContext context) async {
-  final url = Uri.parse('http://10.0.2.2:5000/api/auth/resetPassword');
-  resetPassCred.email = await GetEmail();
+Future<void> logoutFromAllDevices(BuildContext context) async {
+  final url = Uri.parse('http://10.0.2.2:5000/api/auth/logoutAll');
+  final token = await GetToken();
   try {
-    final response = await http.post(
+    final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': '$token',
       },
-      body: jsonEncode(resetPassCred.toMap()),
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       var data = jsonDecode(response.body);
       print('Response: $data');
-      await SaveToken(data['userToken']);
-      Navigator.pushNamed(context, LogoutAfterResetPassword.id);
+      Navigator.pushNamed(context, Login.id);
     } else {
+      print(response);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Something went wrong: ${response.statusCode}"),

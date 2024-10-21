@@ -22,6 +22,6 @@ Future<void> SaveToken(String token) async {
 Future<String?> GetToken() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('token');
-  print('Loaded email: $token');
+  print('Loaded token: $token');
   return token;
 }

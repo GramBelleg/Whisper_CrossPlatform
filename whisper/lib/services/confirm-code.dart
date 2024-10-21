@@ -24,6 +24,7 @@ Future<void> confirmCode(String code, BuildContext context) async {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       var data = jsonDecode(response.body);
       print('Response: $data');
+      await SaveToken(data['userToken']);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
