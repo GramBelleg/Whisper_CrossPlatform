@@ -10,7 +10,7 @@ import 'archived-page.dart';
 import 'search-page.dart';
 
 class MainChats extends StatefulWidget {
-  static const String id = 'main_chats_page';
+  static const String id = '/main_chats_page';
   const MainChats({super.key});
 
   @override

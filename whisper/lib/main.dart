@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:whisper/pages/chat-page.dart';
-
-import 'pages/mainchats-page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/custom-access-button.dart';
+import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/components/custom-quick-login.dart';
+import 'package:whisper/components/custom-text-field.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/pages/confirmation-code.dart';
+import 'package:whisper/pages/forgot-password-email.dart';
+import 'package:whisper/pages/login-with-facebook.dart';
+import 'package:whisper/pages/login-with-github.dart';
+import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/logout-after-reset-password.dart';
+import 'package:whisper/pages/mainchats-page.dart';
+import 'package:whisper/pages/reset-password.dart';
+import 'package:whisper/pages/signup.dart';
 
 void main() {
   runApp(Whisper());
@@ -12,13 +24,20 @@ class Whisper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: MainChats.id,
-      theme: ThemeData(
-        fontFamily: 'ABeeZee',
-      ),
+      initialRoute: Login.id,
+      theme: ThemeData(fontFamily: 'ABeeZee'),
       routes: {
-        MainChats.id: (context) => MainChats(),
+        Login.id: (context) => Login(),
+        Signup.id: (context) => Signup(),
+        ForgotPasswordEmail.id: (context) => ForgotPasswordEmail(),
+        ConfirmationCode.id: (context) => ConfirmationCode(),
+        ResetPassword.id: (context) => ResetPassword(),
+        LoginWithFacebook.id: (context) => LoginWithFacebook(),
+        LoginWithGithub.id: (context) => LoginWithGithub(),
+        LogoutAfterResetPassword.id: (context) => LogoutAfterResetPassword(),
+        MainChats.id: (context) => MainChats()
       },
+      // home: LoginWithFacebook(),
     );
   }
 }
