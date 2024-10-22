@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/message.dart';
 import 'package:whisper/modules/button-sheet.dart';
+import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/own-message-card.dart';
@@ -35,7 +36,11 @@ class _ChatPageState extends State<ChatPage> {
   bool show = false; // Tracks if the emoji picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
   ScrollController _scrollController = ScrollController();
-  final ImagePicker _picker = ImagePicker();
+  ScrollController _scrollController2 = ScrollController();
+  final GlobalKey<FormFieldState<String>> _textFieldKey =
+      GlobalKey<FormFieldState<String>>();
+  int lastVisibleMessageIndex = 0;
+  List<int> isSelected = [];
   late IO.Socket socket;
   List<Message> messages = [];
   List<RecievedMessageCard> recievedmessages = [];
@@ -48,10 +53,14 @@ class _ChatPageState extends State<ChatPage> {
       if (focusNode.hasFocus) {
         setState(() {
           show = false; // Hide emoji picker when the text field is focused
+          isSelected.clear();
         });
       }
     });
 // Listen for incoming messages from the server
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
 
     // Listen for loading existing messages
     socket.on('loadMessages', (data) {
@@ -94,6 +103,24 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _isTyping = text.isNotEmpty; // Check if the text field is not empty
     });
+
+    // Calculate the number of lines in the text field
+    int numberOfLines =
+        (text.split('\n').length).clamp(1, 5); // Minimum 1, maximum 5
+    double additionalHeight = numberOfLines * 40; // Height for the lines
+
+    // Calculate the new scroll position based on the additional height
+    if (_scrollController2.hasClients) {
+      double lastMessagePosition =
+          _scrollController2.position.maxScrollExtent + 100 + additionalHeight;
+
+      // Animate scroll to the last message considering the additional height
+      _scrollController2.animateTo(
+        lastMessagePosition,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   // Toggle emoji picker and keyboard
@@ -105,13 +132,57 @@ class _ChatPageState extends State<ChatPage> {
     }
     setState(() {
       show = !show; // Toggle the emoji picker
+      isSelected.clear();
     });
   }
 
   void _scrollToBottom() {
-    // Check if the scroll controller is attached and has listeners
+    // Check if the scroll controller is attached and has clients
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+
+    if (_scrollController2.hasClients) {
+      // Calculate the current position of the last message
+      double lastMessagePosition =
+          _scrollController2.position.maxScrollExtent + 100;
+
+      // Determine the number of lines in the text field
+      // Limit the number of lines to a maximum of 5
+      int numberOfLines = (_controller.text.split('\n').length)
+          .clamp(1, 5); // Minimum 1, maximum 5
+
+      // Calculate additional height based on the number of lines
+      double additionalHeight =
+          numberOfLines * 40; // Assuming each line takes 40 pixels
+
+      // Calculate the desired position
+      double desiredPosition = additionalHeight;
+
+      // Scroll to the last message if it's above the desired position
+      if (lastMessagePosition >= desiredPosition) {
+        _scrollController2.animateTo(
+          lastMessagePosition,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
+  }
+
+  void clearIsSelected() {
+    setState(() {
+      isSelected.clear();
+    });
+  }
+
+  void _getTextFieldPosition() {
+    // Check if the key has a current context
+    if (_textFieldKey.currentContext != null) {
+      final RenderBox renderBox =
+          _textFieldKey.currentContext!.findRenderObject() as RenderBox;
+      final position = renderBox.localToGlobal(Offset.zero); // Get the position
+      print("TextField Position: ${position.dx}, ${position.dy}");
     }
   }
 
@@ -150,8 +221,8 @@ class _ChatPageState extends State<ChatPage> {
     //socket.emit('/sendmessage', "Client connected");
   }
 
-  void _sendMessage(String message) {
-    if (message.isNotEmpty) {
+  void _sendMessage(String inputMessage) {
+    if (inputMessage.isNotEmpty) {
       // Get the current time
       DateTime now = DateTime.now();
 
@@ -159,101 +230,39 @@ class _ChatPageState extends State<ChatPage> {
       String formattedTime =
           '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-      // Emit the message via socket
-      socket.emit('/sendmessage', message);
-      print('Message sent: $message');
+      // Define the message structure
+      const int chatId = 3;
+      Map<String, dynamic> messageData = {
+        'content': inputMessage,
+        'chatId': chatId,
+        'type': 'text',
+        'forwarded': false,
+        'selfDestruct': true,
+        'expiresAfter': 5, // in minutes
+        'parentMessageId': null
+      };
 
-      // Here you can update your UI with the new message
-      // For example, adding it to your chat messages list
+      // Emit the message via socket
+      socket.emit('send', messageData);
+      print('Message sent: $messageData');
+
+      // Update your UI with the new message
       setState(() {
-        messages.add(Message(message, formattedTime, true, MessageStatus.sent));
+        messages.add(
+            Message(inputMessage, formattedTime, true, MessageStatus.sent));
       });
     }
+    _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Color(0xff8D6AEE), // Set the desired color for the icons
-        ),
-        backgroundColor: const Color(0xff0A122F),
-        leadingWidth: 100,
-        titleSpacing: 0,
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const FaIcon(FontAwesomeIcons.arrowLeft),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.blueGrey,
-              backgroundImage: AssetImage(widget.userImage),
-            ),
-          ],
-        ),
-        title: InkWell(
-          onTap: () {},
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.userName,
-                    style: const TextStyle(fontSize: 19, color: Colors.white)),
-                const Text("last seen today at 12:05",
-                    style: TextStyle(fontSize: 13, color: Colors.white))
-              ],
-            ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const FaIcon(FontAwesomeIcons.phone),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (String result) {
-              print(result);
-            },
-            icon: const FaIcon(FontAwesomeIcons.ellipsisV),
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
-                value: 'View Contact',
-                child: Text('View Contact'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Media, Links, and Docs',
-                child: Text('Media, Links, and Docs'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Search',
-                child: Text('Search'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Mute Notifications',
-                child: Text('Mute Notifications'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'Wallpaper',
-                child: Text('Wallpaper'),
-              ),
-              const PopupMenuItem<String>(
-                value: 'More',
-                child: Text('More'),
-              ),
-            ],
-          )
-        ],
+      appBar: CustomAppBar(
+        isSelected: isSelected,
+        userImage: widget.userImage,
+        userName: widget.userName,
+        clearSelection: clearIsSelected,
       ),
       body: Container(
         color: const Color(0xff0a254a),
@@ -267,16 +276,39 @@ class _ChatPageState extends State<ChatPage> {
                 fit: BoxFit.cover,
               ),
               Container(
-                height: MediaQuery.of(context).size.height - 145,
+                height: show
+                    ? MediaQuery.of(context).size.height - 400
+                    : MediaQuery.of(context).viewInsets.bottom != 0
+                        ? MediaQuery.of(context).size.height - 450
+                        : MediaQuery.of(context).size.height - 145,
                 child: ListView.builder(
+                  controller: _scrollController2,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final messageData = messages[index];
                     return messageData.sent
-                        ? OwnMessageCard(
-                            message: messageData.data,
-                            time: messageData.time,
-                            status: messageData.status,
+                        ? GestureDetector(
+                            onLongPress: () {
+                              setState(() {
+                                isSelected.add(
+                                    index); // Add the index to isSelected list
+                              });
+                            },
+                            onTap: () {
+                              setState(() {
+                                // Check if the index exists in the isSelected list
+                                if (isSelected.contains(index)) {
+                                  // If it exists, remove it
+                                  isSelected.remove(index);
+                                }
+                              });
+                            },
+                            child: OwnMessageCard(
+                              message: messageData.data,
+                              time: messageData.time,
+                              status: messageData.status,
+                              isSelected: isSelected.contains(index),
+                            ),
                           )
                         : RecievedMessageCard(
                             message: messageData.data, time: messageData.time);
@@ -335,7 +367,9 @@ class _ChatPageState extends State<ChatPage> {
                                                     // Hide the button sheet
                                                     Navigator.pop(context);
                                                     // Show the emoji picker
+
                                                     _toggleEmojiPicker();
+                                                    _scrollToBottom();
                                                   },
                                                   onStickerTap: () {},
                                                   onGifTap: () {}));
@@ -354,13 +388,8 @@ class _ChatPageState extends State<ChatPage> {
                                     showModalBottomSheet(
                                         backgroundColor: Colors.transparent,
                                         context: context,
-                                        builder: (builder) => FileButtonSheet(
-                                            onDocumentTap: _pickFile,
-                                            onCameraTap: _pickImageFromCamera,
-                                            onGalleryTap: _pickImageFromGallery,
-                                            onAudioTap: _pickAudio,
-                                            onLocationTap: () {},
-                                            onContactsTap: () {}));
+                                        builder: (builder) =>
+                                            FileButtonSheet());
                                   },
                                   icon: const FaIcon(
                                     FontAwesomeIcons.paperclip,
@@ -446,77 +475,5 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
-  }
-
-  void _pickFile() async {
-    // Use FilePicker to pick a file
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      // Get the selected file
-      String? filePath = result.files.single.path;
-      String? fileName = result.files.single.name;
-
-      // You can now send the file or show a message with the file name
-      print("File selected: $fileName at $filePath");
-
-      // Add logic to send the file or display it in the chat
-      // For example:
-      // _sendFile(filePath);
-    } else {
-      // User canceled the picker
-      print("File selection canceled");
-    }
-  }
-
-  void _pickImageFromCamera() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-
-    if (image != null) {
-      // You can now send the captured image or show a message with the file name
-      print("Image captured: ${image.name} at ${image.path}");
-
-      // For example, you can send the image in the chat
-      // _sendImage(image.path);
-    } else {
-      print("Camera image selection canceled");
-    }
-  }
-
-  void _pickImageFromGallery() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      // You can now send the selected image or show a message with the file name
-      print("Image selected: ${image.name} at ${image.path}");
-
-      // For example, you can send the image in the chat
-      // _sendImage(image.path);
-    } else {
-      print("Gallery image selection canceled");
-    }
-  }
-
-  void _pickAudio() async {
-    // Use FilePicker to pick an audio file
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-    );
-
-    if (result != null) {
-      // Get the selected audio file
-      String? filePath = result.files.single.path;
-      String? fileName = result.files.single.name;
-
-      // You can now send the audio file or show a message with the file name
-      print("Audio selected: $fileName at $filePath");
-
-      // Add logic to send the audio or display it in the chat
-      // For example:
-      // _sendAudio(filePath);
-    } else {
-      // User canceled the picker
-      print("Audio selection canceled");
-    }
   }
 }
