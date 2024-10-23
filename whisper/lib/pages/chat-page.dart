@@ -11,6 +11,8 @@ import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/own-message-card.dart';
 import 'package:whisper/modules/recieved-message-card.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:whisper/services/fetch-messages.dart';
+import 'package:whisper/services/shared-preferences.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -42,12 +44,14 @@ class _ChatPageState extends State<ChatPage> {
   int lastVisibleMessageIndex = 0;
   List<int> isSelected = [];
   late IO.Socket socket;
+  List<ChatMessage> fetchedmessages = []; // fetch messages
   List<Message> messages = [];
   List<RecievedMessageCard> recievedmessages = [];
   @override
   void initState() {
     super.initState();
     connect();
+    loadMessages();
     // Add a listener to the focusNode to hide the emoji picker when the text field is focused
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -59,7 +63,7 @@ class _ChatPageState extends State<ChatPage> {
     });
 // Listen for incoming messages from the server
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
+      _scrollToBottom(0);
     });
 
     // Listen for loading existing messages
@@ -136,37 +140,72 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _scrollToBottom() {
-    // Check if the scroll controller is attached and has clients
+  void _scrollToBottom(double additional) {
+    // Check if the first scroll controller is attached and has clients
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     }
 
+    // Check if the second scroll controller is attached and has clients
     if (_scrollController2.hasClients) {
-      // Calculate the current position of the last message
-      double lastMessagePosition =
-          _scrollController2.position.maxScrollExtent + 100;
+      // Assuming the last message is stored in a variable called `messages`
+      String lastMessage = messages.isNotEmpty ? messages.last.data : '';
 
-      // Determine the number of lines in the text field
-      // Limit the number of lines to a maximum of 5
-      int numberOfLines = (_controller.text.split('\n').length)
-          .clamp(1, 5); // Minimum 1, maximum 5
+      // Count the number of lines in the last message
+      int lastMessageLines = lastMessage.split('\n').length;
 
-      // Calculate additional height based on the number of lines
-      double additionalHeight =
-          numberOfLines * 40; // Assuming each line takes 40 pixels
+      // Calculate additional height based on the number of lines and the passed additional value
+      double additionalHeight = (lastMessageLines * 50) +
+          40 +
+          additional; // Assuming each line takes 50 pixels
 
-      // Calculate the desired position
-      double desiredPosition = additionalHeight;
+      print(additionalHeight);
 
-      // Scroll to the last message if it's above the desired position
-      if (lastMessagePosition >= desiredPosition) {
-        _scrollController2.animateTo(
-          lastMessagePosition,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
+      // Calculate the target scroll position
+      double targetPosition =
+          _scrollController2.position.maxScrollExtent + additionalHeight;
+
+      // Scroll to the target position
+      _scrollController2.animateTo(
+        targetPosition,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  Future<void> loadMessages() async {
+    try {
+      List<ChatMessage> chatMessages = await fetchChatMessages();
+      //print(chatMessages);
+      print("jjj");
+      setState(() {
+        // Transform the fetched messages into the Message class used in your app
+        for (var chatMessage in chatMessages) {
+          // Check if the senderId is 7, and use that to determine the message type
+          bool isSentByCurrentUser = chatMessage.senderId == 7;
+
+          // Format the time for the message
+          String formattedTime =
+              '${chatMessage.createdAt.hour.toString().padLeft(2, '0')}:${chatMessage.createdAt.minute.toString().padLeft(2, '0')}';
+
+          // Add the message in your app's format
+          messages.add(
+            Message(
+                chatMessage.content, // Use the content from the fetched message
+                formattedTime, // Use the formatted time
+                isSentByCurrentUser, // True if sent by current user (senderId == 7)
+                MessageStatus.sent),
+          );
+        }
+      });
+
+      // After messages have been updated, ensure the UI has rebuilt, then scroll to bottom
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom(0);
+      });
+    } catch (e) {
+      print("Error loading messages: $e");
     }
   }
 
@@ -211,9 +250,11 @@ class _ChatPageState extends State<ChatPage> {
       // Update the UI with the received message
       setState(() {
         messages.add(
-            Message(data.toString(), formattedTime, false, MessageStatus.sent));
+            Message(data['content'], formattedTime, false, MessageStatus.sent));
+        _scrollToBottom(40);
       });
     });
+
     // You need to update your UI with the received message
     // For example, you can add the message to a List and rebuild the chat
 
@@ -231,11 +272,11 @@ class _ChatPageState extends State<ChatPage> {
           '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
       // Define the message structure
-      const int chatId = 3;
+      const int chatId = 4;
       Map<String, dynamic> messageData = {
         'content': inputMessage,
         'chatId': chatId,
-        'type': 'text',
+        'type': 'TEXT',
         'forwarded': false,
         'selfDestruct': true,
         'expiresAfter': 5, // in minutes
@@ -252,7 +293,7 @@ class _ChatPageState extends State<ChatPage> {
             Message(inputMessage, formattedTime, true, MessageStatus.sent));
       });
     }
-    _scrollToBottom();
+    _scrollToBottom(0);
   }
 
   @override
@@ -330,7 +371,11 @@ class _ChatPageState extends State<ChatPage> {
                             margin: const EdgeInsets.only(
                                 left: 5, right: 5, bottom: 8),
                             child: TextFormField(
+                              onTap: () {
+                                _scrollToBottom(200);
+                              },
                               scrollController: _scrollController,
+
                               focusNode: focusNode,
                               textAlignVertical: TextAlignVertical.center,
                               keyboardType: TextInputType.multiline,
@@ -357,6 +402,8 @@ class _ChatPageState extends State<ChatPage> {
                                     if (show) {
                                       focusNode.requestFocus();
                                       show != show;
+
+                                      print("daaaaaaaaa");
                                     } else {
                                       showModalBottomSheet(
                                           backgroundColor: Colors.transparent,
@@ -369,7 +416,7 @@ class _ChatPageState extends State<ChatPage> {
                                                     // Show the emoji picker
 
                                                     _toggleEmojiPicker();
-                                                    _scrollToBottom();
+                                                    _scrollToBottom(170);
                                                   },
                                                   onStickerTap: () {},
                                                   onGifTap: () {}));
