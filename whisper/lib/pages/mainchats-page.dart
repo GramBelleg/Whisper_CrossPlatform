@@ -318,6 +318,7 @@ class _MainChatsState extends State<MainChats> {
         ],
       ),
       child: ChatCard(
+        ChatId: chat['chatid'],
         userName: chat['userName'],
         lastMessage: chat['lastMessage'],
         time: chat['time'],

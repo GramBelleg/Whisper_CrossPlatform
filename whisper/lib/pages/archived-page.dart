@@ -90,6 +90,7 @@ class _ArchivedChatsPageState extends State<ArchivedChatsPage> {
         ],
       ),
       child: ChatCard(
+        ChatId: chat['chatid'],
         userName: chat['userName'],
         lastMessage: chat['lastMessage'],
         time: chat['time'],

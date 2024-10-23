@@ -29,6 +29,7 @@ class ChatList {
     }
 
     return {
+      'chatid': chat['lastMessage']?['chatId'],
       'userName': chat['userName'] ??
           'User ${chat['id']}', // Use 'id' if 'userName' is null
       'lastMessage': chat['lastMessage']?['content'] ??
