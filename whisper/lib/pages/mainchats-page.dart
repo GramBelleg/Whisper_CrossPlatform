@@ -21,6 +21,7 @@ class _MainChatsState extends State<MainChats> {
   int _selectedIndex = 0;
   final ScrollController _scrollController = ScrollController();
   final ChatList chatList = ChatList();
+  // bool isLoading = true; // Add a loading state
 
   @override
   Widget build(BuildContext context) {
@@ -34,65 +35,84 @@ class _MainChatsState extends State<MainChats> {
         },
       ),
       body: DraggableHome(
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                print('Edit tapped');
-              },
-              child: const Text(
-                "Edit",
-                style: TextStyle(
-                  color: Color(0xff8D6AEE),
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(width: 20),
-            const Expanded(
-              child: Center(
-                child: Text(
-                  "Chats",
-                  style: TextStyle(
-                    color: Color(0xff8D6AEE),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: SizedBox(
-              width: 20.0,
-              height: 20.0,
-              child: Image.asset(
-                "assets/images/IconStory.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            onPressed: () {
-              _scrollController.animateTo(
-                0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
+        title: _buildTitle(),
+        actions: _buildActions(),
+        body: [
+          FutureBuilder<Widget>(
+            future: _body(), // Use FutureBuilder for the async body
+            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                return snapshot.data!; // Display the body content
+              }
             },
           ),
         ],
         headerWidget: headerWidget(context),
-        body: [
-          _body(),
-        ],
         fullyStretchable: true,
-        expandedBody: const SearchPage(), // Update this line
+        expandedBody: const SearchPage(),
         backgroundColor: const Color(0xFF0A122F),
         appBarColor: const Color(0xFF0A122F),
         scrollController: _scrollController,
       ),
     );
+  }
+
+  Widget _buildTitle() {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () {
+            print('Edit tapped');
+          },
+          child: const Text(
+            "Edit",
+            style: TextStyle(
+              color: Color(0xff8D6AEE),
+              fontSize: 16,
+            ),
+          ),
+        ),
+        const SizedBox(width: 20),
+        const Expanded(
+          child: Center(
+            child: Text(
+              "Chats",
+              style: TextStyle(
+                color: Color(0xff8D6AEE),
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildActions() {
+    return [
+      IconButton(
+        icon: SizedBox(
+          width: 20.0,
+          height: 20.0,
+          child: Image.asset(
+            "assets/images/IconStory.png",
+            fit: BoxFit.cover,
+          ),
+        ),
+        onPressed: () {
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        },
+      ),
+    ];
   }
 
   Widget headerWidget(BuildContext context) {
@@ -153,51 +173,24 @@ class _MainChatsState extends State<MainChats> {
     );
   }
 
-  Widget _body() {
+  Future<Widget> _body() async {
+    // Here you can perform any asynchronous operations if necessary
+    //await Future.delayed(const Duration(seconds: 1)); // Simulate some loading
+    await chatList.initializeChats();
     return SingleChildScrollView(
       child: Column(
         children: [
           const SizedBox(height: 0),
-          // Search Bar
           GestureDetector(
             onTap: () {
-              // Navigate to the search page when the search bar is tapped
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SearchPage()),
               );
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(60.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 2.0,
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // Center the contents
-                  children: [
-                    Icon(Icons.search, color: Colors.grey),
-                    SizedBox(width: 10),
-                    Text(
-                      "Search",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: _buildSearchBar(),
           ),
           const SizedBox(height: 8),
-          // New Archived Chats Button, shown only if there are archived chats
           if (chatList.archivedChats.isNotEmpty)
             ArchivedChatsButton(
               archivedChats: chatList.archivedChats,
@@ -224,6 +217,36 @@ class _MainChatsState extends State<MainChats> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(60.0),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 2.0,
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search, color: Colors.grey),
+            SizedBox(width: 10),
+            Text(
+              "Search",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
       ),
     );
   }

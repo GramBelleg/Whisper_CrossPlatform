@@ -5,13 +5,15 @@ import '../pages/chat-page.dart';
 
 // Define an enum for message types
 enum MessageType {
-  text,
-  image,
-  video,
-  soundRecord,
-  deletedMessage,
-  gif,
-  sticker,
+  TEXT,
+  VM,
+  AUDIO,
+  IMAGE,
+  FILE,
+  DELETED,
+  STICKER,
+  GIF,
+  VIDEO,
 }
 
 class ChatCard extends StatelessWidget {
@@ -37,14 +39,13 @@ class ChatCard extends StatelessWidget {
     this.isSent = true,
     this.isOnline = false,
     this.isPinned = false, // Default to not pinned
-    this.messageType = MessageType.text,
+    this.messageType = MessageType.TEXT, // Updated default value
     this.unreadCount = 0,
     this.isMuted = false,
   }) : super(key: key);
 
   // Define the custom color
-  final Color customColor =
-      const Color(0xFF4CB9CF); // This is the color you want
+  final Color customColor = const Color(0xFF4CB9CF);
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +151,7 @@ class ChatCard extends StatelessWidget {
       children: [
         Expanded(child: _buildLastMessage()),
         const SizedBox(width: 4), // Space between message and status
-        if (unreadCount > 0 && messageType != MessageType.deletedMessage)
+        if (unreadCount > 0 && messageType != MessageType.DELETED)
           _buildUnreadCount(),
       ],
     );
@@ -204,42 +205,44 @@ class ChatCard extends StatelessWidget {
     String messageText;
     // Generate message text based on the message type
     switch (messageType) {
-      case MessageType.image:
+      case MessageType.IMAGE:
         messageText = "📷 Image";
         break;
-      case MessageType.video:
-        messageText = "📹 Video";
-        break;
-      case MessageType.soundRecord:
+      case MessageType.VM:
         messageText = "🎤 Voice message";
         break;
-      case MessageType.deletedMessage:
+      case MessageType.AUDIO:
+        messageText = "🎧 Audio";
+        break;
+      case MessageType.FILE:
+        messageText = "📁 File";
+        break;
+      case MessageType.DELETED:
         messageText = "🗑️ Message deleted";
         break;
-      case MessageType.gif:
-        messageText = "🎞️ GIF";
-        break;
-      case MessageType.sticker:
+      case MessageType.STICKER:
         messageText = "🎨 Sticker";
         break;
-      case MessageType.text:
+      case MessageType.GIF:
+        messageText = "🎞️ GIF";
+        break;
+      case MessageType.VIDEO:
+        messageText = "📹 Video";
+        break;
+      case MessageType.TEXT:
       default:
         messageText = lastMessage;
         break;
     }
+
     return Text(
       messageText,
+      maxLines: 1, // Limit to 1 line
+      overflow: TextOverflow
+          .ellipsis, // Add ellipsis at the end if the text is too long
       style: TextStyle(
         color: customColor, // Apply custom color to the message types
       ),
-    );
-  }
-
-  Widget _buildMuteIcon() {
-    return Icon(
-      Icons.volume_mute,
-      size: 16, // Adjust icon size
-      color: Colors.yellow, // Color of the pin icon
     );
   }
 }
