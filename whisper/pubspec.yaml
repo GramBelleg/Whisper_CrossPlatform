@@ -44,6 +44,11 @@ dependencies:
   shared_preferences: ^2.3.2
   http: ^1.2.2
   webview_flutter: ^4.10.0
+  flutter_recaptcha_v2_compat: ^1.0.5
+  webview_flutter_plus: ^0.4.7
+  flutter_facebook_auth: ^7.1.1
+  google_sign_in: ^6.2.1
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
   flutter_test:

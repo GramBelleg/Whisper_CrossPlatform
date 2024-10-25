@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/pages/login-with-facebook.dart';
 import 'package:whisper/pages/login-with-github.dart';
+import 'package:whisper/pages/login-with-google.dart';
 
 import '../constants/colors.dart';
 
@@ -19,7 +20,9 @@ class CustomQuickLogin extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, LoginWithGoogle.id);
+            },
             child: FaIcon(
               FontAwesomeIcons.google,
               color: secondNeutralColor,

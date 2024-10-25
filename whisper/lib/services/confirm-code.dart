@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> confirmCode(String code, BuildContext context) async {
@@ -25,6 +26,7 @@ Future<void> confirmCode(String code, BuildContext context) async {
       var data = jsonDecode(response.body);
       print('Response: $data');
       await SaveToken(data['userToken']);
+      Navigator.pushNamed(context, Login.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

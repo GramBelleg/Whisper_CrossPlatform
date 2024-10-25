@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-phone-field.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/recaptcha.dart';
+import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/services/signup-services.dart';
 import 'package:whisper/services/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
@@ -46,7 +48,8 @@ class _SignupState extends State<Signup> {
         userName: userNameController.text,
         phoneNumber: phoneController.getFullPhoneNumber(),
       );
-      await signup(user, context);
+      await SaveSignupCredentials(user);
+      Navigator.pushNamed(context, Recaptcha.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

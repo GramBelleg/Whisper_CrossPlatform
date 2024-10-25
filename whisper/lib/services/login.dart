@@ -3,10 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/modules/login-credentials.dart';
+import 'package:whisper/pages/signup.dart';
+import 'package:whisper/services/check-already-loggedin.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> login(LoginCredentials loginCred, BuildContext context) async {
   final url = Uri.parse('http://10.0.2.2:5000/api/auth/login');
+
   try {
     final response = await http.post(
       url,
@@ -21,6 +24,7 @@ Future<void> login(LoginCredentials loginCred, BuildContext context) async {
       await SaveToken(data['userToken']);
       print('Response: $data');
       await SaveEmail(loginCred.email!);
+      Navigator.pushNamed(context, Signup.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

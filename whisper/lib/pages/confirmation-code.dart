@@ -30,64 +30,99 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
     }
   }
 
+  //todo: make it future builder
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: firstNeutralColor,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
-        child: Form(
-          key: this.formKey,
-          child: ListView(
-            children: [
-              Image.asset(
-                'assets/images/whisper-logo.png',
+    return FutureBuilder(
+      future: GetEmail(),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: firstNeutralColor,
+            body: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
+              child: Form(
+                key: this.formKey,
+                child: ListView(
+                  children: [
+                    Image.asset(
+                      'assets/images/whisper-logo.png',
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    CustomTextField(
+                      controller: this._codeController,
+                      label: "Enter the code",
+                      prefixIcon: FontAwesomeIcons.userSecret,
+                      isObscure: true,
+                      isPassword: true,
+                      validate: ValidateConfirmationCode,
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    CustomAccessButton(
+                      label: "Submit Confirmation Code",
+                      onPressed: () {
+                        _submitForm(context);
+                      },
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Center(
+                      child: Text(
+                        "Sent code to: ",
+                        style: TextStyle(
+                          color: secondNeutralColor,
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        '${snap.data}',
+                        style: TextStyle(
+                          color: secondNeutralColor,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomHighlightText(
+                          callToActionText: "Go back",
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        CustomHighlightText(
+                          callToActionText: "Resend code",
+                          onTap: () async {
+                            final email = await GetEmail();
+                            await sendConfirmationCode(email!, context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(
-                height: 50,
-              ),
-              CustomTextField(
-                controller: this._codeController,
-                label: "Enter the code",
-                prefixIcon: FontAwesomeIcons.userSecret,
-                isObscure: true,
-                isPassword: true,
-                validate: ValidateConfirmationCode,
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              CustomAccessButton(
-                label: "Submit Confirmation Code",
-                onPressed: () {
-                  _submitForm(context);
-                },
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomHighlightText(
-                    callToActionText: "Go back",
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  CustomHighlightText(
-                    callToActionText: "Resend code",
-                    onTap: () async {
-                      final email = await GetEmail();
-                      await sendConfirmationCode(email!, context);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(
+              color: secondNeutralColor,
+              value: 0.5,
+            ),
+          );
+        }
+      },
     );
   }
 }
