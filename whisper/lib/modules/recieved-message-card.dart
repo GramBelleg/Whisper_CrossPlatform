@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class RecievedMessageCard extends StatelessWidget {
   final String message;
-  final String time;
+  final DateTime time;
 
   const RecievedMessageCard({
     super.key,
@@ -10,23 +11,27 @@ class RecievedMessageCard extends StatelessWidget {
     required this.time,
   });
 
+  // Function to format DateTime as "HH:mm"
+  String _formatTime(DateTime dateTime) {
+    
+    return DateFormat('HH:mm').format(dateTime); // Format as hours:minutes
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment
-          .centerLeft, // Align the message to the left for received messages
+      alignment: Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width - 45,
         ),
         child: Card(
-          color: const Color(0xff0A122F), // Updated color
+          color: const Color(0xff0A122F),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
-              bottomRight: Radius.circular(
-                  20), // Adjust shape to have rounded bottom right
+              bottomRight: Radius.circular(20),
             ),
           ),
           margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -51,12 +56,11 @@ class RecievedMessageCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      time,
+                      _formatTime(time), // Format and display time
                       style:
                           const TextStyle(fontSize: 12, color: Colors.white70),
                     ),
                     const SizedBox(width: 4),
-                    // Icon removed as per request
                   ],
                 ),
               ),

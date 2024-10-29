@@ -1,0 +1,20 @@
+// import 'package:flutter/foundation.dart';
+
+// class AuthState with ChangeNotifier {
+//   String _token;
+
+//   // Getter to access the token
+//   String get token => _token;
+
+//   // Method to update the token
+//   void setToken(String newToken) {
+//     _token = newToken;
+//     notifyListeners(); // Notify listeners to rebuild the UI
+//   }
+
+//   // Method to clear the token
+//   void clearToken() {
+//     _token = null;
+//     notifyListeners();
+//   }
+// }

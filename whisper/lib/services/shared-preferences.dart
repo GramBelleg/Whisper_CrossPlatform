@@ -25,3 +25,16 @@ Future<String?> GetToken() async {
   print('Loaded token: $token');
   return token;
 }
+
+Future<void> SaveId(int id) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('id', id);
+  print('Id saved: $id');
+}
+
+Future<int?> GetId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int? id = prefs.getInt('id');
+  print('Loaded Id: $id');
+  return id;
+}

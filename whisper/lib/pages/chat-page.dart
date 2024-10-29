@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:whisper/components/message.dart';
+import 'package:whisper/main.dart';
 import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
@@ -11,8 +13,10 @@ import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/own-message-card.dart';
 import 'package:whisper/modules/recieved-message-card.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:whisper/services/auth-provider';
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'dart:collection';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -20,12 +24,16 @@ class ChatPage extends StatefulWidget {
   final int ChatID;
   final String userName;
   final String userImage;
+  final String? token;
+  final int? senderId;
 
   const ChatPage({
     super.key,
     required this.userName,
     required this.userImage,
     required this.ChatID,
+    required this.token,
+    required this.senderId,
   });
 
   @override
@@ -47,12 +55,20 @@ class _ChatPageState extends State<ChatPage> {
   List<int> isSelected = [];
   late IO.Socket socket;
   List<ChatMessage> fetchedmessages = []; // fetch messages
-  List<Message> messages = [];
+  List<ChatMessage> messages = [];
+
   List<RecievedMessageCard> recievedmessages = [];
+  List<DateTime> sendMessagesTime = [];
+
   @override
   void initState() {
     super.initState();
-    connect();
+    if (widget.token != null && widget.token!.isNotEmpty) {
+      connect(widget.token!); // Use the token to connect
+    } else {
+      print("Token is null or empty");
+    }
+
     loadMessages();
     // Add a listener to the focusNode to hide the emoji picker when the text field is focused
     focusNode.addListener(() {
@@ -88,6 +104,9 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     _controller.dispose(); // Dispose of the controller
     focusNode.dispose(); // Dispose of the focusNode
+    if (socket.connected) {
+      socket.disconnect();
+    }
     super.dispose();
   }
 
@@ -151,7 +170,7 @@ class _ChatPageState extends State<ChatPage> {
     // Check if the second scroll controller is attached and has clients
     if (_scrollController2.hasClients) {
       // Assuming the last message is stored in a variable called `messages`
-      String lastMessage = messages.isNotEmpty ? messages.last.data : '';
+      String lastMessage = messages.isNotEmpty ? messages.last.content : '';
 
       // Count the number of lines in the last message
       int lastMessageLines = lastMessage.split('\n').length;
@@ -179,26 +198,35 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> loadMessages() async {
     try {
       List<ChatMessage> chatMessages = await fetchChatMessages(widget.ChatID);
-      //print(chatMessages);
-      print("jjj");
+
+      for (var message in chatMessages) {
+        print("Message ID: ${message.id}");
+        print("Chat ID: ${message.chatId}");
+        print("Sender ID: ${message.senderId}");
+        print("Content: ${message.content}");
+        print("Forwarded: ${message.forwarded}");
+        print("Pinned: ${message.pinned}");
+        print("Self-Destruct: ${message.selfDestruct}");
+        print("Expires After: ${message.expiresAfter}");
+        print("Type: ${message.type}");
+        print("Time: ${message.time}");
+        print("Sent At: ${message.sentAt}");
+        print("Parent Message ID: ${message.parentMessageId}");
+        if (message.parentMessage != null) {
+          print("Parent Message Content: ${message.parentMessage!.content}");
+          print("Parent Message Media: ${message.parentMessage!.media}");
+        }
+        print("----"); // Separator for readability
+      }
+
+      int? currentUserId = await GetId();
       setState(() {
         // Transform the fetched messages into the Message class used in your app
         for (var chatMessage in chatMessages) {
-          // Check if the senderId is 7, and use that to determine the message type
-          bool isSentByCurrentUser = chatMessage.senderId == 7;
-
-          // Format the time for the message
-          String formattedTime =
-              '${chatMessage.createdAt.hour.toString().padLeft(2, '0')}:${chatMessage.createdAt.minute.toString().padLeft(2, '0')}';
-
+          chatMessage.time = chatMessage.time?.toLocal();
+          chatMessage.sentAt = chatMessage.sentAt!.toLocal();
           // Add the message in your app's format
-          messages.add(
-            Message(
-                chatMessage.content, // Use the content from the fetched message
-                formattedTime, // Use the formatted time
-                isSentByCurrentUser, // True if sent by current user (senderId == 7)
-                MessageStatus.sent),
-          );
+          messages.add(chatMessage);
         }
       });
 
@@ -227,14 +255,25 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  void connect() {
+  void connect(String token) {
+    print("send token: $token");
     // Replace with your server's IP and port
-    socket = IO.io("http://172.20.192.1:5000", <String, dynamic>{
+    // Create the query map
+    final queryMap = token != null && token.isNotEmpty
+        ? {
+            "Authorization": "Bearer $token"
+          } // Include token if not null or empty
+        : {}; // Empty map if token is null or empty
+
+    // Replace with your server's IP and port
+    socket = IO.io("http://localhost:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
+      'query': {'token': "Bearer $token"} // Use the query map
     });
 
     socket.connect();
+    socket.off('receiveMessage');
 
     // Listen for successful connection
     socket.on('connect', (_) {
@@ -242,19 +281,49 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     // Listen for incoming messages from the server
-    socket.on('receive', (data) {
+    socket.on('receiveMessage', (data) {
       print("Message received: $data");
-      //print("hey");
-      DateTime now = DateTime.now();
-      String formattedTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-      // Update the UI with the received message
       setState(() {
-        messages.add(
-            Message(data['content'], formattedTime, false, MessageStatus.sent));
-        _scrollToBottom(40);
+        DateTime receivedSentAt = DateTime.parse(data['time']).toLocal();
+        int index = messages.indexWhere((msg) => msg.sentAt == receivedSentAt);
+        if (index != -1) {
+          ChatMessage updatedMessage = ChatMessage(
+              id: data['id'],
+              chatId: data['chatId'],
+              senderId: data["senderId"],
+              content: data['content'],
+              forwarded: data['forwarded'],
+              pinned: data['pinned'],
+              selfDestruct: data['selfDestruct'],
+              expiresAfter: data['expiresAfter'],
+              type: data['type'],
+              time: DateTime.parse(data['time']).toLocal(),
+              sentAt: DateTime.parse(data['sentAt']).toLocal(),
+              parentMessageId: data['parentMessageId'],
+              parentMessage: data['parentMessage']);
+          messages[index] = updatedMessage;
+        } else {
+          setState(() {
+            messages.add(ChatMessage(
+                id: data['id'],
+                chatId: data['chatId'],
+                senderId: data["senderId"],
+                content: data['content'],
+                forwarded: data['forwarded'],
+                pinned: data['pinned'],
+                selfDestruct: data['selfDestruct'],
+                expiresAfter: data['expiresAfter'],
+                type: data['type'],
+                time: DateTime.parse(data['time']).toLocal(),
+                sentAt: DateTime.parse(data['sentAt']).toLocal(),
+                parentMessageId: data['parentMessageId'],
+                parentMessage: data['parentMessage']));
+          });
+        }
       });
+      print(messages);
+      _scrollToBottom(40);
     });
 
     // You need to update your UI with the received message
@@ -267,33 +336,35 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String inputMessage) {
     if (inputMessage.isNotEmpty) {
       // Get the current time
-      DateTime now = DateTime.now();
+      DateTime now = DateTime.now().toUtc();
 
-      // Format the time manually
-      String formattedTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-      // Define the message structure
-      const int chatId = 4;
+      int chatId = widget.ChatID; ////////// need modificaiton
       Map<String, dynamic> messageData = {
         'content': inputMessage,
         'chatId': chatId,
         'type': 'TEXT',
         'forwarded': false,
         'selfDestruct': true,
-        'expiresAfter': 5, // in minutes
-        'parentMessageId': null
+        'expiresAfter': 5,
+        'sentAt': now.toIso8601String(),
+        // 'parentMessageId': null
       };
-
-      // Emit the message via socket
-      socket.emit('send', messageData);
-      print('Message sent: $messageData');
-
-      // Update your UI with the new message
       setState(() {
-        messages.add(
-            Message(inputMessage, formattedTime, true, MessageStatus.sent));
+        messages.add(ChatMessage(
+          chatId: chatId,
+          senderId: widget.senderId,
+          content: inputMessage,
+          forwarded: false,
+          selfDestruct: true,
+          expiresAfter: 5,
+          type: 'TEXT',
+          sentAt: now.toLocal(),
+        ));
       });
+      print(messageData['sentAt']);
+      // Emit the message via socket
+      socket.emit('sendMessage', messageData);
+      print('Message sent: $messageData');
     }
     _scrollToBottom(0);
   }
@@ -329,32 +400,35 @@ class _ChatPageState extends State<ChatPage> {
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final messageData = messages[index];
-                    return messageData.sent
+
+                    print(messageData.content);
+                    return messageData.senderId == widget.senderId
                         ? GestureDetector(
                             onLongPress: () {
                               setState(() {
-                                isSelected.add(
-                                    index); // Add the index to isSelected list
+                                isSelected.add(messageData
+                                    .id!); // Add the index to isSelected list
                               });
                             },
                             onTap: () {
                               setState(() {
                                 // Check if the index exists in the isSelected list
-                                if (isSelected.contains(index)) {
+                                if (isSelected.contains(messageData.id!)) {
                                   // If it exists, remove it
-                                  isSelected.remove(index);
+                                  isSelected.remove(messageData.id!);
                                 }
                               });
                             },
                             child: OwnMessageCard(
-                              message: messageData.data,
-                              time: messageData.time,
-                              status: messageData.status,
-                              isSelected: isSelected.contains(index),
+                              message: messageData.content,
+                              time: messageData.time!,
+                              status: MessageStatus.sent, // need modification
+                              isSelected: isSelected.contains(messageData.id!),
                             ),
                           )
                         : RecievedMessageCard(
-                            message: messageData.data, time: messageData.time);
+                            message: messageData.content,
+                            time: messageData.time!);
                   },
                 ),
               ),

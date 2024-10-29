@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/services/shared-preferences.dart';
 
 import '../pages/chat-page.dart';
 
@@ -81,7 +82,9 @@ class ChatCard extends StatelessWidget {
                 _buildPinIcon(), // Conditionally show pin icon below
             ],
           ),
-          onTap: () {
+          onTap: () async {
+            String? token = await GetToken();
+            int? senderId = await GetId();
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -89,6 +92,8 @@ class ChatCard extends StatelessWidget {
                   userName: userName,
                   userImage: avatarUrl,
                   ChatID: ChatId,
+                  token: token,
+                  senderId: senderId,
                 ),
               ),
             );

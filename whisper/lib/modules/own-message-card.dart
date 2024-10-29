@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
-// Define the enum for message status
 enum MessageStatus {
   sent,
   received,
@@ -10,42 +10,41 @@ enum MessageStatus {
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
-  final String time;
-  final MessageStatus status; // Use the enum for status
-  bool isSelected;
+  final DateTime time; // Change to DateTime type
+  final MessageStatus status;
+  final bool isSelected;
 
   OwnMessageCard({
     super.key,
     required this.message,
     required this.time,
     required this.isSelected,
-    this.status = MessageStatus.sent, // Default to sent
+    this.status = MessageStatus.sent,
   });
+
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('hh:mm').format(dateTime); // Format as hours:minutes
+  }
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        // The container that spans the whole width of the screen
         width: MediaQuery.of(context).size.width,
         color: isSelected
             ? const Color.fromARGB(255, 129, 142, 221)
-            : Colors.transparent, // Background color for selection
-        padding: const EdgeInsets.symmetric(
-            vertical: 5), // Optional vertical padding
+            : Colors.transparent,
+        padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.end, // Align message to the right
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             ConstrainedBox(
-              // Constrain the width of the message container
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width *
-                    0.8, // Max width for the message container (80% of the screen)
+                maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color: const Color(0xff8D6AEE), // Your desired color
+                color: const Color(0xff8D6AEE),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
@@ -76,25 +75,20 @@ class OwnMessageCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            time,
+                            _formatTime(time),
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white70),
                           ),
                           const SizedBox(width: 4),
-                          // Display the appropriate icon based on the status
                           Icon(
                             status == MessageStatus.seen
                                 ? FontAwesomeIcons.checkDouble
                                 : status == MessageStatus.received
-                                    ? FontAwesomeIcons
-                                        .checkDouble // Double check for received
-                                    : FontAwesomeIcons
-                                        .check, // Single check for sent
-                            color: status ==
-                                    MessageStatus.seen // Blue color for seen
+                                    ? FontAwesomeIcons.checkDouble
+                                    : FontAwesomeIcons.check,
+                            color: status == MessageStatus.seen
                                 ? Colors.blue
-                                : Colors
-                                    .white, // Default color for other statuses
+                                : Colors.white,
                             size: 12,
                           ),
                         ],
