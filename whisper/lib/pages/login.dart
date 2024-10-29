@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/keys/login-keys.dart';
 import 'package:whisper/modules/login-credentials.dart';
+import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/recaptcha.dart';
 import 'package:whisper/pages/signup.dart';
@@ -46,12 +48,11 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    _checkLoginStatus();
     super.initState();
   }
 
-  Future<bool?> _checkLoginStatus() async {
-    return await CheckAlreadyLoggedIn(context); // Replace with your async call
+ Future<bool?> _checkLoginStatus() async {
+    return CheckAlreadyLoggedIn(context); // Replace with your async call
   }
 
   @override
@@ -60,12 +61,12 @@ class _LoginState extends State<Login> {
       future: _checkLoginStatus(),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.waiting) {
-          if (!snap.data!)
+          if (!snap.data!) {
             return Scaffold(
               backgroundColor: firstNeutralColor,
               body: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 64.0,
+                  horizontal: 32.0,
                   vertical: 32.0,
                 ),
                 child: Form(
@@ -79,6 +80,7 @@ class _LoginState extends State<Login> {
                         height: 20,
                       ),
                       CustomTextField(
+                        key: const ValueKey(LoginKeys.emailTextFieldKey),
                         controller: this.emailController,
                         label: "Email",
                         prefixIcon: FontAwesomeIcons.envelope,
@@ -90,6 +92,7 @@ class _LoginState extends State<Login> {
                         height: 10,
                       ),
                       CustomTextField(
+                        key: const ValueKey(LoginKeys.passwordTextFieldKey),
                         controller: this.passwordController,
                         label: "Password",
                         prefixIcon: FontAwesomeIcons.lock,
@@ -101,6 +104,7 @@ class _LoginState extends State<Login> {
                         height: 10,
                       ),
                       CustomAccessButton(
+                        key:const ValueKey(LoginKeys.loginButtonKey),
                         label: "Login",
                         onPressed: _submitForm,
                       ),
@@ -158,9 +162,10 @@ class _LoginState extends State<Login> {
                 ),
               ),
             );
-          else
-            return Signup();
-          //todo: this should be recplaced with the chat page
+          } else {
+            return ChatPage();
+          }
+          //todo: this should be replaced with the chat page
         } else {
           return Center(
               child: CircularProgressIndicator(

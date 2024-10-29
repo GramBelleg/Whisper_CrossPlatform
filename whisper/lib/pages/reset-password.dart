@@ -6,6 +6,7 @@ import 'package:whisper/modules/reset-password-credentials.dart';
 import 'package:whisper/services/send-reset-code.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/validators/form-validation/password-field-validation.dart';
+import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
@@ -23,13 +24,22 @@ class ResetPassword extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      ResetPasswordCredentials resetPasswordCredentials =
-          ResetPasswordCredentials(
-        password: _passwordController.text,
-        confirmPassword: _rePasswordController.text,
-        code: _codeController.text,
-      );
-      await resetPassword(resetPasswordCredentials, context);
+      if (ValidateSimilarPasswords(
+          _passwordController.text, _rePasswordController.text)) {
+        ResetPasswordCredentials resetPasswordCredentials =
+            ResetPasswordCredentials(
+          password: _passwordController.text,
+          confirmPassword: _rePasswordController.text,
+          code: _codeController.text,
+        );
+        await resetPassword(resetPasswordCredentials, context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Passwords are not similar'),
+          ),
+        );
+      }
     }
   }
 

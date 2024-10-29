@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
+import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/login-with-facebook.dart';
@@ -44,6 +45,7 @@ class Whisper extends StatelessWidget {
               },
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
+        ChatPage.id: (context) => ChatPage(),
       },
       // home: LoginWithFacebook(),
     );

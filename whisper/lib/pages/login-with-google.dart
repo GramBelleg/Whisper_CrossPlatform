@@ -92,7 +92,8 @@ class LoginWithGoogle extends StatelessWidget {
 
   Future<void> sendAuthCodeToBackend(
       String authCode, BuildContext context) async {
-    final url = 'http://10.0.2.2:5000/api/auth/google'; // Your backend endpoint
+    final url =
+        'http://192.168.1.8:5000/api/auth/google'; // Your backend endpoint
 
     try {
       final response = await http.post(
@@ -100,7 +101,6 @@ class LoginWithGoogle extends StatelessWidget {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'code': authCode}),
       );
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print('User data: $data');

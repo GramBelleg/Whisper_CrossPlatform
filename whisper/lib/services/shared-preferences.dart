@@ -34,7 +34,7 @@ Future<SignupCredentials> GetSignUpCredentials() async {
   credential.userName = await _secureStorage.read(key: 'userName');
   credential.name = await _secureStorage.read(key: 'name');
 
-  print('Signup credentials retrieved securely: $credential');
+  print('Signup credentials retrieved securely: ${credential.email}, ${credential.phoneNumber}');
   return credential;
 }
 

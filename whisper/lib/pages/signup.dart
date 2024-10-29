@@ -10,6 +10,7 @@ import 'package:whisper/services/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import 'package:whisper/validators/form-validation/name-field-validation.dart';
 import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
+import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
@@ -40,16 +41,27 @@ class _SignupState extends State<Signup> {
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
-      SignupCredentials user = SignupCredentials(
-        email: emailController.text,
-        password: passwordController.text,
-        confirmPassword: rePasswordController.text,
-        name: nameController.text,
-        userName: userNameController.text,
-        phoneNumber: phoneController.getFullPhoneNumber(),
-      );
-      await SaveSignupCredentials(user);
-      Navigator.pushNamed(context, Recaptcha.id);
+      if (!ValidateSimilarPasswords(
+          passwordController.text, rePasswordController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'The two passwords are not similar',
+            ),
+          ),
+        );
+      } else {
+        SignupCredentials user = SignupCredentials(
+          email: emailController.text,
+          password: passwordController.text,
+          confirmPassword: rePasswordController.text,
+          name: nameController.text,
+          userName: userNameController.text,
+          phoneNumber: phoneController.getFullPhoneNumber(),
+        );
+        await SaveSignupCredentials(user);
+        Navigator.pushNamed(context, Recaptcha.id);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -75,7 +87,7 @@ class _SignupState extends State<Signup> {
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
         child: Form(
           key: formKey,
           child: ListView(

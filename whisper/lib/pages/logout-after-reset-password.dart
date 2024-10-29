@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/login.dart';
+import 'package:whisper/pages/signup.dart';
 import 'package:whisper/services/logout-all-devices.dart';
 import '../constants/colors.dart';
 
@@ -45,7 +47,11 @@ class LogoutAfterResetPassword extends StatelessWidget {
                   CustomHighlightText(
                     callToActionText: "No",
                     onTap: () async {
-                      Navigator.pushNamed(context, Login.id);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        ChatPage.id,
+                            (Route<dynamic> route) => false,
+                      );
                     },
                   ),
                   CustomHighlightText(

@@ -7,6 +7,7 @@ import '../constants/colors.dart';
 
 class CustomTextField extends StatefulWidget {
   CustomTextField({
+    super.key,
     required this.label,
     this.prefixIcon,
     required this.isObscure,
@@ -36,6 +37,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   Widget build(BuildContext context) {
     return TextFormField(
+      enableInteractiveSelection: widget.isPassword! ? false : true,
       controller: this.widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,

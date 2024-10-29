@@ -85,18 +85,17 @@ class _RecaptchaState extends State<Recaptcha> {
       backgroundColor: firstNeutralColor,
       body: Column(
         children: [
-          SizedBox(height: 100), // Provides space at the top
           Container(
-            height: 500, // You can adjust the height if needed
+            height: 300, // You can adjust the height if needed
             margin: EdgeInsets.symmetric(horizontal: 50),
             child: Align(
               child: WebViewWidget(controller: _controller),
               alignment: Alignment.center,
             ),
           ),
-          Spacer(), // This pushes the "Go Back" button up without fixing it at the bottom
+          Spacer(),
           Padding(
-            padding: const EdgeInsets.only(bottom: 30), // Optional padding for spacing above the bottom
+            padding: const EdgeInsets.only(bottom: 30),
             child: CustomHighlightText(
               callToActionText: "Go Back",
               onTap: () {
