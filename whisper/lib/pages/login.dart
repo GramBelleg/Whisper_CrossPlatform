@@ -113,6 +113,7 @@ class _LoginState extends State<Login> {
                       ),
                       Center(
                         child: CustomHighlightText(
+                          key: const ValueKey(LoginKeys.forgotPasswordHighlightText),
                           callToActionText: 'Forgot Password?',
                           onTap: () {
                             Navigator.pushNamed(
@@ -135,6 +136,7 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                           CustomHighlightText(
+                            key: const ValueKey(LoginKeys.registerHighLightTextKey),
                             callToActionText: "Register",
                             onTap: () {
                               Navigator.pushNamed(context, Signup.id);

@@ -3,7 +3,11 @@ import 'package:flutter/cupertino.dart';
 import '../constants/colors.dart';
 
 class CustomHighlightText extends StatelessWidget {
-  CustomHighlightText({required this.callToActionText, this.onTap});
+  CustomHighlightText({
+    super.key,
+    required this.callToActionText,
+    this.onTap,
+  });
 
   String? callToActionText;
   void Function()? onTap;

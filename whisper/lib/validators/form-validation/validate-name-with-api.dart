@@ -25,9 +25,9 @@ Future<NameValidationResult> ValidateNameWithAPI(String? name) async {
       }
     }
   });
-
+try{
   final response =
-      await http.post(Uri.parse(url), headers: headers, body: body);
+  await http.post(Uri.parse(url), headers: headers, body: body);
   print(jsonDecode(response.body));
   if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
@@ -44,4 +44,10 @@ Future<NameValidationResult> ValidateNameWithAPI(String? name) async {
     return NameValidationResult(
         isValid: false, message: 'Error: ${response.statusCode}');
   }
+} catch(e)
+  {
+    return NameValidationResult(
+        isValid: false, message: 'Error: ${e}');
+  }
+
 }

@@ -9,6 +9,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/signup-keys.dart';
 import 'package:whisper/modules/signup-credentials.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/services/signup.dart';
@@ -86,25 +87,36 @@ class _RecaptchaState extends State<Recaptcha> {
       body: Center(
         child: Column(
           children: [
-            Spacer(flex: 1,),
+            Spacer(
+              flex: 1,
+            ),
             Container(
               height: 500,
               width: 300,
               child: Align(
-                  alignment: Alignment.center,
-                  child: WebViewWidget(controller: _controller)),
+                alignment: Alignment.center,
+                child: WebViewWidget(
+                  key: ValueKey(SignupKeys.recaptchaWebViewKey),
+                  controller: _controller,
+                ),
+              ),
             ),
-            Spacer(flex: 2,),
+            Spacer(
+              flex: 2,
+            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
               child: CustomHighlightText(
+                key: ValueKey(SignupKeys.goBackFromRecaptchaHighlightTextKey),
                 callToActionText: "Go Back",
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
             ),
-            Spacer(flex: 3,),
+            Spacer(
+              flex: 3,
+            ),
           ],
         ),
       ),

@@ -11,6 +11,7 @@ import 'package:whisper/validators/reset-password-validation/confirmation-code-v
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
+import '../keys/forgot-password-keys.dart';
 import '../services/reset-password.dart';
 
 class ResetPassword extends StatelessWidget {
@@ -60,6 +61,7 @@ class ResetPassword extends StatelessWidget {
                 height: 50,
               ),
               CustomTextField(
+                key: ValueKey(ForgotPasswordKeys.codeTextFieldKey),
                 controller: this._codeController,
                 label: "Enter the code",
                 prefixIcon: FontAwesomeIcons.userSecret,
@@ -71,6 +73,7 @@ class ResetPassword extends StatelessWidget {
                 height: 20,
               ),
               CustomTextField(
+                key: ValueKey(ForgotPasswordKeys.passwordTextFieldKey),
                 controller: this._passwordController,
                 label: "New password",
                 prefixIcon: FontAwesomeIcons.lock,
@@ -82,6 +85,7 @@ class ResetPassword extends StatelessWidget {
                 height: 20,
               ),
               CustomTextField(
+                key: ValueKey(ForgotPasswordKeys.rePasswordTextFieldKey),
                 controller: this._rePasswordController,
                 label: "Re-Enter New password",
                 prefixIcon: FontAwesomeIcons.lock,
@@ -93,6 +97,7 @@ class ResetPassword extends StatelessWidget {
                 height: 20,
               ),
               CustomAccessButton(
+                key: ValueKey(ForgotPasswordKeys.savePasswordAndLoginButtonKey),
                 label: "Save password and login",
                 onPressed: () {
                   _submitForm(context);
@@ -105,12 +110,15 @@ class ResetPassword extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CustomHighlightText(
+                    key: ValueKey(ForgotPasswordKeys
+                        .goBackFromCodeAndPasswordsHighlightTextKey),
                     callToActionText: "Go Back",
                     onTap: () {
                       Navigator.pop(context);
                     },
                   ),
                   CustomHighlightText(
+                    key: ValueKey(ForgotPasswordKeys.resendCodeHighlightTextKey),
                     callToActionText: "Resend code",
                     onTap: () async {
                       final email = await GetEmail();

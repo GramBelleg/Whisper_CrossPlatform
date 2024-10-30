@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/keys/signup-keys.dart';
 import 'package:whisper/services/confirm-code.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
@@ -53,6 +54,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                       height: 50,
                     ),
                     CustomTextField(
+                      key: ValueKey(SignupKeys.codeTextFieldKey),
                       controller: this._codeController,
                       label: "Enter the code",
                       prefixIcon: FontAwesomeIcons.userSecret,
@@ -64,6 +66,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                       height: 50,
                     ),
                     CustomAccessButton(
+                      key: ValueKey(SignupKeys.submitCodeButtonKey),
                       label: "Submit Confirmation Code",
                       onPressed: () {
                         _submitForm(context);
@@ -95,12 +98,14 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CustomHighlightText(
+                          key: ValueKey(SignupKeys.goBackFromSubmittingCodeKey),
                           callToActionText: "Go back",
                           onTap: () {
                             Navigator.pop(context);
                           },
                         ),
                         CustomHighlightText(
+                          key: ValueKey(SignupKeys.resendCodeHighlightTextKey),
                           callToActionText: "Resend code",
                           onTap: () async {
                             final email = await GetEmail();

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/keys/login-keys.dart';
 import 'package:whisper/pages/login-with-facebook.dart';
 import 'package:whisper/pages/login-with-github.dart';
 import 'package:whisper/pages/login-with-google.dart';
@@ -24,6 +25,7 @@ class CustomQuickLogin extends StatelessWidget {
               Navigator.pushNamed(context, LoginWithGoogle.id);
             },
             child: FaIcon(
+              key: ValueKey(LoginKeys.googleLoginIconKey),
               FontAwesomeIcons.google,
               color: secondNeutralColor,
             ),
@@ -33,6 +35,7 @@ class CustomQuickLogin extends StatelessWidget {
               Navigator.pushNamed(context, LoginWithGithub.id);
             },
             child: FaIcon(
+              key: ValueKey(LoginKeys.githubLoginIconKey),
               FontAwesomeIcons.github,
               color: secondNeutralColor,
             ),
@@ -42,6 +45,7 @@ class CustomQuickLogin extends StatelessWidget {
               Navigator.pushNamed(context, LoginWithFacebook.id);
             },
             child: FaIcon(
+              key: ValueKey(LoginKeys.facebookLoginIconKey),
               FontAwesomeIcons.facebook,
               color: secondNeutralColor,
             ),
