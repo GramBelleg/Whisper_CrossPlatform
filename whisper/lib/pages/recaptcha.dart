@@ -83,29 +83,31 @@ class _RecaptchaState extends State<Recaptcha> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: firstNeutralColor,
-      body: Column(
-        children: [
-          Container(
-            height: 300, // You can adjust the height if needed
-            margin: EdgeInsets.symmetric(horizontal: 50),
-            child: Align(
-              child: WebViewWidget(controller: _controller),
-              alignment: Alignment.center,
+      body: Center(
+        child: Column(
+          children: [
+            Spacer(flex: 1,),
+            Container(
+              height: 500,
+              width: 300,
+              child: Align(
+                  alignment: Alignment.center,
+                  child: WebViewWidget(controller: _controller)),
             ),
-          ),
-          Spacer(),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30),
-            child: CustomHighlightText(
-              callToActionText: "Go Back",
-              onTap: () {
-                Navigator.pop(context);
-              },
+            Spacer(flex: 2,),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: CustomHighlightText(
+                callToActionText: "Go Back",
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
-          ),
-        ],
+            Spacer(flex: 3,),
+          ],
+        ),
       ),
     );
   }
-
 }

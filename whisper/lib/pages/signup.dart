@@ -11,6 +11,7 @@ import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import 'package:whisper/validators/form-validation/name-field-validation.dart';
 import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
 import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
+import 'package:whisper/validators/form-validation/username-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
@@ -18,6 +19,7 @@ import '../constants/colors.dart';
 import '../controllers/phone-number-controller.dart';
 import '../modules/signup-credentials.dart';
 import '../validators/form-validation/password-field-validation.dart';
+import '../validators/form-validation/validate-name-with-api.dart';
 
 class Signup extends StatefulWidget {
   Signup({super.key});
@@ -51,16 +53,30 @@ class _SignupState extends State<Signup> {
           ),
         );
       } else {
-        SignupCredentials user = SignupCredentials(
-          email: emailController.text,
-          password: passwordController.text,
-          confirmPassword: rePasswordController.text,
-          name: nameController.text,
-          userName: userNameController.text,
-          phoneNumber: phoneController.getFullPhoneNumber(),
-        );
-        await SaveSignupCredentials(user);
-        Navigator.pushNamed(context, Recaptcha.id);
+        NameValidationResult result = await ValidateNameWithAPI(nameController.text);
+        if(result.isValid)
+          {
+            SignupCredentials user = SignupCredentials(
+              email: emailController.text,
+              password: passwordController.text,
+              confirmPassword: rePasswordController.text,
+              name: nameController.text,
+              userName: userNameController.text,
+              phoneNumber: phoneController.getFullPhoneNumber(),
+            );
+            await SaveSignupCredentials(user);
+            Navigator.pushNamed(context, Recaptcha.id);
+          }
+        else
+          {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Enter your real name',
+                ),
+              ),
+            );
+          }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +141,7 @@ class _SignupState extends State<Signup> {
                 prefixIcon: FontAwesomeIcons.user,
                 isObscure: false,
                 isPassword: false,
-                validate: ValidateNameField,
+                validate: ValidateUsernameField,
                 controller: userNameController,
               ),
               SizedBox(

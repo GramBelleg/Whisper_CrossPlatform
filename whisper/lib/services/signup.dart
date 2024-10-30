@@ -27,7 +27,7 @@ Future<void> signup(BuildContext context) async {
     var data = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       await SaveEmail(user.email!);
-      Navigator.pushNamed(context, ConfirmationCode.id);
+      Navigator.pushReplacementNamed(context, ConfirmationCode.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

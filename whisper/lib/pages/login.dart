@@ -52,7 +52,7 @@ class _LoginState extends State<Login> {
   }
 
  Future<bool?> _checkLoginStatus() async {
-    return CheckAlreadyLoggedIn(context); // Replace with your async call
+    return await CheckAlreadyLoggedIn(context); // Replace with your async call
   }
 
   @override
