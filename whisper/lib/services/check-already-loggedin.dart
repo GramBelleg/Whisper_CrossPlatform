@@ -28,10 +28,6 @@ Future<bool?> CheckAlreadyLoggedIn(BuildContext context) async {
       return false;
     }
   } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Something went wrong: ${e}"),
-      ),
-    );
+
   }
 }

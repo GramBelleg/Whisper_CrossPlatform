@@ -32,6 +32,7 @@ class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
+  Future<bool?>? loginStatusFuture;
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
@@ -49,19 +50,20 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    loginStatusFuture = _checkLoginStatus();
   }
 
- Future<bool?> _checkLoginStatus() async {
+  Future<bool?> _checkLoginStatus() async {
     return await CheckAlreadyLoggedIn(context); // Replace with your async call
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _checkLoginStatus(),
+      future: loginStatusFuture,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.waiting) {
-          if (!snap.data!) {
+          if (snap.hasData && snap.data != null && !snap.data!) {
             return Scaffold(
               backgroundColor: firstNeutralColor,
               body: Padding(
@@ -104,7 +106,7 @@ class _LoginState extends State<Login> {
                         height: 10,
                       ),
                       CustomAccessButton(
-                        key:const ValueKey(LoginKeys.loginButtonKey),
+                        key: const ValueKey(LoginKeys.loginButtonKey),
                         label: "Login",
                         onPressed: _submitForm,
                       ),
@@ -113,7 +115,8 @@ class _LoginState extends State<Login> {
                       ),
                       Center(
                         child: CustomHighlightText(
-                          key: const ValueKey(LoginKeys.forgotPasswordHighlightText),
+                          key: const ValueKey(
+                              LoginKeys.forgotPasswordHighlightText),
                           callToActionText: 'Forgot Password?',
                           onTap: () {
                             Navigator.pushNamed(
@@ -136,7 +139,8 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                           CustomHighlightText(
-                            key: const ValueKey(LoginKeys.registerHighLightTextKey),
+                            key: const ValueKey(
+                                LoginKeys.registerHighLightTextKey),
                             callToActionText: "Register",
                             onTap: () {
                               Navigator.pushNamed(context, Signup.id);
@@ -164,16 +168,28 @@ class _LoginState extends State<Login> {
                 ),
               ),
             );
-          } else {
+          } else if (snap.hasData && snap.data != null && snap.data!) {
             return ChatPage();
+            //todo: this should be replaced with the chat page
           }
-          //todo: this should be replaced with the chat page
+          return Scaffold(
+            body: Center(
+              child: Text("Run the backend first"),
+            ),
+          );
         } else {
-          return Center(
-              child: CircularProgressIndicator(
-            color: secondNeutralColor,
-            value: 0.5,
-          ));
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Loading"),
+                  SizedBox(height: 20),
+                  CircularProgressIndicator(), // Add a loading indicator under the logo
+                ],
+              ),
+            ),
+          );
         }
       },
     );
