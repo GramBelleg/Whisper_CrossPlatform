@@ -16,7 +16,7 @@ void main() {
     });
 
     test('returns error if name has special characters', () async{
-      NameValidationResult result = await ValidateNameWithAPI("SEiff Mohammmed");
+      NameValidationResult result = await ValidateNameWithAPI("SEifffff Mohammmed");
       expect(
         result.message,
         'RANDOM_TYPING',

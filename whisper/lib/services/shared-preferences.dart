@@ -18,8 +18,10 @@ Future<void> SaveSignupCredentials(SignupCredentials credentials) async {
   await _secureStorage.write(key: 'name', value: credentials.name!);
   await _secureStorage.write(key: 'userName', value: credentials.userName!);
   await _secureStorage.write(key: 'password', value: credentials.password!);
-  await _secureStorage.write(key: 'confirmPassword', value: credentials.confirmPassword!);
-  await _secureStorage.write(key: 'phoneNumber', value: credentials.phoneNumber!);
+  await _secureStorage.write(
+      key: 'confirmPassword', value: credentials.confirmPassword!);
+  await _secureStorage.write(
+      key: 'phoneNumber', value: credentials.phoneNumber!);
 
   print('Signup credentials saved securely: $credentials');
 }
@@ -29,12 +31,14 @@ Future<SignupCredentials> GetSignUpCredentials() async {
 
   credential.email = await _secureStorage.read(key: 'email');
   credential.password = await _secureStorage.read(key: 'password');
-  credential.confirmPassword = await _secureStorage.read(key: 'confirmPassword');
+  credential.confirmPassword =
+      await _secureStorage.read(key: 'confirmPassword');
   credential.phoneNumber = await _secureStorage.read(key: 'phoneNumber');
   credential.userName = await _secureStorage.read(key: 'userName');
   credential.name = await _secureStorage.read(key: 'name');
 
-  print('Signup credentials retrieved securely: ${credential.email}, ${credential.phoneNumber}');
+  print(
+      'Signup credentials retrieved securely: ${credential.email}, ${credential.phoneNumber}');
   return credential;
 }
 

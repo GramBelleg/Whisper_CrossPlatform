@@ -20,7 +20,7 @@ void main() {
     test('returns error if there is a sequence of characters more than two', () {
       expect(
         ValidateNameField("Ssseif Mohamed"),
-        "No real name contains sss",
+        "Provide your real name please",
       );
     });
 
@@ -35,7 +35,7 @@ void main() {
     test('returns error if there is a number in the name', () {
       expect(
         ValidateNameField("x2 y"),
-        "Enter a valid name",
+        "Write your first and last names please",
       );
     });
 
