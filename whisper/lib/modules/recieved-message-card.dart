@@ -13,8 +13,7 @@ class RecievedMessageCard extends StatelessWidget {
 
   // Function to format DateTime as "HH:mm"
   String _formatTime(DateTime dateTime) {
-    
-    return DateFormat('HH:mm').format(dateTime); // Format as hours:minutes
+    return DateFormat('hh:mm a').format(dateTime); // Format as hours:minutes
   }
 
   @override

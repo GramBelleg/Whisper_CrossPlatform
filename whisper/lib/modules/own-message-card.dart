@@ -23,7 +23,7 @@ class OwnMessageCard extends StatelessWidget {
   });
 
   String _formatTime(DateTime dateTime) {
-    return DateFormat('hh:mm').format(dateTime); // Format as hours:minutes
+    return DateFormat('hh:mm a').format(dateTime); // Format as hours:minutes
   }
 
   @override

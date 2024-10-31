@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:whisper/bloc/chat-bloc.dart';
 import 'package:whisper/bloc/chat-event.dart';
 import 'package:whisper/bloc/chat-state.dart';
+import 'package:whisper/models/chat-messages';
 import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
@@ -52,13 +54,14 @@ class _ChatPageState extends State<ChatPage> {
   // late IO.Socket socket;
   List<ChatMessage> fetchedmessages = []; // fetch messages
   List<ChatMessage> messages = [];
-
+  final chatViewModel = ChatViewModel();
   List<RecievedMessageCard> recievedmessages = [];
   List<DateTime> sendMessagesTime = [];
 
   @override
   void initState() {
     super.initState();
+    loadMessages(widget.ChatID);
     _chatBloc = ChatBloc();
     if (widget.token != null && widget.token!.isNotEmpty) {
       try {
@@ -70,26 +73,19 @@ class _ChatPageState extends State<ChatPage> {
       print("Token is null or empty");
     }
 
-    _chatBloc.add(LoadMessages(widget.ChatID!)); // Load previous messages
-
     // Listen for incoming messages
     _chatBloc.stream.listen((state) {
-      if (state is MessagesLoaded) {
-        setState(() {
-          messages = state.messages; // Update the messages state
-        });
-      } else if (state is MessageAdded) {
-        print("message receive ${state.message}");
-        setState(() {
-          // messages.add(state.message); // Add new message to the list
-        });
-      } else if (state is MessageUpdated) {
+      if (state is MessageAdded) {
         print("message receive ${state.message}");
         // Update existing message in the list if necessary
         int index = messages.indexWhere((msg) => msg.id == state.message.id);
         if (index != -1) {
           setState(() {
             messages[index] = state.message; // Update the message
+          });
+        } else {
+          setState(() {
+            messages.add(state.message);
           });
         }
       }
@@ -125,6 +121,26 @@ class _ChatPageState extends State<ChatPage> {
       _chatBloc.socket?.disconnect();
     }
     super.dispose();
+  }
+
+  Future<void> loadMessages(int chatId) async {
+    try {
+      print("Loading messages for chatId: $chatId");
+      await chatViewModel.fetchChatMessages(chatId);
+      setState(() {
+        for (var chatMessage in chatViewModel.messages) {
+          // Ensure chatMessage.time and chatMessage.sentAt are non-null
+          chatMessage.time = chatMessage.time?.toLocal();
+          chatMessage.sentAt =
+              chatMessage.sentAt?.toLocal(); // Handle potential null
+          messages.add(chatMessage);
+        }
+      });
+      print("Messages loaded successfully");
+    } catch (e) {
+      print("Error loading messages: $e");
+    }
+    _scrollToBottom(messages.length * 75);
   }
 
   void _updateTextProperties(String text) {
@@ -238,6 +254,8 @@ class _ChatPageState extends State<ChatPage> {
               userImage: widget.userImage,
               userName: widget.userName,
               clearSelection: clearIsSelected,
+              chatId: widget.ChatID,
+              chatViewModel: ChatViewModel(),
             ),
             body: Container(
               color: const Color(0xff0a254a),
@@ -256,47 +274,44 @@ class _ChatPageState extends State<ChatPage> {
                           : MediaQuery.of(context).viewInsets.bottom != 0
                               ? MediaQuery.of(context).size.height - 450
                               : MediaQuery.of(context).size.height - 145,
-                      child: BlocBuilder<ChatBloc, SocketState>(
-                          builder: (context, state) {
-                        return ListView.builder(
-                          controller: _scrollController2,
-                          itemCount: messages.length,
-                          itemBuilder: (context, index) {
-                            final messageData = messages[index];
-                            print(messageData.content);
-                            return messageData.senderId == widget.senderId
-                                ? GestureDetector(
-                                    onLongPress: () {
-                                      setState(() {
-                                        isSelected.add(messageData
-                                            .id!); // Add the index to isSelected list
-                                      });
-                                    },
-                                    onTap: () {
-                                      setState(() {
-                                        // Check if the index exists in the isSelected list
-                                        if (isSelected
-                                            .contains(messageData.id!)) {
-                                          // If it exists, remove it
-                                          isSelected.remove(messageData.id!);
-                                        }
-                                      });
-                                    },
-                                    child: OwnMessageCard(
-                                      message: messageData.content,
-                                      time: messageData.time!,
-                                      status: MessageStatus
-                                          .sent, // need modification
-                                      isSelected:
-                                          isSelected.contains(messageData.id!),
-                                    ),
-                                  )
-                                : RecievedMessageCard(
+                      child: ListView.builder(
+                        controller: _scrollController2,
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final messageData = messages[index];
+                          print(messageData.content);
+                          return messageData.senderId == widget.senderId
+                              ? GestureDetector(
+                                  onLongPress: () {
+                                    setState(() {
+                                      isSelected.add(messageData
+                                          .id!); // Add the index to isSelected list
+                                    });
+                                  },
+                                  onTap: () {
+                                    setState(() {
+                                      // Check if the index exists in the isSelected list
+                                      if (isSelected
+                                          .contains(messageData.id!)) {
+                                        // If it exists, remove it
+                                        isSelected.remove(messageData.id!);
+                                      }
+                                    });
+                                  },
+                                  child: OwnMessageCard(
                                     message: messageData.content,
-                                    time: messageData.time!);
-                          },
-                        );
-                      }),
+                                    time: messageData.time!,
+                                    status:
+                                        MessageStatus.sent, // need modification
+                                    isSelected:
+                                        isSelected.contains(messageData.id!),
+                                  ),
+                                )
+                              : RecievedMessageCard(
+                                  message: messageData.content,
+                                  time: messageData.time!);
+                        },
+                      ),
                     ),
                     Align(
                       alignment: Alignment.bottomCenter,

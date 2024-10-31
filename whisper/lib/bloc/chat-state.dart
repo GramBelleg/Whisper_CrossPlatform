@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:whisper/models/chat-messages';
 import 'package:whisper/services/fetch-messages.dart';
 
 abstract class SocketState extends Equatable {
@@ -29,16 +30,6 @@ class ChatConnected extends SocketState {
   List<Object> get props => []; // Return List<Object> to match the type
 }
 
-class MessagesLoaded extends SocketState {
-  final List<ChatMessage> messages;
-
-  const MessagesLoaded(this.messages);
-
-  @override
-  List<Object> get props =>
-      messages; // This works since List<ChatMessage> can be treated as List<Object>
-}
-
 class MessageReceived extends SocketState {
   final ChatMessage message;
 
@@ -51,7 +42,7 @@ class MessageReceived extends SocketState {
 class MessageSent extends SocketState {
   final ChatMessage message;
 
-  const MessageSent(this.message);
+  MessageSent(this.message);
 
   @override
   List<Object> get props => [message]; // Include the message in props

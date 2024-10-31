@@ -15,14 +15,6 @@ class ConnectSocket extends SocketEvent {
   List<Object> get props => [token];
 }
 
-class LoadMessages extends SocketEvent {
-  final int chatId;
-
-  const LoadMessages(this.chatId);
-
-  @override
-  List<Object> get props => [chatId];
-}
 
 class ReceiveMessage extends SocketEvent {
   final Map<String, dynamic> data;
