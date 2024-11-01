@@ -67,7 +67,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       final messagesCubit = BlocProvider.of<MessagesCubit>(context);
       try {
         // Call the deleteMessage method from the MessagesCubit
-        
+
         await messagesCubit.deleteMessage(widget.chatId, widget.isSelected);
         print('Deleted for user: ${widget.isSelected}');
 
@@ -90,13 +90,32 @@ class _CustomAppBarState extends State<CustomAppBar> {
     }
   }
 
-  void _deleteForEveryone(BuildContext context) {
-    // Add your deletion logic for "Delete for Everyone" here
-    print('Deleting for everyone: ${widget.isSelected}');
-    if (widget.clearSelection != null) {
-      widget.clearSelection!();
+  void _deleteForEveryone(BuildContext context) async {
+    if (widget.isSelected.isNotEmpty) {
+      final messagesCubit = BlocProvider.of<MessagesCubit>(context);
+      try {
+        // Emit delete message for everyone
+        messagesCubit.emitDeleteMessageForEveryone(
+            widget.isSelected, widget.chatId);
+        print('Deleted for everyone: ${widget.isSelected}');
+
+        // Clear the selection after deletion
+        if (widget.clearSelection != null) {
+          widget.clearSelection!();
+        }
+
+        Navigator.of(context).pop(); // Close the dialog
+      } catch (e) {
+        // Handle any errors that occur during deletion
+        print('Error deleting messages for everyone: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting messages for everyone: $e')),
+        );
+      }
+    } else {
+      Navigator.of(context)
+          .pop(); // Close the dialog if no messages are selected
     }
-    Navigator.of(context).pop(); // Close the dialog
   }
 
   @override

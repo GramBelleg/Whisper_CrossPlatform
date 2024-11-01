@@ -270,10 +270,10 @@ class _ChatPageState extends State<ChatPage> {
                   messages
                       .removeWhere((msg) => state.deletedIds.contains(msg.id));
                 });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('Message deleted: ${state.deletedIds}')),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //     // SnackBar(
+                //     //     content: Text('Message deleted: ${state.deletedIds}')),
+                //     );
               } else if (state is MessagesDeleteError) {
                 // Handle deletion error
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -305,36 +305,37 @@ class _ChatPageState extends State<ChatPage> {
                         itemBuilder: (context, index) {
                           final messageData = messages[index];
                           print(messageData.content);
-                          return messageData.senderId == widget.senderId
-                              ? GestureDetector(
-                                  onLongPress: () {
-                                    setState(() {
-                                      isSelected.add(messageData
-                                          .id!); // Add the index to isSelected list
-                                    });
-                                  },
-                                  onTap: () {
-                                    setState(() {
-                                      // Check if the index exists in the isSelected list
-                                      if (isSelected
-                                          .contains(messageData.id!)) {
-                                        // If it exists, remove it
-                                        isSelected.remove(messageData.id!);
-                                      }
-                                    });
-                                  },
-                                  child: OwnMessageCard(
-                                    message: messageData.content,
-                                    time: messageData.time!,
-                                    status:
-                                        MessageStatus.sent, // need modification
-                                    isSelected:
-                                        isSelected.contains(messageData.id!),
-                                  ),
-                                )
-                              : RecievedMessageCard(
-                                  message: messageData.content,
-                                  time: messageData.time!);
+                          return GestureDetector(
+                              onLongPress: () {
+                                setState(() {
+                                  isSelected.add(messageData
+                                      .id!); // Add the index to isSelected list
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  // Check if the index exists in the isSelected list
+                                  if (isSelected.contains(messageData.id!)) {
+                                    // If it exists, remove it
+                                    isSelected.remove(messageData.id!);
+                                  }
+                                });
+                              },
+                              child: messageData.senderId == widget.senderId
+                                  ? OwnMessageCard(
+                                      message: messageData.content,
+                                      time: messageData.time!,
+                                      status: MessageStatus
+                                          .sent, // need modification
+                                      isSelected:
+                                          isSelected.contains(messageData.id!),
+                                    )
+                                  : RecievedMessageCard(
+                                      message: messageData.content,
+                                      time: messageData.time!,
+                                      isSelected:
+                                          isSelected.contains(messageData.id!),
+                                    ));
                         },
                       ),
                     ),

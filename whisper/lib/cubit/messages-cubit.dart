@@ -60,6 +60,12 @@ class MessagesCubit extends Cubit<MessagesState> {
       emit(SocketDisconnected());
       print("Disconnected from server");
     });
+
+    socket?.on('deleteMessage', (data) {
+      final ids = List<int>.from(data['Ids']);
+      final chatId = data['chatId'];
+      receiveDeletedMessage(ids, chatId); // Handle deleted messages
+    });
   }
 
   void disconnectSocket() {
@@ -128,5 +134,32 @@ class MessagesCubit extends Cubit<MessagesState> {
     }
   }
 
-  void deleteMessagesForEveryOne(Map<String, dynamic> data) {}
+  void emitDeleteMessageForEveryone(List<int> ids, int chatId) {
+    final data = {
+      'Ids': ids,
+      'chatId': chatId,
+    };
+
+    try {
+      // Attempt to emit the delete event to the server
+      socket?.emit('deleteMessage', data);
+      emit(MessagesDeletedSuccessfully(ids));
+      print(
+          "Broadcast delete message request for chatId: $chatId with ids: $ids");
+    } catch (e) {
+      emit(MessagesDeleteError(e.toString()));
+      print("Error broadcasting delete message request: $e");
+    }
+  }
+
+  void receiveDeletedMessage(List<int> ids, int chatId) {
+    try {
+      // Handle incoming delete event and remove messages locally
+      emit(MessagesDeletedSuccessfully(ids));
+      print("Messages deleted from chatId: $chatId with ids: $ids");
+    } catch (e) {
+      emit(MessagesDeleteError(e.toString()));
+      print("Error handling received delete message: $e");
+    }
+  }
 }
