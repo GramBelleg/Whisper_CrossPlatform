@@ -8,6 +8,7 @@ import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> sendConfirmationCode(String email, BuildContext context) async {
   final url = Uri.parse('http://$ip:5000/api/auth/resendConfirmCode');
+
   try {
     final response = await http.post(
       url,
