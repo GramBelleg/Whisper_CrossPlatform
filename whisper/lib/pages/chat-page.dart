@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:whisper/bloc/chat-bloc.dart';
-import 'package:whisper/bloc/chat-event.dart';
-import 'package:whisper/bloc/chat-state.dart';
+
+import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/cubit/chat-event.dart';
+import 'package:whisper/cubit/messages-state.dart';
 import 'package:whisper/models/chat-messages';
 import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
@@ -38,7 +38,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  late ChatBloc _chatBloc;
   TextEditingController _controller = TextEditingController();
   TextAlign _textAlign = TextAlign.left; // Default text alignment
   TextDirection _textDirection = TextDirection.ltr; // Default text direction
@@ -61,41 +60,40 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    loadMessages(widget.ChatID);
-    _chatBloc = ChatBloc();
+
     if (widget.token != null && widget.token!.isNotEmpty) {
       try {
-        _chatBloc.add(ConnectSocket(widget.token!));
+        context.read<MessagesCubit>().connectSocket(widget.token!);
       } catch (e) {
         print("Error connecting to socket: $e");
       }
     } else {
       print("Token is null or empty");
     }
+    context.read<MessagesCubit>().loadMessages(widget.ChatID);
+    // // Listen for incoming messages
+    // _chatBloc.stream.listen((state) {
+    //   if (state is MessageAdded) {
+    //     print("message receive ${state.message}");
+    //     // Update existing message in the list if necessary
+    //     int index = messages.indexWhere((msg) => msg.id == state.message.id);
+    //     if (index != -1) {
+    //       setState(() {
+    //         messages[index] = state.message; // Update the message
+    //       });
+    //     } else {
+    //       setState(() {
+    //         messages.add(state.message);
+    //       });
+    //     }
+    //   }
+    //
+    // });
 
-    // Listen for incoming messages
-    _chatBloc.stream.listen((state) {
-      if (state is MessageAdded) {
-        print("message receive ${state.message}");
-        // Update existing message in the list if necessary
-        int index = messages.indexWhere((msg) => msg.id == state.message.id);
-        if (index != -1) {
-          setState(() {
-            messages[index] = state.message; // Update the message
-          });
-        } else {
-          setState(() {
-            messages.add(state.message);
-          });
-        }
-      }
-      _scrollToBottom(messages.length * 75);
-    });
-
-    // Scroll to the bottom on widget build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom(0);
-    });
+    // // Scroll to the bottom on widget build
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollToBottom(0);
+    // });
 
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -113,34 +111,12 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    _chatBloc.close();
+    // _chatBloc.close();
     _controller.dispose(); // Dispose of the controller
     focusNode.dispose(); // Dispose of the focusNode
 
-    if (_chatBloc.socket!.connected) {
-      _chatBloc.socket?.disconnect();
-    }
+    context.read<MessagesCubit>().disconnectSocket();
     super.dispose();
-  }
-
-  Future<void> loadMessages(int chatId) async {
-    try {
-      print("Loading messages for chatId: $chatId");
-      await chatViewModel.fetchChatMessages(chatId);
-      setState(() {
-        for (var chatMessage in chatViewModel.messages) {
-          // Ensure chatMessage.time and chatMessage.sentAt are non-null
-          chatMessage.time = chatMessage.time?.toLocal();
-          chatMessage.sentAt =
-              chatMessage.sentAt?.toLocal(); // Handle potential null
-          messages.add(chatMessage);
-        }
-      });
-      print("Messages loaded successfully");
-    } catch (e) {
-      print("Error loading messages: $e");
-    }
-    _scrollToBottom(messages.length * 75);
   }
 
   void _updateTextProperties(String text) {
@@ -246,18 +222,67 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (_) => _chatBloc,
-        child: Scaffold(
-            appBar: CustomAppBar(
-              isSelected: isSelected,
-              userImage: widget.userImage,
-              userName: widget.userName,
-              clearSelection: clearIsSelected,
-              chatId: widget.ChatID,
-              chatViewModel: ChatViewModel(),
-            ),
-            body: Container(
+    return Scaffold(
+        appBar: CustomAppBar(
+          isSelected: isSelected,
+          userImage: widget.userImage,
+          userName: widget.userName,
+          clearSelection: clearIsSelected,
+          chatId: widget.ChatID,
+          chatViewModel: ChatViewModel(),
+        ),
+        body: BlocListener<MessagesCubit, MessagesState>(
+            listener: (context, state) {
+              if (state is MessagesLoading) {
+                print("loading");
+              } else if (state is MessageFetchedSuccessfully) {
+                setState(() {
+                  messages = state
+                      .messages; // Assume state.messages is the list of messages
+                });
+                _scrollToBottom(messages.length * 100);
+              } else if (state is MessageFetchedWrong) {
+                print("erroor");
+              } else if (state is MessageSent) {
+                setState(() {
+                  messages.add(state.message);
+                });
+              } else if (state is MessageReceived) {
+                DateTime receivedTime = state.message.time!.toLocal();
+                int index =
+                    messages.indexWhere((msg) => msg.sentAt == receivedTime);
+
+                if (index != -1) {
+                  print("hhhhhhhhhhhh");
+                  setState(() {
+                    messages[index] = state.message; // Update the message
+                  });
+                } else {
+                  setState(() {
+                    messages.add(state.message);
+                  });
+                }
+                _scrollToBottom(100);
+              } else if (state is MessagesDeletedSuccessfully) {
+                print("state.deletIds=${state.deletedIds}");
+                // Remove the message with the given ID from the list
+                setState(() {
+                  messages
+                      .removeWhere((msg) => state.deletedIds.contains(msg.id));
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('Message deleted: ${state.deletedIds}')),
+                );
+              } else if (state is MessagesDeleteError) {
+                // Handle deletion error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('Error deleting message: ${state.error}')),
+                );
+              }
+            },
+            child: Container(
               color: const Color(0xff0a254a),
               child: WillPopScope(
                 child: Stack(
@@ -434,10 +459,14 @@ class _ChatPageState extends State<ChatPage> {
                                     onPressed: () {
                                       if (_isTyping) {
                                         print("hey");
-                                        _chatBloc.add(SendMessage(
-                                            _controller.text,
-                                            widget.ChatID,
-                                            widget.senderId));
+                                        context
+                                            .read<MessagesCubit>()
+                                            .sendMessage(
+                                                _controller
+                                                    .text, // Message content
+                                                widget.ChatID, // Chat ID
+                                                widget.senderId! // Sender ID
+                                                );
 
                                         _controller
                                             .clear(); // Clear the text field after sending

@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon-creation.dart';
+import 'dart:io';
 
 class FileButtonSheet extends StatelessWidget {
   final ImagePicker _picker = ImagePicker();
@@ -34,23 +35,34 @@ class FileButtonSheet extends StatelessWidget {
 
   void _pickFile() async {
     // Use FilePicker to pick a file
+
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       // Get the selected file
+      print("fucckssss $result");
       String? filePath = result.files.single.path;
       String? fileName = result.files.single.name;
 
-      // You can now send the file or show a message with the file name
-      print("File selected: $fileName at $filePath");
+      if (filePath != null) {
+        File selectedFile = File(filePath);
 
-      // Add logic to send the file or display it in the chat
-      // For example:
-      // _sendFile(filePath);
+        // You can now send or display the file in the chat
+        print("File selected: $fileName at $filePath");
+
+        // Example: Call a function to send/display the file
+        _sendFile(selectedFile, fileName);
+      }
     } else {
       // User canceled the picker
       print("File selection canceled");
     }
+  }
+
+  void _sendFile(File file, String fileName) {
+    // Here you can implement the logic to send the file
+    // For example, upload the file to a server or show it in a chat UI
+    print("Sending file: $fileName");
   }
 
   void _pickImageFromCamera() async {

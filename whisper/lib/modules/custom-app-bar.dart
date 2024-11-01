@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/services/fetch-messages.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  final List<int> isSelected;
+  final List<int> isSelected; // List of selected message IDs
   final String userImage;
   final String userName;
+  final int chatId;
   final VoidCallback? clearSelection;
+  final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
 
   CustomAppBar({
     required this.isSelected,
     required this.userImage,
     required this.userName,
     required this.clearSelection,
+    required this.chatViewModel, // Initialize ChatViewModel
+    required this.chatId,
   });
 
   @override
@@ -22,6 +29,76 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete these items?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _deleteForMe(context); // Handle "Delete for Me" action
+              },
+              child: Text('Delete for Me'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteForEveryone(
+                    context); // Handle "Delete for Everyone" action
+              },
+              child: Text('Delete for Everyone'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Handle "Cancel" action
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteForMe(BuildContext context) async {
+    if (widget.isSelected.isNotEmpty) {
+      final messagesCubit = BlocProvider.of<MessagesCubit>(context);
+      try {
+        // Call the deleteMessage method from the MessagesCubit
+        
+        await messagesCubit.deleteMessage(widget.chatId, widget.isSelected);
+        print('Deleted for user: ${widget.isSelected}');
+
+        // Clear the selection after deletion
+        if (widget.clearSelection != null) {
+          widget.clearSelection!();
+        }
+
+        Navigator.of(context).pop(); // Close the dialog
+      } catch (e) {
+        // Handle any errors that occur during deletion
+        print('Error deleting messages: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting messages: $e')),
+        );
+      }
+    } else {
+      Navigator.of(context)
+          .pop(); // Close the dialog if no messages are selected
+    }
+  }
+
+  void _deleteForEveryone(BuildContext context) {
+    // Add your deletion logic for "Delete for Everyone" here
+    print('Deleting for everyone: ${widget.isSelected}');
+    if (widget.clearSelection != null) {
+      widget.clearSelection!();
+    }
+    Navigator.of(context).pop(); // Close the dialog
+  }
+
   @override
   Widget build(BuildContext context) {
     return !widget.isSelected.isEmpty
@@ -73,7 +150,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
               IconButton(
                 onPressed: () {
-                  // Add delete/garbage action here
+                  // Show the delete dialog when the delete icon is pressed
+                  _showDeleteDialog(context);
                 },
                 icon: const Icon(
                   Icons.delete,
