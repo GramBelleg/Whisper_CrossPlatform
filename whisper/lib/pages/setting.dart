@@ -38,4 +38,36 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+
+  Widget _buildProfileSection() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 70,
+            backgroundColor: Colors.grey,
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/el-gayar.jpg', // Replace with your image asset path
+                fit: BoxFit.cover,
+                width: 140,
+                height: 140,
+              ),
+            ),
+          ),
+          // Display name and online status
+          Text(
+            nameController.text,
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          SizedBox(height: 4),
+          Text(
+            isOnline ? 'Online' : 'Offline',
+            style: TextStyle(color: isOnline ? Color(0xFF4CB9CF) : Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
 }
