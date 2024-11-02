@@ -40,7 +40,7 @@ class ResetPassword extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -50,7 +50,7 @@ class ResetPassword extends StatelessWidget {
                 height: 50,
               ),
               CustomTextField(
-                controller: this._codeController,
+                controller: _codeController,
                 label: "Enter the code",
                 prefixIcon: FontAwesomeIcons.userSecret,
                 isObscure: true,
@@ -61,7 +61,7 @@ class ResetPassword extends StatelessWidget {
                 height: 20,
               ),
               CustomTextField(
-                controller: this._passwordController,
+                controller: _passwordController,
                 label: "New password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,
@@ -72,7 +72,7 @@ class ResetPassword extends StatelessWidget {
                 height: 20,
               ),
               CustomTextField(
-                controller: this._rePasswordController,
+                controller: _rePasswordController,
                 label: "Re-Enter New password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,

@@ -17,7 +17,7 @@ import '../modules/signup-credentials.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
 class Signup extends StatefulWidget {
-  Signup({super.key});
+  const Signup({super.key});
 
   static String id = "/Signup";
 

@@ -18,7 +18,7 @@ class LogoutAfterResetPassword extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(

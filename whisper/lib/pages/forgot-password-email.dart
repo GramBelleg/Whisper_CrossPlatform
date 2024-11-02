@@ -37,7 +37,7 @@ class ForgotPasswordEmail extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -47,7 +47,7 @@ class ForgotPasswordEmail extends StatelessWidget {
                 height: 50,
               ),
               CustomTextField(
-                controller: this._emailController,
+                controller: _emailController,
                 label: "Email",
                 prefixIcon: FontAwesomeIcons.envelope,
                 isObscure: false,

@@ -7,9 +7,9 @@ import '../validators/form-validation/phone-field-validation.dart';
 
 class CustomPhoneField extends StatefulWidget {
   const CustomPhoneField({
-    Key? key,
+    super.key,
     required this.controller,
-  }) : super(key: key);
+  });
 
   final CustomPhoneController controller;
 

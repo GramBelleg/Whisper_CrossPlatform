@@ -6,7 +6,7 @@ import 'package:whisper/services/shared-preferences.dart';
 Future<List<dynamic>> fetchChats() async {
   final String url = 'http://localhost:5000/api/chats';
   String? token = await GetToken(); // Retrieve token
-  print("Hello, Flutter!");
+  //print("Hello, Flutter!");
   try {
     final response = await http.get(
       Uri.parse(url),

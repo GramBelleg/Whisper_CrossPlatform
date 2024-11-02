@@ -14,7 +14,7 @@ import '../services/login.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
 class Login extends StatefulWidget {
-  Login({super.key});
+  const Login({super.key});
 
   static String id = "/Login";
 
@@ -52,7 +52,7 @@ class _LoginState extends State<Login> {
           vertical: 32.0,
         ),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -62,7 +62,7 @@ class _LoginState extends State<Login> {
                 height: 20,
               ),
               CustomTextField(
-                controller: this.emailController,
+                controller: emailController,
                 label: "Email",
                 prefixIcon: FontAwesomeIcons.envelope,
                 isObscure: false,
@@ -73,7 +73,7 @@ class _LoginState extends State<Login> {
                 height: 10,
               ),
               CustomTextField(
-                controller: this.passwordController,
+                controller: passwordController,
                 label: "Password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,

@@ -7,6 +7,7 @@ import '../constants/colors.dart';
 
 class CustomTextField extends StatefulWidget {
   CustomTextField({
+    super.key,
     required this.label,
     this.prefixIcon,
     required this.isObscure,
@@ -30,13 +31,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void updateIsObscure() {
     setState(() {
-      this.widget.isObscure = !this.widget.isObscure!;
+      widget.isObscure = !widget.isObscure!;
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: this.widget.controller,
+      controller: widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,
       style: TextStyle(

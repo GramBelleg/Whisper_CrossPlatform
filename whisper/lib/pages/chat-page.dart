@@ -38,14 +38,14 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   TextAlign _textAlign = TextAlign.left; // Default text alignment
   TextDirection _textDirection = TextDirection.ltr; // Default text direction
   bool _isTyping = false;
   bool show = false; // Tracks if the emoji picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
-  ScrollController _scrollController = ScrollController();
-  ScrollController _scrollController2 = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController2 = ScrollController();
   final GlobalKey<FormFieldState<String>> _textFieldKey =
       GlobalKey<FormFieldState<String>>();
   int lastVisibleMessageIndex = 0;
@@ -293,7 +293,7 @@ class _ChatPageState extends State<ChatPage> {
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.cover,
                     ),
-                    Container(
+                    SizedBox(
                       height: show
                           ? MediaQuery.of(context).size.height - 400
                           : MediaQuery.of(context).viewInsets.bottom != 0
@@ -347,7 +347,7 @@ class _ChatPageState extends State<ChatPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width - 55,
                                 child: Card(
                                   margin: const EdgeInsets.only(

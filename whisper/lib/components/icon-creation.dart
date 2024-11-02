@@ -7,12 +7,12 @@ class IconCreationWidget extends StatelessWidget {
   final Function onTap;
 
   const IconCreationWidget({
-    Key? key,
+    super.key,
     required this.icon,
     required this.text,
     required this.color,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +22,12 @@ class IconCreationWidget extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 30,
+            backgroundColor: color,
             child: Icon(
               icon,
               size: 29,
               color: Colors.white,
             ),
-            backgroundColor: color,
           ),
           Text(text),
         ],

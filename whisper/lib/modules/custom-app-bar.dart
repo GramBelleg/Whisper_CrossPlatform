@@ -12,7 +12,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
 
-  CustomAppBar({
+  const CustomAppBar({
+    super.key,
     required this.isSelected,
     required this.userImage,
     required this.userName,
@@ -67,7 +68,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       final messagesCubit = BlocProvider.of<MessagesCubit>(context);
       try {
         // Call the deleteMessage method from the MessagesCubit
-        
+
         await messagesCubit.deleteMessage(widget.chatId, widget.isSelected);
         print('Deleted for user: ${widget.isSelected}');
 
@@ -101,7 +102,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return !widget.isSelected.isEmpty
+    return widget.isSelected.isNotEmpty
         ? AppBar(
             iconTheme: const IconThemeData(
               color: Color(0xff8D6AEE), // Color for the icons

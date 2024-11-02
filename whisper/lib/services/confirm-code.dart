@@ -35,7 +35,7 @@ Future<void> confirmCode(String code, BuildContext context) async {
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Something went wrong: ${e}"),
+        content: Text("Something went wrong: $e"),
       ),
     );
   }

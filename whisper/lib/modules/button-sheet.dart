@@ -7,8 +7,8 @@ import 'dart:io';
 class FileButtonSheet extends StatelessWidget {
   final ImagePicker _picker = ImagePicker();
   FileButtonSheet({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   void _pickAudio() async {
     // Use FilePicker to pick an audio file
@@ -95,7 +95,7 @@ class FileButtonSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height / 3,
       width: MediaQuery.of(context).size.width,
       child: Card(

@@ -11,7 +11,7 @@ import '../constants/colors.dart';
 import '../services/send-confirmation-code.dart';
 
 class ConfirmationCode extends StatefulWidget {
-  ConfirmationCode({super.key});
+  const ConfirmationCode({super.key});
 
   static String id = "/ConfirmationCode";
 
@@ -37,7 +37,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -47,7 +47,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                 height: 50,
               ),
               CustomTextField(
-                controller: this._codeController,
+                controller: _codeController,
                 label: "Enter the code",
                 prefixIcon: FontAwesomeIcons.userSecret,
                 isObscure: true,

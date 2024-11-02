@@ -14,7 +14,7 @@ class OwnMessageCard extends StatelessWidget {
   final MessageStatus status;
   final bool isSelected;
 
-  OwnMessageCard({
+  const OwnMessageCard({
     super.key,
     required this.message,
     required this.time,

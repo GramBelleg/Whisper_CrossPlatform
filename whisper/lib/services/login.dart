@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/modules/login-credentials.dart';
-import 'package:whisper/pages/mainchats-page.dart';
+import 'package:whisper/pages/mainchats.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> login(LoginCredentials loginCred, BuildContext context) async {
@@ -35,7 +35,7 @@ Future<void> login(LoginCredentials loginCred, BuildContext context) async {
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Something went wrong: ${e}"),
+        content: Text("Something went wrong: $e"),
       ),
     );
   }

@@ -80,10 +80,10 @@ final sampleUsers = [
 
 class StoryPage extends StatefulWidget {
   const StoryPage({
-    Key? key,
+    super.key,
     required this.userIndex,
     this.withCloseIcon = true,
-  }) : super(key: key);
+  });
   final int userIndex;
   final bool withCloseIcon; // if false --> open from expandedBody
   @override
