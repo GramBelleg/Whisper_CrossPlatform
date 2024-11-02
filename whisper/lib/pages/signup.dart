@@ -54,36 +54,16 @@ class _SignupState extends State<Signup> {
           ),
         );
       } else {
-        try{
-          NameValidationResult result = await ValidateNameWithAPI(nameController.text);
-          if(result.isValid)
-          {
-            SignupCredentials user = SignupCredentials(
-              email: emailController.text,
-              password: passwordController.text,
-              confirmPassword: rePasswordController.text,
-              name: nameController.text,
-              userName: userNameController.text,
-              phoneNumber: phoneController.getFullPhoneNumber(),
-            );
-            await SaveSignupCredentials(user);
-            Navigator.pushNamed(context, Recaptcha.id);
-          }
-          else
-          {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  result.message!
-                ),
-              ),
-            );
-          }
-        }catch(e)
-    {
-      print(e);
-    }
-
+        SignupCredentials user = SignupCredentials(
+          email: emailController.text,
+          password: passwordController.text,
+          confirmPassword: rePasswordController.text,
+          name: nameController.text,
+          userName: userNameController.text,
+          phoneNumber: phoneController.getFullPhoneNumber(),
+        );
+        await SaveSignupCredentials(user);
+        Navigator.pushNamed(context, Recaptcha.id);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

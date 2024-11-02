@@ -28,14 +28,14 @@ Future<void> sendConfirmationCode(String email, BuildContext context) async {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Something went wrong: ${data['message']}"),
+          content: Text("Something went wrong : ${data['message']}"),
         ),
       );
     }
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Something went wrong: ${e}"),
+        content: Text("Something went wrong : ${e}"),
       ),
     );
   }

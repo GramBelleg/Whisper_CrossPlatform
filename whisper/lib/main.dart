@@ -3,7 +3,6 @@ import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
-import 'package:whisper/pages/login-with-facebook.dart';
 import 'package:whisper/pages/login-with-github.dart';
 import 'package:whisper/pages/login-with-google.dart';
 import 'package:whisper/pages/login.dart';
@@ -31,7 +30,6 @@ class Whisper extends StatelessWidget {
         ForgotPasswordEmail.id: (context) => ForgotPasswordEmail(),
         ConfirmationCode.id: (context) => ConfirmationCode(),
         ResetPassword.id: (context) => ResetPassword(),
-        LoginWithFacebook.id: (context) => LoginWithFacebook(),
         LoginWithGithub.id: (context) => LoginWithGithub(),
         LogoutAfterResetPassword.id: (context) => LogoutAfterResetPassword(),
         Recaptcha.id: (context) => Recaptcha(
