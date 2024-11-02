@@ -33,7 +33,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   void connectSocket(String token) {
     print("send token: $token");
 
-    socket = IO.io("http://localhost:5000", <String, dynamic>{
+    socket = IO.io("http://172.20.192.1:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
