@@ -70,4 +70,63 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+
+  Widget _buildEditFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: usernameController,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Username',
+            labelStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          ),
+        ),
+        SizedBox(height: 10),
+        TextField(
+          controller: phoneController,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Phone Number',
+            labelStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          ),
+        ),
+        SizedBox(height: 10),
+        TextField(
+          controller: emailController,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Email',
+            labelStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          ),
+        ),
+        SizedBox(height: 10),
+        TextField(
+          controller: bioController,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Bio',
+            labelStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          ),
+        ),
+      ],
+    );
+  }
 }
