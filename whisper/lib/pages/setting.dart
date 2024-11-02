@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:whisper/components/user-state.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/services/shared-preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -13,19 +15,80 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final bool isOnline = true; // Change to false to test offline status
-  bool isEditing = false; // Track if in edit mode
+  UserState? userState; // Global UserState variable
+  bool isOnline = true;
+  bool isEditing = false;
 
-  final TextEditingController nameController =
-      TextEditingController(text: 'Amr Saad');
-  final TextEditingController usernameController =
-      TextEditingController(text: 'User123');
-  final TextEditingController phoneController =
-      TextEditingController(text: '+012222222');
-  final TextEditingController emailController =
-      TextEditingController(text: 'maroo@gmail.com');
-  final TextEditingController bioController =
-      TextEditingController(); // Bio can be set later
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+  String profilePic = '';
+  String lastSeen = '';
+  String status = '';
+  int autoDownloadSize = 0;
+  String lastSeenPrivacy = 'Everyone';
+  String pfpPrivacy = 'Everyone';
+  bool readReceipts = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserState();
+  }
+
+  Future<void> _loadUserState() async {
+    userState = await getUserState(); // Fetch and set global UserState
+    if (userState != null) {
+      setState(() {
+        nameController.text = userState!.name;
+        usernameController.text = userState!.username;
+        emailController.text = userState!.email;
+        bioController.text = userState!.bio;
+        phoneController.text = userState!.phoneNumber;
+        profilePic = userState!.profilePic;
+        lastSeen = userState!.lastSeen;
+        status = userState!.status;
+        autoDownloadSize = userState!.autoDownloadSize;
+        lastSeenPrivacy = userState!.lastSeenPrivacy;
+        pfpPrivacy = userState!.pfpPrivacy;
+        readReceipts = userState!.readReceipts;
+        isOnline = userState!.status == "online";
+      });
+    }
+  }
+
+  void _saveChanges() async {
+    // Create a new UserState with updated values using copyWith
+    UserState updatedUserState = await userState!.copyWith(
+      name: nameController.text,
+      username: usernameController.text,
+      email: emailController.text,
+      bio: bioController.text,
+      phoneNumber: phoneController.text,
+    );
+
+    // Save the updated UserState to your persistent storage
+    await saveUserState(updatedUserState); // Implement this method to save
+
+    setState(() {
+      userState = updatedUserState;
+      isEditing = false;
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      nameController.text = userState!.name;
+      usernameController.text = userState!.username;
+      emailController.text = userState!.email;
+      bioController.text = userState!.bio;
+      phoneController.text = userState!.phoneNumber;
+      isEditing = false;
+    });
+  }
 
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));
@@ -89,8 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _buildProfileSection(),
-              if (isEditing)
-                _buildEditFields(), // Show edit fields if in editing mode
+              if (isEditing) _buildEditFields(),
               if (!isEditing) ...[
                 SizedBox(height: 30),
                 _buildInfoRow(
@@ -111,24 +173,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     fontSize: 20,
                   ),
                 ),
-                SizedBox(
-                    height: 16), // Add vertical space between title and buttons
-                // Privacy Settings buttons
-                _buildPrivacyCard(
-                  'Visibility Settings',
-                  FontAwesomeIcons.eye,
-                  const VisibilitySettingsPage(),
-                ),
-                _buildPrivacyCard(
-                  'Blocked Users',
-                  FontAwesomeIcons.userSlash,
-                  const BlockedUsersPage(),
-                ),
-                _buildPrivacyCard(
-                  'Who can see my profile picture?',
-                  FontAwesomeIcons.image,
-                  const ProfilePictureSettingsPage(),
-                ),
+                SizedBox(height: 16),
+                _buildPrivacyCard('Visibility Settings', FontAwesomeIcons.eye,
+                    const VisibilitySettingsPage()),
+                _buildPrivacyCard('Blocked Users', FontAwesomeIcons.userSlash,
+                    const BlockedUsersPage()),
+                _buildPrivacyCard('Who can see my profile picture?',
+                    FontAwesomeIcons.image, const ProfilePictureSettingsPage()),
               ]
             ]),
           ),
@@ -150,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 backgroundColor: Colors.grey,
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/images/el-gayar.jpg', // Replace with your image asset path
+                    'assets/images/el-gayar.jpg',
                     fit: BoxFit.cover,
                     width: 140,
                     height: 140,
@@ -175,13 +226,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
             ],
           ),
-          // Show the button for setting a new photo in edit mode
           if (isEditing)
             PopupMenuButton<String>(
               onSelected: (value) {
-                // Handle the selected option
                 print("Selected: $value");
-                // You can replace this print statement with your actual logic
                 if (value == 'Camera') {
                   // Logic to take a photo
                 } else if (value == 'Gallery') {
@@ -205,9 +253,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ],
               child: TextButton(
-                onPressed: null, // Disable button click handling
+                onPressed: null,
                 style: TextButton.styleFrom(
-                  foregroundColor: Color(0xff8D6AEE), // Set the text color
+                  foregroundColor: Color(0xff8D6AEE),
                   backgroundColor: Colors.transparent,
                 ),
                 child: Text(
@@ -219,9 +267,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-
           SizedBox(height: 16),
-          // Display either the name as a TextField or as text based on editing mode
           if (isEditing)
             TextField(
               controller: nameController,
@@ -242,7 +288,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SizedBox(height: 4),
             Text(
-              isOnline ? 'Online' : 'Offline',
+              isOnline ? "Online" : "Offline",
               style:
                   TextStyle(color: isOnline ? Color(0xFF4CB9CF) : Colors.grey),
             ),
@@ -254,7 +300,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildEditFields() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextField(
           controller: usernameController,
@@ -268,20 +313,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 borderSide: BorderSide(color: Color(0xff8D6AEE))),
           ),
         ),
-        SizedBox(height: 10),
-        TextField(
-          controller: phoneController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Phone Number',
-            labelStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
-          ),
-        ),
-        SizedBox(height: 10),
         TextField(
           controller: emailController,
           style: TextStyle(color: Colors.white),
@@ -294,12 +325,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 borderSide: BorderSide(color: Color(0xff8D6AEE))),
           ),
         ),
-        SizedBox(height: 10),
         TextField(
           controller: bioController,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
             labelText: 'Bio',
+            labelStyle: TextStyle(color: Colors.grey),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          ),
+        ),
+        TextField(
+          controller: phoneController,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            labelText: 'Phone Number',
             labelStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
@@ -380,18 +422,5 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
     );
-  }
-
-  void _saveChanges() {
-    // Save changes logic here
-    setState(() {
-      isEditing = false; // Exit edit mode
-    });
-  }
-
-  void _cancelEdit() {
-    setState(() {
-      isEditing = false; // Exit edit mode
-    });
   }
 }
