@@ -11,47 +11,49 @@ void showVisibilityOptions(
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
-      return Container(
-        color: Color(0xFF0A122F),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              title: Text(
-                title,
-                style: TextStyle(color: Color(0xff8D6AEE)),
+      return SingleChildScrollView(
+        child: Container(
+          color: Color(0xFF0A122F),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: Text(
+                  title,
+                  style: TextStyle(color: Color(0xff8D6AEE)),
+                ),
               ),
-            ),
-            RadioListTile<VisibilityState>(
-              title:
-                  Text("Everyone", style: TextStyle(color: Color(0xff8D6AEE))),
-              value: VisibilityState.everyone,
-              groupValue: currentValue,
-              onChanged: (VisibilityState? value) {
-                onChanged(value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<VisibilityState>(
-              title: Text("My Contacts",
-                  style: TextStyle(color: Color(0xff8D6AEE))),
-              value: VisibilityState.contacts,
-              groupValue: currentValue,
-              onChanged: (VisibilityState? value) {
-                onChanged(value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<VisibilityState>(
-              title: Text("Nobody", style: TextStyle(color: Color(0xff8D6AEE))),
-              value: VisibilityState.nobody,
-              groupValue: currentValue,
-              onChanged: (VisibilityState? value) {
-                onChanged(value!);
-                Navigator.pop(context);
-              },
-            ),
-          ],
+              RadioListTile<VisibilityState>(
+                title:
+                    Text("Everyone", style: TextStyle(color: Color(0xff8D6AEE))),
+                value: VisibilityState.everyone,
+                groupValue: currentValue,
+                onChanged: (VisibilityState? value) {
+                  onChanged(value!);
+                  Navigator.pop(context);
+                },
+              ),
+              RadioListTile<VisibilityState>(
+                title: Text("My Contacts",
+                    style: TextStyle(color: Color(0xff8D6AEE))),
+                value: VisibilityState.contacts,
+                groupValue: currentValue,
+                onChanged: (VisibilityState? value) {
+                  onChanged(value!);
+                  Navigator.pop(context);
+                },
+              ),
+              RadioListTile<VisibilityState>(
+                title: Text("Nobody", style: TextStyle(color: Color(0xff8D6AEE))),
+                value: VisibilityState.nobody,
+                groupValue: currentValue,
+                onChanged: (VisibilityState? value) {
+                  onChanged(value!);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         ),
       );
     },

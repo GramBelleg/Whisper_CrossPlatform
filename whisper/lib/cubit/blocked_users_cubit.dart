@@ -19,6 +19,14 @@ class BlockedUsersCubit extends Cubit<List<Map<String, String>>> {
             'name': 'bati5a',
             'profilePicture': 'https://place.dog/200/200',
           },
+          {
+            'name': 'lalala',
+            'profilePicture': 'https://placecats.com/bella/100/100',
+          },
+          {
+            'name': 'bababa',
+            'profilePicture': 'https://placecats.com/millie/100/100',
+          },
         ]);
 
   void unblockUser(int index) {
