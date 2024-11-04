@@ -4,7 +4,7 @@ import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/pages/signup.dart';
-import 'package:whisper/services/logout-all-devices.dart';
+import 'package:whisper/services/log-out-services.dart';
 import '../constants/colors.dart';
 
 class LogoutAfterResetPassword extends StatelessWidget {
@@ -57,7 +57,7 @@ class LogoutAfterResetPassword extends StatelessWidget {
                   CustomHighlightText(
                     callToActionText: "Yes",
                     onTap: () async {
-                      await logoutFromAllDevices(context);
+                      await LogoutService.logoutFromAllDevices(context);
                     },
                   ),
                 ],

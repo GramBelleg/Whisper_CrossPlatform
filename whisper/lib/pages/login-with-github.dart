@@ -31,14 +31,12 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
   void initState() {
     super.initState();
 
-    // Construct the OAuth URL for GitHub
     oauthUrl = 'https://github.com/login/oauth/authorize'
         '?client_id=$clientId'
         '&redirect_uri=$redirectUri'
         '&scope=user:email'
         '&prompt=select_account';
 
-    // Create WebView controller
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
@@ -82,7 +80,6 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                 } catch (e) {
                   print(e);
                 }
-                // Close the WebView and return the code
               }
               return NavigationDecision.prevent;
             }

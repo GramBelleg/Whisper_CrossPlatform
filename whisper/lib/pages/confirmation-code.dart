@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/keys/signup-keys.dart';
-import 'package:whisper/services/confirm-code.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/sign-up-services.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
-import '../services/send-confirmation-code.dart';
 
 class ConfirmationCode extends StatefulWidget {
   ConfirmationCode({super.key});
@@ -27,11 +26,10 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      await confirmCode(_codeController.text, context);
+      await SignupService.confirmCode(_codeController.text, context);
     }
   }
 
-  //todo: make it future builder
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -109,7 +107,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                           callToActionText: "Resend code",
                           onTap: () async {
                             final email = await GetEmail();
-                            await sendConfirmationCode(email!, context);
+                            await SignupService.sendConfirmationCode(email!, context);
                           },
                         ),
                       ],

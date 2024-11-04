@@ -5,12 +5,8 @@ import 'package:whisper/components/custom-phone-field.dart';
 import 'package:whisper/keys/signup-keys.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/pages/recaptcha.dart';
-import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/signup-services.dart';
-import 'package:whisper/services/signup.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import 'package:whisper/validators/form-validation/name-field-validation.dart';
-import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
 import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
 import 'package:whisper/validators/form-validation/username-field-validation.dart';
 import '../components/custom-access-button.dart';
@@ -20,7 +16,6 @@ import '../constants/colors.dart';
 import '../controllers/phone-number-controller.dart';
 import '../modules/signup-credentials.dart';
 import '../validators/form-validation/password-field-validation.dart';
-import '../validators/form-validation/validate-name-with-api.dart';
 
 class Signup extends StatefulWidget {
   Signup({super.key});
@@ -62,8 +57,7 @@ class _SignupState extends State<Signup> {
           userName: userNameController.text,
           phoneNumber: phoneController.getFullPhoneNumber(),
         );
-        await SaveSignupCredentials(user);
-        Navigator.pushNamed(context, Recaptcha.id);
+        Navigator.pushNamed(context, Recaptcha.id,arguments: user);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

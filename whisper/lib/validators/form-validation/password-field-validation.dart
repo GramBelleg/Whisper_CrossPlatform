@@ -17,7 +17,7 @@ String? ValidatePasswordField(String? value,
   final hasLower = RegExp(r'[a-z]').hasMatch(passwordWithoutSpaces);
   final hasUpper = RegExp(r'[A-Z]').hasMatch(passwordWithoutSpaces);
   final hasDigit = RegExp(r'\d').hasMatch(passwordWithoutSpaces);
-  final hasSpecialChar = RegExp(r'[@$!%*?&#^]').hasMatch(passwordWithoutSpaces);
+  final hasSpecialChar = RegExp(r'[@$!%*?&#^_]').hasMatch(passwordWithoutSpaces);
   final repeatPattern = RegExp(r'(.)\1{' + (maxRepeat-1).toString() + ',}');
 
   if (!hasLower) {

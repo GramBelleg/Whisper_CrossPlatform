@@ -13,8 +13,7 @@ import '../components/custom-highlight-text.dart';
 import '../components/custom-quick-login.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
-import '../services/check-already-loggedin.dart';
-import '../services/login.dart';
+import '../services/log-in-services.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
 class Login extends StatefulWidget {
@@ -41,7 +40,7 @@ class _LoginState extends State<Login> {
         email: emailController.text,
         password: passwordController.text,
       );
-      await login(loginCred, context);
+      await LoginService.login(loginCred, context);
     } else {
       print("Form is invalid!");
     }
@@ -54,8 +53,9 @@ class _LoginState extends State<Login> {
   }
 
   Future<bool?> _checkLoginStatus() async {
-    return await CheckAlreadyLoggedIn(context); // Replace with your async call
+    return await LoginService.CheckAlreadyLoggedIn(context);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +170,7 @@ class _LoginState extends State<Login> {
             );
           } else if (snap.hasData && snap.data != null && snap.data!) {
             return ChatPage();
-            //todo: this should be replaced with the chat page
+            //todo: this should be replaced with the real chat page
           }
           return Scaffold(
             body: Center(

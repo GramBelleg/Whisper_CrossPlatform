@@ -40,6 +40,10 @@ void main() {
       expect(ValidatePasswordField('Abc1234'),
           'Password must contain at least one special character (@,\$, !, %, *, ?, &)');
     });
+    test('valid password', () {
+      expect(ValidatePasswordField('Abc_1234'),
+          null);
+    });
 
     test(
         'returns error if password has too many consecutive repeating characters',

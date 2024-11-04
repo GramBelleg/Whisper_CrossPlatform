@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/modules/reset-password-credentials.dart';
-import 'package:whisper/services/send-reset-code.dart';
+import 'package:whisper/services/reset-password-services.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/validators/form-validation/password-field-validation.dart';
 import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
@@ -12,7 +12,6 @@ import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 import '../keys/forgot-password-keys.dart';
-import '../services/reset-password.dart';
 
 class ResetPassword extends StatelessWidget {
   ResetPassword({super.key});
@@ -33,7 +32,7 @@ class ResetPassword extends StatelessWidget {
           confirmPassword: _rePasswordController.text,
           code: _codeController.text,
         );
-        await resetPassword(resetPasswordCredentials, context);
+        await ResetPasswordService.resetPassword(resetPasswordCredentials, context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -122,7 +121,7 @@ class ResetPassword extends StatelessWidget {
                     callToActionText: "Resend code",
                     onTap: () async {
                       final email = await GetEmail();
-                      sendResetCode(email!, context);
+                      ResetPasswordService.sendResetCode(email!, context);
                     },
                   ),
                 ],

@@ -22,6 +22,15 @@ void main() {
     test('returns error for invalid email without domain', () {
       expect(ValidateEmailField('user@.com'), 'Enter a valid email');
     });
+    test('returns error for invalid email starts with dot', () {
+      expect(ValidateEmailField('.user@.com'), 'Enter a valid email');
+    });
+    test('returns error for invalid email ends with dot', () {
+      expect(ValidateEmailField('user@.com.'), 'Enter a valid email');
+    });
+    test('returns error for invalid email contains consecutive dots', () {
+      expect(ValidateEmailField('user@gmail..com'), 'Enter a valid email');
+    });
 
     test('returns error for invalid email with invalid characters', () {
       expect(ValidateEmailField('user@exa!mple.com'), 'Enter a valid email');
@@ -42,5 +51,6 @@ void main() {
     test('returns valid for email with numbers and special characters', () {
       expect(ValidateEmailField('user.name+tag@example.co.uk'), null);
     });
+
   });
 }

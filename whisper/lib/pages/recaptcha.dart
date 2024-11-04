@@ -12,7 +12,7 @@ import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/signup-keys.dart';
 import 'package:whisper/modules/signup-credentials.dart';
 import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/signup.dart';
+import 'package:whisper/services/sign-up-services.dart';
 
 class Recaptcha extends StatefulWidget {
   final String apiKey;
@@ -43,9 +43,9 @@ class _RecaptchaState extends State<Recaptcha> {
   late RecaptchaV2Controller controller;
   late final WebViewController _controller;
 
-  void verifyToken(String token) async {
+  void verifyToken(String token,SignupCredentials? user) async {
     await SaveRobotToken(token);
-    await signup(context);
+    await SignupService.signup(context,user);
   }
 
   @override
@@ -71,7 +71,9 @@ class _RecaptchaState extends State<Recaptcha> {
           if (_token.contains("verify")) {
             _token = _token.substring(7);
           }
-          verifyToken(_token);
+          final SignupCredentials? receivedData =
+          ModalRoute.of(context)?.settings.arguments as SignupCredentials?;
+          verifyToken(_token,receivedData);
         },
       )
       ..loadRequest(Uri.parse("${widget.pluginURL}?api_key=${widget.apiKey}"));
@@ -82,6 +84,8 @@ class _RecaptchaState extends State<Recaptcha> {
 
   @override
   Widget build(BuildContext context) {
+    final SignupCredentials? receivedData =
+        ModalRoute.of(context)?.settings.arguments as SignupCredentials?;
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Center(

@@ -15,7 +15,7 @@ void main() {
         body: Login(),
       ),
     ));
-    await tester.pump();
+    await tester.pumpAndSettle(Duration(seconds: 5));
     expect(find.byKey(Key(emailFieldKey)), findsOneWidget);
     expect(find.byKey(Key(passwordFieldKey)), findsOneWidget);
     expect(find.byKey(Key(loginButtonKey)), findsOneWidget);
@@ -23,8 +23,8 @@ void main() {
     // first scenario : trying to login
     // without writing any email or password
     await tester.tap(find.byKey(Key(loginButtonKey)));
-    await tester.pump();
-    expect(find.text("This Field is required"), findsExactly(2));
+    await tester.pumpAndSettle(Duration(seconds: 5));
+    expect(find.text("This field is required"), findsExactly(2));
 
     // second scenario : trying to login
     // with incorrect email format
@@ -37,7 +37,7 @@ void main() {
       "12345678",
     );
     await tester.tap(find.byKey(Key(loginButtonKey)));
-    await tester.pump();
+    await tester.pumpAndSettle(Duration(seconds: 5));
     expect(find.text("Enter a valid email"), findsExactly(1));
 
     // third scenario : trying to login
@@ -48,12 +48,12 @@ void main() {
     );
     await tester.enterText(
       find.byKey(Key(passwordFieldKey)),
-      "123458",
+      "12348",
     );
     await tester.tap(find.byKey(Key(loginButtonKey)));
-    await tester.pump();
+    await tester.pumpAndSettle(Duration(seconds: 5));
     expect(
-      find.text("Password must be at least 8 characters"),
+      find.text("Password must be at least 6 characters"),
       findsExactly(1),
     );
   });

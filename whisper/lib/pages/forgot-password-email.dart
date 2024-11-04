@@ -7,7 +7,7 @@ import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
-import '../services/send-reset-code.dart';
+import '../services/reset-password-services.dart';
 
 class ForgotPasswordEmail extends StatelessWidget {
   ForgotPasswordEmail({super.key});
@@ -18,7 +18,7 @@ class ForgotPasswordEmail extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      await sendResetCode(
+      await ResetPasswordService.sendResetCode(
         _emailController.text,
         context,
       );

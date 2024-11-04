@@ -9,7 +9,12 @@ void main() {
         'Enter a valid name',
       );
     });
-
+    test('returns error if name has special characters', () {
+      expect(
+        ValidateNameField(""),
+        'This field is required',
+      );
+    });
     test('valid name', () {
       expect(
         ValidateNameField("Seif Mohamed"),
@@ -43,6 +48,12 @@ void main() {
       expect(
         ValidateNameField("x y"),
         "Write your first and last names please",
+      );
+    });
+    test('returns error if it is not a first and last name', () {
+      expect(
+        ValidateNameField("xy"),
+        "Please provide both first and last names",
       );
     });
   });
