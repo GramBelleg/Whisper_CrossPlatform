@@ -4,19 +4,14 @@ import 'package:integration_test/integration_test.dart';
 import 'package:whisper/main.dart' as app;
 import 'package:whisper/keys/login-keys.dart';
 import 'package:whisper/keys/home-keys.dart';
-import 'package:logger/logger.dart'; // Import logger
-import 'utils/test_cases/LoginTestCases.dart';
-import 'utils/auth_user.dart';
+import '../utils/test_cases/LoginTestCases.dart';
+import '../utils/auth_user.dart';
 const String invalidEmailErrorMessage = 'Enter a valid email';
 const String emptyField = 'This field is required';
-const String notExistingEmailErrorMessage = 'Something went wrong';
+const String notExistingEmailErrorMessage = 'existed in DB';
 
 void main() {
-  final Logger logger = Logger(
-    printer: PrettyPrinter(),
-  );
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   group('Login E2E Tests', () {
     late Finder emailField;
     late Finder passwordField;
@@ -27,7 +22,7 @@ void main() {
         passwordField = find.byKey(const ValueKey(LoginKeys.passwordTextFieldKey));
         loginButton = find.byKey(const ValueKey(LoginKeys.loginButtonKey));
       } catch (e) {
-        logger.e("SETUP FAILED: Can't find fields", e); // Log error
+        print("SETUP FAILED: Can't find fields: $e"); // Log error
       }
     });
 
@@ -44,7 +39,7 @@ void main() {
         try {
           expect(find.text(invalidEmailErrorMessage), findsOneWidget);
         } catch (e) {
-          logger.e("Test case failed for invalid email: $testcase", e); // Log error
+          print("Test case failed for invalid email: $testcase: $e"); // Log error
           testFailed=true;
         }
       }
@@ -55,11 +50,11 @@ void main() {
       try {
         expect(find.text(emptyField), findsOneWidget);
       } catch (e) {
-        logger.e("Test case failed for empty email field", e); // Log error
+       print("Test case failed for empty email field: $e"); // Log error
         testFailed=true;
       }
       if(testFailed) {
-        throw Error();
+        print("invalid email and valid password failed");
       }
     });
 
@@ -75,7 +70,7 @@ void main() {
         try {
           expect(find.textContaining('Password must'), findsOneWidget);
         } catch (e) {
-          logger.e("Test case failed for invalid password: $testcase", e); // Log error
+          print("Test case failed for invalid password: $testcase, $e"); // Log error
           testFailed=true;
         }
       }
@@ -86,11 +81,11 @@ void main() {
       try {
         expect(find.text(emptyField), findsOneWidget);
       } catch (e) {
-        logger.e("Test case failed for empty password field", e); // Log error
+        print("Test case failed for empty password field, $e"); // Log error
         testFailed=true;
       }
       if(testFailed){
-          throw Error();
+          print("valid email and invalid password failed");
         }
     });
 
@@ -106,12 +101,12 @@ void main() {
         try {
           expect(find.textContaining(notExistingEmailErrorMessage), findsOneWidget);
         } catch (e) {
-          logger.e("Test case failed for valid but non-existing email: $testcase", e); // Log error
+          print("Test case failed for valid but non-existing email: $testcase, $e"); // Log error
           testFailed=true;
         }
       }
       if(testFailed){
-          throw Error();
+          print("valid emails but not existing in DB failed");
         }
     });
 
@@ -123,15 +118,15 @@ void main() {
       await tester.enterText(passwordField, AuthUser.password);
       await tester.tap(loginButton);
       await tester.pumpAndSettle();
-      await tester.pumpAndSettle(const Duration(seconds: 15));
       try {
+        await tester.pumpAndSettle(Duration(seconds: 5));
         expect(find.byKey((const ValueKey(HomeKeys.logoutButtonKey))), findsOneWidget);
       } catch (e) {
-        logger.e("Login failed", e); // Log error
+        print("Login failed, $e"); // Log error
         testFailed=true;
       }
       if(testFailed){
-          throw Error();
+          print("Login with valid email and password failed");
         }
     });
   });
