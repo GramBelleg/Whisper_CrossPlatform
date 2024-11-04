@@ -35,14 +35,14 @@ class _LoginState extends State<Login> {
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
-      print("Form is valid!");
+      // print("Form is valid!");
       LoginCredentials loginCred = LoginCredentials(
         email: emailController.text,
         password: passwordController.text,
       );
       await LoginService.login(loginCred, context);
     } else {
-      print("Form is invalid!");
+      // print("Form is invalid!");
     }
   }
 
