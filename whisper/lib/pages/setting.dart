@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
@@ -43,9 +44,9 @@ class _SettingsPageState extends State<SettingsPage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFF0A122F),
+        backgroundColor: firstNeutralColor,
         appBar: AppBar(
-          backgroundColor: Color(0xFF0A122F),
+          backgroundColor: firstNeutralColor,
           actions: isEditing
               ? [
                   Padding(
@@ -55,14 +56,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Text(
                         "Done",
                         style:
-                            TextStyle(color: Color(0xff8D6AEE), fontSize: 18),
+                            TextStyle(color: primaryColor, fontSize: 18),
                       ),
                     ),
                   ),
                 ]
               : [
                   IconButton(
-                    icon: Icon(Icons.edit, color: Colors.white),
+                    icon: Icon(Icons.edit, color: secondNeutralColor),
                     onPressed: () {
                       setState(() {
                         isEditing = true; // Enter edit mode
@@ -79,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Text(
                         "Cancel",
                         style:
-                            TextStyle(color: Color(0xff8D6AEE), fontSize: 18),
+                            TextStyle(color: primaryColor, fontSize: 18),
                       ),
                     ),
                     SizedBox(width: 60), // Placeholder for alignment
@@ -111,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   "Privacy Settings",
                   style: TextStyle(
-                    color: Color(0xff8D6AEE),
+                    color: primaryColor,
                     fontSize: 20,
                   ),
                 ),
@@ -138,11 +139,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("Who can add me to groups?",
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: secondNeutralColor)),
                           Text(
                             getVisibilityText(privacyState['addMeToGroups']),
                             style: TextStyle(
-                                color: Color(0xff8D6AEE).withOpacity(0.6)),
+                                color: primaryColor.withOpacity(0.6)),
                           )
                         ],
                       ),
@@ -196,11 +197,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   height: 38,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xff8D6AEE),
+                    color: primaryColor,
                   ),
                   child: IconButton(
                     icon: Icon(Icons.add, size: 24),
-                    color: Colors.white,
+                    color: secondNeutralColor,
                     onPressed: () {
                       // Add functionality to upload a profile picture
                     },
@@ -240,7 +241,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: TextButton(
                 onPressed: null, // Disable button click handling
                 style: TextButton.styleFrom(
-                  foregroundColor: Color(0xff8D6AEE), // Set the text color
+                  foregroundColor: primaryColor, // Set the text color
                   backgroundColor: Colors.transparent,
                 ),
                 child: Text(
@@ -258,26 +259,26 @@ class _SettingsPageState extends State<SettingsPage> {
           if (isEditing)
             TextField(
               controller: nameController,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: secondNeutralColor),
               decoration: InputDecoration(
                 labelText: 'Name',
                 labelStyle: TextStyle(color: Colors.grey),
                 enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey)),
                 focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff8D6AEE))),
+                    borderSide: BorderSide(color: primaryColor)),
               ),
             )
           else ...[
             Text(
               nameController.text,
-              style: TextStyle(color: Colors.white, fontSize: 20),
+              style: TextStyle(color: secondNeutralColor, fontSize: 20),
             ),
             SizedBox(height: 4),
             Text(
               isOnline ? 'Online' : 'Offline',
               style:
-                  TextStyle(color: isOnline ? Color(0xFF4CB9CF) : Colors.grey),
+                  TextStyle(color: isOnline ? highlightColor : Colors.grey),
             ),
           ],
         ],
@@ -291,53 +292,53 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         TextField(
           controller: usernameController,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: secondNeutralColor),
           decoration: InputDecoration(
             labelText: 'Username',
             labelStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+                borderSide: BorderSide(color: primaryColor)),
           ),
         ),
         SizedBox(height: 10),
         TextField(
           controller: phoneController,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: secondNeutralColor),
           decoration: InputDecoration(
             labelText: 'Phone Number',
             labelStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+                borderSide: BorderSide(color: primaryColor)),
           ),
         ),
         SizedBox(height: 10),
         TextField(
           controller: emailController,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: secondNeutralColor),
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+                borderSide: BorderSide(color: primaryColor)),
           ),
         ),
         SizedBox(height: 10),
         TextField(
           controller: bioController,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: secondNeutralColor),
           decoration: InputDecoration(
             labelText: 'Bio',
             labelStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+                borderSide: BorderSide(color: primaryColor)),
           ),
         ),
       ],
@@ -359,7 +360,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Text(
                 value,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: secondNeutralColor,
                   fontSize: 18,
                 ),
               ),
@@ -402,7 +403,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     SizedBox(width: 8),
                     Text(
                       setting,
-                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      style: TextStyle(color: secondNeutralColor, fontSize: 15),
                     ),
                   ],
                 ),

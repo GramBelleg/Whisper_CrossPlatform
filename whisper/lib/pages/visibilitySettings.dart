@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../constants/colors.dart';
 import '../cubit/visibility_cubit.dart';
 import '../utils/visibility_utils.dart';
 
@@ -16,14 +16,14 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0A122F),
+      backgroundColor: firstNeutralColor,
       appBar: AppBar(
         title: Text(
           "Visibility Settings",
-          style: TextStyle(color: Color(0xff8D6AEE)),
+          style: TextStyle(color: primaryColor),
         ),
-        backgroundColor: Color(0xFF0A122F),
-        iconTheme: IconThemeData(color: Color(0xff8D6AEE)),
+        backgroundColor: firstNeutralColor,
+        iconTheme: IconThemeData(color: primaryColor),
       ),
       body: BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
         builder: (context, privacyState) {
@@ -35,12 +35,12 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   children: [
                     Text(
                       "Who can see my profile picture?",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
                       getVisibilityText(privacyState['profilePicture']),
-                      style: TextStyle(
-                          color: Color(0xff8D6AEE).withOpacity(0.6)),
+                      style:
+                          TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -64,12 +64,12 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   children: [
                     Text(
                       "Who can see my stories?",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
                       getVisibilityText(privacyState['stories']),
-                      style: TextStyle(
-                          color: Color(0xff8D6AEE).withOpacity(0.6)),
+                      style:
+                          TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -93,12 +93,12 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   children: [
                     Text(
                       "Who can see my last seen?",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
                       getVisibilityText(privacyState['lastSeen']),
-                      style: TextStyle(
-                          color: Color(0xff8D6AEE).withOpacity(0.6)),
+                      style:
+                          TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -118,7 +118,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   children: [
                     Text(
                       "Read Receipts",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: secondNeutralColor),
                     ),
                     Switch(
                       value: privacyState['readReceipts'],
