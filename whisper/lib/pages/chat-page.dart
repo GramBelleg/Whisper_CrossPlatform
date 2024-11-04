@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:swipe_to/swipe_to.dart';
+import 'package:whisper/components/reply-preview.dart';
 
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/cubit/chat-event.dart';
@@ -54,9 +57,9 @@ class _ChatPageState extends State<ChatPage> {
   List<ChatMessage> fetchedmessages = []; // fetch messages
   List<ChatMessage> messages = [];
   final chatViewModel = ChatViewModel();
-  List<RecievedMessageCard> recievedmessages = [];
-  List<DateTime> sendMessagesTime = [];
-
+  ParentMessage? _replyingTo; // Stores the message being replied to
+  bool _isReplying = false; // Tracks if in reply mode
+  double paddingSpaceForReplay = 0;
   @override
   void initState() {
     super.initState();
@@ -71,29 +74,6 @@ class _ChatPageState extends State<ChatPage> {
       print("Token is null or empty");
     }
     context.read<MessagesCubit>().loadMessages(widget.ChatID);
-    // // Listen for incoming messages
-    // _chatBloc.stream.listen((state) {
-    //   if (state is MessageAdded) {
-    //     print("message receive ${state.message}");
-    //     // Update existing message in the list if necessary
-    //     int index = messages.indexWhere((msg) => msg.id == state.message.id);
-    //     if (index != -1) {
-    //       setState(() {
-    //         messages[index] = state.message; // Update the message
-    //       });
-    //     } else {
-    //       setState(() {
-    //         messages.add(state.message);
-    //       });
-    //     }
-    //   }
-    //
-    // });
-
-    // // Scroll to the bottom on widget build
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _scrollToBottom(0);
-    // });
 
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -192,13 +172,13 @@ class _ChatPageState extends State<ChatPage> {
       print(additionalHeight);
 
       // Calculate the target scroll position
-      double targetPosition =
-          _scrollController2.position.maxScrollExtent + additionalHeight;
+      double targetPosition = additionalHeight;
+      // _scrollController2.position.maxScrollExtent +
 
       // Scroll to the target position
       _scrollController2.animateTo(
         targetPosition,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
     }
@@ -240,21 +220,28 @@ class _ChatPageState extends State<ChatPage> {
                   messages = state
                       .messages; // Assume state.messages is the list of messages
                 });
-                _scrollToBottom(messages.length * 100);
+                _scrollToBottom(messages.length * 150);
               } else if (state is MessageFetchedWrong) {
                 print("erroor");
               } else if (state is MessageSent) {
                 setState(() {
+                  ;
                   messages.add(state.message);
                 });
               } else if (state is MessageReceived) {
+                setState(() {
+                  paddingSpaceForReplay = 0;
+                });
                 DateTime receivedTime = state.message.time!.toLocal();
+
                 int index =
                     messages.indexWhere((msg) => msg.sentAt == receivedTime);
 
+                // print(messages[index].toString());
+                print({state.message.toString()});
                 if (index != -1) {
-                  print("hhhhhhhhhhhh");
                   setState(() {
+                    print("zzzzzzzzzzzzeeeeeeeeeeeeaaaaaaaaaaddddddddd");
                     messages[index] = state.message; // Update the message
                   });
                 } else {
@@ -262,7 +249,7 @@ class _ChatPageState extends State<ChatPage> {
                     messages.add(state.message);
                   });
                 }
-                _scrollToBottom(100);
+                _scrollToBottom(messages.length * 150);
               } else if (state is MessagesDeletedSuccessfully) {
                 print("state.deletIds=${state.deletedIds}");
                 // Remove the message with the given ID from the list
@@ -299,44 +286,75 @@ class _ChatPageState extends State<ChatPage> {
                           : MediaQuery.of(context).viewInsets.bottom != 0
                               ? MediaQuery.of(context).size.height - 450
                               : MediaQuery.of(context).size.height - 145,
-                      child: ListView.builder(
-                        controller: _scrollController2,
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final messageData = messages[index];
-                          print(messageData.content);
-                          return GestureDetector(
-                              onLongPress: () {
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: paddingSpaceForReplay),
+                        child: ListView.builder(
+                          controller: _scrollController2,
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) {
+                            final messageData = messages[index];
+
+                            print(messageData.id);
+                            return SwipeTo(
+                              key: ValueKey(messageData.id),
+                              iconColor: Color(0xff8D6AEE),
+                              onRightSwipe: (details) {
+                                print(
+                                    "hhhhhhhhhhhhhhhhhhhhhhzzzzzzzzkkkkkkkkk${messageData.id}");
                                 setState(() {
-                                  isSelected.add(messageData
-                                      .id!); // Add the index to isSelected list
+                                  print(
+                                      "i will make a reply here ${messageData.toString()}");
+                                  _isReplying = true;
+                                  _replyingTo = ParentMessage(
+                                      id: messageData.id!,
+                                      content: messageData.content,
+                                      type: messageData.type,
+                                      senderName: widget.userName);
+                                  paddingSpaceForReplay = 50;
+                                  _scrollToBottom(messages.length * 150);
                                 });
                               },
-                              onTap: () {
-                                setState(() {
-                                  // Check if the index exists in the isSelected list
-                                  if (isSelected.contains(messageData.id!)) {
-                                    // If it exists, remove it
-                                    isSelected.remove(messageData.id!);
-                                  }
-                                });
-                              },
-                              child: messageData.senderId == widget.senderId
-                                  ? OwnMessageCard(
-                                      message: messageData.content,
-                                      time: messageData.time!,
-                                      status: MessageStatus
-                                          .sent, // need modification
-                                      isSelected:
-                                          isSelected.contains(messageData.id!),
-                                    )
-                                  : RecievedMessageCard(
-                                      message: messageData.content,
-                                      time: messageData.time!,
-                                      isSelected:
-                                          isSelected.contains(messageData.id!),
-                                    ));
-                        },
+                              child: GestureDetector(
+                                  onLongPress: () {
+                                    setState(() {
+                                      isSelected.add(messageData
+                                          .id!); // Add the index to isSelected list
+                                    });
+                                  },
+                                  onTap: () {
+                                    setState(() {
+                                      // Check if the index exists in the isSelected list
+                                      if (isSelected
+                                          .contains(messageData.id!)) {
+                                        // If it exists, remove it
+                                        isSelected.remove(messageData.id!);
+                                      }
+                                    });
+                                  },
+                                  child: messageData.senderId == widget.senderId
+                                      ? OwnMessageCard(
+                                          message: messageData.content,
+                                          time: messageData.time!,
+                                          status: MessageStatus
+                                              .sent, // need modification
+                                          isSelected: messageData.id != null &&
+                                              isSelected
+                                                  .contains(messageData.id!),
+                                          repliedMessage:
+                                              messageData.parentMessage,
+                                        )
+                                      : RecievedMessageCard(
+                                          message: messageData.content,
+                                          time: messageData.time!,
+                                          isSelected: messageData.id != null &&
+                                              isSelected
+                                                  .contains(messageData.id!),
+                                          repliedMessage:
+                                              messageData.parentMessage,
+                                        )),
+                            );
+                          },
+                        ),
                       ),
                     ),
                     Align(
@@ -344,6 +362,18 @@ class _ChatPageState extends State<ChatPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
+                          ReplyPreview(
+                            isReplying: _isReplying,
+                            senderName: widget.userName,
+                            content: _replyingTo?.content ?? '',
+                            onCancelReply: () {
+                              setState(() {
+                                _isReplying = false;
+                                _replyingTo = null;
+                                paddingSpaceForReplay = 0;
+                              });
+                            },
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -355,7 +385,7 @@ class _ChatPageState extends State<ChatPage> {
                                       left: 5, right: 5, bottom: 8),
                                   child: TextFormField(
                                     onTap: () {
-                                      _scrollToBottom(200);
+                                      _scrollToBottom(messages.length * 150);
                                     },
                                     scrollController: _scrollController,
 
@@ -459,21 +489,26 @@ class _ChatPageState extends State<ChatPage> {
                                   child: IconButton(
                                     onPressed: () {
                                       if (_isTyping) {
-                                        print("hey");
+                                        print("heyd");
+                                        print(_isReplying);
                                         context
                                             .read<MessagesCubit>()
                                             .sendMessage(
                                                 _controller
                                                     .text, // Message content
                                                 widget.ChatID, // Chat ID
-                                                widget.senderId! // Sender ID
-                                                );
-
+                                                widget.senderId!, // Sender ID,
+                                                _replyingTo,
+                                                widget.userName,
+                                                _isReplying);
+                                        print("heyda");
                                         _controller
                                             .clear(); // Clear the text field after sending
                                         setState(() {
                                           _isTyping =
                                               false; // Reset typing status
+                                          _isReplying = false;
+                                          _replyingTo = null;
                                         });
                                       } else {}
                                     },

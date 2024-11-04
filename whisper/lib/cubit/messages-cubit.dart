@@ -66,6 +66,10 @@ class MessagesCubit extends Cubit<MessagesState> {
       final chatId = data['chatId'];
       receiveDeletedMessage(ids, chatId); // Handle deleted messages
     });
+
+    socket?.on('error', (err) {
+      print(err);
+    });
   }
 
   void disconnectSocket() {
@@ -73,14 +77,18 @@ class MessagesCubit extends Cubit<MessagesState> {
     print("Socket disconnected");
   }
 
-  void sendMessage(String content, int chatId, int senderId) {
+  void sendMessage(String content, int chatId, int senderId,
+      ParentMessage? parentMessage, String senderName, bool isReplying) {
     DateTime now = DateTime.now().toUtc();
-
+    // print("zzzzzzzzzzzzzzzzzzzzzzzz ${parentMessage?.content}");
+    print("hallllllllllllozeyad${parentMessage}");
     final messageData = {
       'content': content,
       'chatId': chatId,
       'type': 'TEXT',
       'sentAt': now.toIso8601String(),
+      'mentions': [],
+      'parentMessage': parentMessage,
     };
 
     final newMessage = ChatMessage(
@@ -90,6 +98,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       sentAt: now.toLocal(),
       type: 'TEXT',
       time: now.toLocal(),
+      parentMessage: parentMessage,
     );
 
     socket?.emit('sendMessage', messageData);
@@ -99,25 +108,31 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   // Handle incoming messages without events
   void receiveMessage(Map<String, dynamic> data) {
-    ChatMessage newMessage = ChatMessage(
-      id: data['id'],
-      chatId: data['chatId'],
-      senderId: data["senderId"],
-      content: data['content'],
-      forwarded: data['forwarded'],
-      pinned: data['pinned'],
-      selfDestruct: data['selfDestruct'],
-      expiresAfter: data['expiresAfter'],
-      type: data['type'],
-      time: DateTime.parse(data['time']).toLocal(),
-      sentAt: DateTime.parse(data['sentAt']).toLocal(),
-      parentMessageId: data['parentMessageId'],
-      parentMessage: data['parentMessage'],
-    );
+    ParentMessage? parentMessage;
+    if (data['parentMessage'] != null) {
+      parentMessage = ParentMessage.fromJson(data['parentMessage']);
+    }
 
+    ChatMessage newMessage = ChatMessage(
+        id: data['id'],
+        chatId: data['chatId'],
+        senderId: data["senderId"],
+        content: data['content'],
+        forwarded: data['forwarded'],
+        pinned: data['pinned'],
+        selfDestruct: data['selfDestruct'],
+        expiresAfter: data['expiresAfter'],
+        type: data['type'],
+        time: DateTime.parse(data['time']).toLocal(),
+        sentAt: DateTime.parse(data['sentAt']).toLocal(),
+        parentMessage: parentMessage,
+        isSecret: data['isSecret'],
+        isAnnouncement: data['isAnnouncement']);
+    print(newMessage.toString());
+//mentions->list
     // Emit a state indicating the message has been received
-    emit(MessageReceived(
-        newMessage)); // Ensure MessageReceived is defined in your state
+    print("daaaaaaaaaaaamn ${newMessage.toString()}");
+    emit(MessageReceived(newMessage));
     print("Message received: ${data["content"]}");
   }
 
@@ -129,6 +144,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       await chatDeletionService.deleteMessages(chatId, ids);
       //chatViewModel.messages.removeWhere((message) => ids.contains(message.id));
       // Ensure you have this state defined
+      print("hhhhhhhhhhhhhh");
     } catch (e) {
       emit(MessagesDeleteError(e.toString()));
     }

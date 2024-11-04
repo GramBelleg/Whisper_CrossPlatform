@@ -1,25 +1,53 @@
-// models/parent_message.dart
 class ParentMessage {
+  final int id;
   final String content;
-  final String media;
+  final String type;
+  final String? media;
+  final String senderName;
 
-  ParentMessage({required this.content, required this.media});
+  ParentMessage({
+    required this.id,
+    required this.content,
+    required this.type,
+    this.media,
+    required this.senderName,
+  });
 
   factory ParentMessage.fromJson(Map<String, dynamic> json) {
     return ParentMessage(
+      id: json['id'],
       content: json['content'],
+      type: json['type'],
       media: json['media'],
+      senderName: json['senderName'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'content': content, 'media': media};
+    return {
+      'id': id,
+      'content': content,
+      'type': type,
+      'media': media,
+      'senderName': senderName,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'ParentMessage('
+        'id: $id, '
+        'content: $content, '
+        'type: $type, '
+        'media: $media, '
+        'senderName: $senderName'
+        ')';
   }
 }
 
 
 class ChatMessage {
-  final int? id;
+   int? id;
   final int chatId;
   final int? senderId;
   final String content;
@@ -28,15 +56,17 @@ class ChatMessage {
   final bool? selfDestruct;
   final int? expiresAfter;
   final String type;
-  DateTime? time;
-  DateTime? sentAt;
-  final int? parentMessageId;
+  final bool? isSecret;
+  final bool? isAnnouncement;
+  final List<dynamic>? mentions;
+   DateTime? time;
+   DateTime? sentAt;
   final ParentMessage? parentMessage;
 
   ChatMessage({
     this.id,
     required this.chatId,
-    required this.senderId,
+    this.senderId,
     required this.content,
     this.forwarded,
     this.pinned,
@@ -45,9 +75,32 @@ class ChatMessage {
     required this.type,
     this.time,
     required this.sentAt,
-    this.parentMessageId,
     this.parentMessage,
+    this.isSecret,
+    this.isAnnouncement,
+    this.mentions,
   });
+
+    @override
+  String toString() {
+    return 'ChatMessage('
+           'id: $id, '
+           'chatId: $chatId, '
+           'senderId: $senderId, '
+           'content: $content, '
+           'forwarded: $forwarded, '
+           'pinned: $pinned, '
+           'selfDestruct: $selfDestruct, '
+           'expiresAfter: $expiresAfter, '
+           'type: $type, '
+           'isSecret: $isSecret, '
+           'isAnnouncement: $isAnnouncement, '
+           'mentions: $mentions, '
+           'time: $time, '
+           'sentAt: $sentAt, '
+           'parentMessage: $parentMessage'
+           ')';
+  }
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
@@ -61,8 +114,10 @@ class ChatMessage {
       selfDestruct: json['selfDestruct'],
       expiresAfter: json['expiresAfter'],
       type: json['type'],
-      time: DateTime.parse(json['time']),
-      parentMessageId: json['parentMessageId'],
+      time: json['time'] != null ? DateTime.parse(json['time']) : null,
+      isSecret: json['isSecret'],
+      isAnnouncement: json['isAnnouncement'],
+      mentions: json['mentions'],
       parentMessage: json['parentMessage'] != null
           ? ParentMessage.fromJson(json['parentMessage'])
           : null,
@@ -82,8 +137,10 @@ class ChatMessage {
       'expiresAfter': expiresAfter,
       'type': type,
       'time': time?.toIso8601String(),
-      'parentMessageId': parentMessageId,
       'parentMessage': parentMessage?.toJson(),
+      'isSecret': isSecret,
+      'isAnnouncement': isAnnouncement,
+      'mentions': mentions,
     };
   }
 }

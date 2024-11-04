@@ -69,6 +69,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         // Call the deleteMessage method from the MessagesCubit
 
         await messagesCubit.deleteMessage(widget.chatId, widget.isSelected);
+        print("hhhhhhhhhhhhhhhhhhh");
         print('Deleted for user: ${widget.isSelected}');
 
         // Clear the selection after deletion
