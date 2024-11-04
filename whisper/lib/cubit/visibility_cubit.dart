@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-enum VisibilityState { everyone, contacts, nobody }
+import '../utils/visibility_utils.dart';
 
 class VisibilityCubit extends Cubit<Map<String, dynamic>> {
   VisibilityCubit()
@@ -9,6 +9,7 @@ class VisibilityCubit extends Cubit<Map<String, dynamic>> {
           'lastSeen': VisibilityState.everyone,
           'stories': VisibilityState.everyone,
           'readReceipts': true,
+          'addMeToGroups': VisibilityState.everyone,
         });
   
   void updateProfilePictureVisibility(VisibilityState visibility) {
@@ -25,5 +26,9 @@ class VisibilityCubit extends Cubit<Map<String, dynamic>> {
 
   void updateReadReceipts(bool value) {
     emit({...state, 'readReceipts': value});
+  }
+
+  void updateAddMeToGroupsVisibility(VisibilityState visibility) {
+    emit({...state, 'addMeToGroups': visibility});
   }
 }

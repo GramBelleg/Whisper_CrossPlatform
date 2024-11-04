@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/login-with-facebook.dart';
@@ -21,6 +22,7 @@ void main() {
         create: (context) =>
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
     // BlocProvider(create: (context) => UserCubit()),
+    BlocProvider(create: (context) => VisibilityCubit()),
   ], child: Whisper()));
 }
 

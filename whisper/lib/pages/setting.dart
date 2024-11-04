@@ -1,15 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/utils/visibility_utils.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -124,11 +128,40 @@ class _SettingsPageState extends State<SettingsPage> {
                   FontAwesomeIcons.userSlash,
                   const BlockedUsersPage(),
                 ),
-                _buildPrivacyCard(
-                  'Who can see my profile picture?',
-                  FontAwesomeIcons.image,
-                  const ProfilePictureSettingsPage(),
+                SizedBox(
+                  height: 6,
                 ),
+                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
+                  builder: (context, privacyState) {
+                    return ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Who can add me to groups?",
+                              style: TextStyle(color: Colors.white)),
+                          Text(
+                            getVisibilityText(privacyState['addMeToGroups']),
+                            style: TextStyle(
+                                color: Color(0xff8D6AEE).withOpacity(0.6)),
+                          )
+                        ],
+                      ),
+                      onTap: () {
+                        if (kDebugMode) print("add me to groups");
+                        showVisibilityOptions(
+                          context,
+                          "Who can add me to groups?",
+                          privacyState['addMeToGroups'],
+                          (value) {
+                            context
+                                .read<VisibilityCubit>()
+                                .updateAddMeToGroupsVisibility(value);
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
               ]
             ]),
           ),
