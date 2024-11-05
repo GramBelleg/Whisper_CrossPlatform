@@ -1,4 +1,4 @@
-import '../common_functions.dart';
+import '../test-common-functions.dart';
 
 // Define different groups for login using a Map
 final Map<String, List<String>> loginTestCases = {
