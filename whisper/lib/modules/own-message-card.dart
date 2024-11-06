@@ -42,36 +42,6 @@ class OwnMessageCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (repliedMessage != null) ...[
-              Container(
-                margin: const EdgeInsets.only(left: 15, right: 15),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blueAccent, width: 1),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      repliedMessage!.senderName ?? "Unknown",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      repliedMessage!.content,
-                      style: const TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 5),
-            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -92,18 +62,55 @@ class OwnMessageCard extends StatelessWidget {
                     child: Stack(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(
+                          padding: EdgeInsets.only(
                             left: 10,
-                            right: 70,
-                            top: 10,
-                            bottom: 20,
+                            right: repliedMessage != null ? 30 : 85,
+                            top: repliedMessage != null ? 10 : 10,
+                            bottom: repliedMessage != null ? 20 : 30,
                           ),
-                          child: Text(
-                            message,
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Display reply bubble if repliedMessage exists
+                              if (repliedMessage != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                        0xffb39ddb), // lighter purple color for reply background
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        repliedMessage!.senderName ?? "Unknown",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        repliedMessage!.content,
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              // Main message content
+                              Text(
+                                message,
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ],
                           ),
                         ),
+                        // Positioned time and status icons
                         Positioned(
                           bottom: 8,
                           right: 10,

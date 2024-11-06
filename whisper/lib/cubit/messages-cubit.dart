@@ -32,8 +32,15 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void connectSocket(String token) {
     print("send token: $token");
+    // Disconnect the socket if it's already connected
+    if (socket != null && socket!.connected) {
+      socket?.disconnect();
+    }
 
-    socket = IO.io("http://localhost:5000", <String, dynamic>{
+    // Remove existing listeners to avoid memory leaks or duplicate calls
+    socket?.clearListeners();
+
+    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
@@ -79,14 +86,17 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void sendMessage(String content, int chatId, int senderId,
       ParentMessage? parentMessage, String senderName, bool isReplying) {
-    DateTime now = DateTime.now().toUtc();
+    int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
+
+    print("Current time in milliseconds: $nowMillis");
     // print("zzzzzzzzzzzzzzzzzzzzzzzz ${parentMessage?.content}");
     print("hallllllllllllozeyad${parentMessage}");
     final messageData = {
       'content': content,
       'chatId': chatId,
       'type': 'TEXT',
-      'sentAt': now.toIso8601String(),
+      'sentAt': DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true)
+          .toIso8601String(),
       'mentions': [],
       'parentMessage': parentMessage,
     };
@@ -95,9 +105,11 @@ class MessagesCubit extends Cubit<MessagesState> {
       content: content,
       chatId: chatId,
       senderId: senderId,
-      sentAt: now.toLocal(),
+      sentAt:
+          DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       type: 'TEXT',
-      time: now.toLocal(),
+      time:
+          DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       parentMessage: parentMessage,
     );
 

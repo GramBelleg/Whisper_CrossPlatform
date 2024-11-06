@@ -74,7 +74,7 @@ class _ChatPageState extends State<ChatPage> {
       print("Token is null or empty");
     }
     context.read<MessagesCubit>().loadMessages(widget.ChatID);
-
+    // _scrollToBottom(messages.length * 1);
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -95,7 +95,7 @@ class _ChatPageState extends State<ChatPage> {
     _controller.dispose(); // Dispose of the controller
     focusNode.dispose(); // Dispose of the focusNode
 
-    context.read<MessagesCubit>().disconnectSocket();
+    // context.read<MessagesCubit>().disconnectSocket();
     super.dispose();
   }
 
@@ -151,6 +151,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _scrollToBottom(double additional) {
+    additional = additional * 150;
     // Check if the first scroll controller is attached and has clients
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -169,7 +170,7 @@ class _ChatPageState extends State<ChatPage> {
           40 +
           additional; // Assuming each line takes 50 pixels
 
-      print(additionalHeight);
+      print("ddddd$additionalHeight");
 
       // Calculate the target scroll position
       double targetPosition = additionalHeight;
@@ -178,7 +179,7 @@ class _ChatPageState extends State<ChatPage> {
       // Scroll to the target position
       _scrollController2.animateTo(
         targetPosition,
-        duration: const Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 100),
         curve: Curves.easeInOut,
       );
     }
@@ -220,12 +221,11 @@ class _ChatPageState extends State<ChatPage> {
                   messages = state
                       .messages; // Assume state.messages is the list of messages
                 });
-                _scrollToBottom(messages.length * 150);
+                _scrollToBottom(messages.length * 1);
               } else if (state is MessageFetchedWrong) {
                 print("erroor");
               } else if (state is MessageSent) {
                 setState(() {
-                  ;
                   messages.add(state.message);
                 });
               } else if (state is MessageReceived) {
@@ -233,7 +233,11 @@ class _ChatPageState extends State<ChatPage> {
                   paddingSpaceForReplay = 0;
                 });
                 DateTime receivedTime = state.message.time!.toLocal();
+                print("receivedTime: $receivedTime");
 
+                for (var x in messages) {
+                  print("sentAt: ${x.sentAt}");
+                }
                 int index =
                     messages.indexWhere((msg) => msg.sentAt == receivedTime);
 
@@ -249,7 +253,7 @@ class _ChatPageState extends State<ChatPage> {
                     messages.add(state.message);
                   });
                 }
-                _scrollToBottom(messages.length * 150);
+                _scrollToBottom(messages.length * 1);
               } else if (state is MessagesDeletedSuccessfully) {
                 print("state.deletIds=${state.deletedIds}");
                 // Remove the message with the given ID from the list
@@ -310,8 +314,8 @@ class _ChatPageState extends State<ChatPage> {
                                       content: messageData.content,
                                       type: messageData.type,
                                       senderName: widget.userName);
-                                  paddingSpaceForReplay = 50;
-                                  _scrollToBottom(messages.length * 150);
+                                  paddingSpaceForReplay = 70;
+                                  _scrollToBottom(messages.length * 1);
                                 });
                               },
                               child: GestureDetector(
@@ -343,7 +347,7 @@ class _ChatPageState extends State<ChatPage> {
                                           repliedMessage:
                                               messageData.parentMessage,
                                         )
-                                      : RecievedMessageCard(
+                                      : ReceivedMessageCard(
                                           message: messageData.content,
                                           time: messageData.time!,
                                           isSelected: messageData.id != null &&
@@ -385,7 +389,7 @@ class _ChatPageState extends State<ChatPage> {
                                       left: 5, right: 5, bottom: 8),
                                   child: TextFormField(
                                     onTap: () {
-                                      _scrollToBottom(messages.length * 150);
+                                      _scrollToBottom(messages.length * 1);
                                     },
                                     scrollController: _scrollController,
 

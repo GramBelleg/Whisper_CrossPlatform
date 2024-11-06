@@ -14,7 +14,7 @@ class ChatDeletionService {
     };
 
     final url = Uri.http(
-        'localhost:5000', '/api/messages/$chatId/deleteForMe', queryParameters);
+        '192.168.1.11:5000', '/api/messages/$chatId/deleteForMe', queryParameters);
 
     // Print the constructed URL to verify it's correct
     print('Constructed URL: ${url.toString()}');
