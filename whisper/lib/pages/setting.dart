@@ -155,7 +155,7 @@ class _SettingsContentState extends State<SettingsContent> {
         backgroundColor: firstNeutralColor,
         appBar: AppBar(
           backgroundColor: firstNeutralColor,
-          actions: isEditing
+          actions: widget.isEditing
               ? [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -190,8 +190,7 @@ class _SettingsContentState extends State<SettingsContent> {
                       },
                       child: Text(
                         "Cancel",
-                        style:
-                            TextStyle(color: primaryColor, fontSize: 18),
+                        style: TextStyle(color: primaryColor, fontSize: 18),
                       ),
                     ),
                     SizedBox(width: 60), // Placeholder for alignment
@@ -205,24 +204,24 @@ class _SettingsContentState extends State<SettingsContent> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _buildProfileSection(),
-              if (isEditing)
+              if (widget.isEditing)
                 _buildEditFields(), // Show edit fields if in editing mode
-              if (!isEditing) ...[
+              if (!widget.isEditing) ...[
                 SizedBox(height: 30),
                 _buildInfoRow(
-                    context, phoneController.text, 'Phone', Icons.phone),
+                    widget.userState!.phoneNumber, 'Phone', Icons.phone),
                 _buildInfoRow(
-                    context, usernameController.text, 'Username', Icons.person),
-                _buildInfoRow(
-                    context, emailController.text, 'Email', Icons.email),
+                    widget.userState!.username, 'Username', Icons.person),
+                _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
               ],
-              if (!isEditing) SizedBox(height: 8),
-              if (!isEditing) const Divider(
-                    color: Color(0xFF0A254A),
-                    thickness: 4.0,
-                  ),
-              if (!isEditing) SizedBox(height: 8),
-              if (!isEditing) ...[
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing)
+                const Divider(
+                  color: Color(0xFF0A254A),
+                  thickness: 4.0,
+                ),
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing) ...[
                 Text(
                   "Privacy Settings",
                   style: TextStyle(
@@ -234,17 +233,15 @@ class _SettingsContentState extends State<SettingsContent> {
                     height: 16), // Add vertical space between title and buttons
                 // Privacy Settings buttons
                 _buildPrivacyCard(
-                  'Visibility Settings',
-                  FontAwesomeIcons.eye,
-                  const VisibilitySettingsPage(),
-                  VisibilitySettingsKeys.visibilitySettingsTile
-                ),
+                    'Visibility Settings',
+                    FontAwesomeIcons.eye,
+                    const VisibilitySettingsPage(),
+                    VisibilitySettingsKeys.visibilitySettingsTile),
                 _buildPrivacyCard(
-                  'Blocked Users',
-                  FontAwesomeIcons.userSlash,
-                  const BlockedUsersPage(),
-                  VisibilitySettingsKeys.blockedUsersTile
-                ),
+                    'Blocked Users',
+                    FontAwesomeIcons.userSlash,
+                    const BlockedUsersPage(),
+                    VisibilitySettingsKeys.blockedUsersTile),
                 SizedBox(
                   height: 6,
                 ),
@@ -259,8 +256,8 @@ class _SettingsContentState extends State<SettingsContent> {
                               style: TextStyle(color: secondNeutralColor)),
                           Text(
                             getVisibilityText(privacyState['addMeToGroups']),
-                            style: TextStyle(
-                                color: primaryColor.withOpacity(0.6)),
+                            style:
+                                TextStyle(color: primaryColor.withOpacity(0.6)),
                           )
                         ],
                       ),
@@ -319,7 +316,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   ),
                 ),
               ),
-              if (!isEditing)
+              if (!widget.isEditing)
                 Container(
                   width: 38,
                   height: 38,
@@ -465,7 +462,6 @@ class _SettingsContentState extends State<SettingsContent> {
               child: Text(value,
                   style:
                       const TextStyle(color: Color(0xFFFBFBFB), fontSize: 18)),
-
             ),
             Text(label,
                 style: const TextStyle(color: Colors.grey, fontSize: 14)),
@@ -475,7 +471,8 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
-  Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage, Key key) {
+  Widget _buildPrivacyCard(
+      String setting, IconData icon, Widget targetPage, Key key) {
     return SizedBox(
       child: Card(
         color: const Color(0xFF1A1E2D),
@@ -498,7 +495,7 @@ class _SettingsContentState extends State<SettingsContent> {
                     SizedBox(width: 8),
                     Text(
                       setting,
-                      style: const TextStyle(color: secondNeutralColor, fontSize: 15),
+                      style: TextStyle(color: secondNeutralColor, fontSize: 15),
                     ),
                   ],
                 ),
