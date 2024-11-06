@@ -1,93 +1,139 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
-import 'package:whisper/components/user-state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/components/user-state.dart'; // Your UserState model
+import 'package:whisper/cubit/profile-setting-cubit.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
-import 'package:whisper/services/shared-preferences.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  Widget build(BuildContext context) {
+    // Load user state when the page is built
+    context.read<SettingsCubit>().loadUserState();
+
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: BlocBuilder<SettingsCubit, SettingsState>(
+              builder: (context, state) {
+                if (state is SettingsInitial) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is SettingsLoaded) {
+                  return SettingsContent(
+                    userState: state.userState,
+                    isEditing: state.isEditing,
+                  );
+                }
+                return const Center(child: Text("An error occurred."));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  UserState? userState; // Global UserState variable
-  bool isOnline = true;
-  bool isEditing = false;
+class SettingsContent extends StatefulWidget {
+  final UserState? userState;
+  final bool isEditing;
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController bioController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
+  const SettingsContent(
+      {Key? key, required this.userState, required this.isEditing})
+      : super(key: key);
 
-  String profilePic = '';
-  String lastSeen = '';
-  String status = '';
-  int autoDownloadSize = 0;
-  String lastSeenPrivacy = 'Everyone';
-  String pfpPrivacy = 'Everyone';
-  bool readReceipts = true;
+  @override
+  _SettingsContentState createState() => _SettingsContentState();
+}
 
+class _SettingsContentState extends State<SettingsContent> {
+  late TextEditingController nameController;
+  late TextEditingController usernameController;
+  late TextEditingController emailController;
+  late TextEditingController bioController;
+  late TextEditingController phoneController;
+
+  String usernameError = '';
+  String emailError = '';
+
+  // Success indicators for each field
+  bool isNameUpdated = false;
+  bool isUsernameUpdated = false;
+  bool isPhoneUpdated = false;
+  bool isEmailUpdated = false;
+  bool isBioUpdated = false;
+
+  // Initialize text controllers
   @override
   void initState() {
     super.initState();
-    _loadUserState();
+    nameController = TextEditingController(text: widget.userState?.name);
+    usernameController =
+        TextEditingController(text: widget.userState?.username);
+    emailController = TextEditingController(text: widget.userState?.email);
+    bioController = TextEditingController(text: widget.userState?.bio);
+    phoneController =
+        TextEditingController(text: widget.userState?.phoneNumber);
   }
 
-  Future<void> _loadUserState() async {
-    userState = await getUserState(); // Fetch and set global UserState
-    if (userState != null) {
-      setState(() {
-        nameController.text = userState!.name;
-        usernameController.text = userState!.username;
-        emailController.text = userState!.email;
-        bioController.text = userState!.bio;
-        phoneController.text = userState!.phoneNumber;
-        profilePic = userState!.profilePic;
-        lastSeen = userState!.lastSeen;
-        status = userState!.status;
-        autoDownloadSize = userState!.autoDownloadSize;
-        lastSeenPrivacy = userState!.lastSeenPrivacy;
-        pfpPrivacy = userState!.pfpPrivacy;
-        readReceipts = userState!.readReceipts;
-        isOnline = userState!.status == "online";
-      });
+  @override
+  void dispose() {
+    nameController.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    bioController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  // Save changes method with success indicators
+  Future<void> _saveChanges(BuildContext context) async {
+    bool success = true;
+
+    if (nameController.text != widget.userState?.name) {
+      isNameUpdated =
+          await context.read<SettingsCubit>().updateName(nameController.text);
+      success &= isNameUpdated;
     }
-  }
 
-  void _saveChanges() async {
-    // Create a new UserState with updated values using copyWith
-    UserState updatedUserState = await userState!.copyWith(
-      name: nameController.text,
-      username: usernameController.text,
-      email: emailController.text,
-      bio: bioController.text,
-      phoneNumber: phoneController.text,
-    );
+    if (usernameController.text != widget.userState?.username) {
+      isUsernameUpdated = await context
+          .read<SettingsCubit>()
+          .updateUsername(usernameController.text);
+      success &= isUsernameUpdated;
+    }
 
-    // Save the updated UserState to your persistent storage
-    await saveUserState(updatedUserState); // Implement this method to save
+    if (phoneController.text != widget.userState?.phoneNumber) {
+      isPhoneUpdated = await context
+          .read<SettingsCubit>()
+          .updatePhoneNumber(phoneController.text);
+      success &= isPhoneUpdated;
+    }
 
-    setState(() {
-      userState = updatedUserState;
-      isEditing = false;
-    });
-  }
+    if (emailController.text != widget.userState?.email) {
+      isEmailUpdated = await context
+          .read<SettingsCubit>()
+          .sendEmailCode(emailController.text);
+      success &= isEmailUpdated;
+    }
 
-  void _cancelEdit() {
-    setState(() {
-      nameController.text = userState!.name;
-      usernameController.text = userState!.username;
-      emailController.text = userState!.email;
-      bioController.text = userState!.bio;
-      phoneController.text = userState!.phoneNumber;
-      isEditing = false;
-    });
+    if (bioController.text != widget.userState?.bio) {
+      isBioUpdated =
+          await context.read<SettingsCubit>().updateBio(bioController.text);
+      success &= isBioUpdated;
+    }
+
+    if (success) {
+      context.read<SettingsCubit>().toggleEditing();
+      resetUpdateFlags();
+      setState(() {}); // Rebuild UI to show indicators
+    }
   }
 
   void _copyToClipboard(String text) {
@@ -100,21 +146,22 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xFF0A122F),
         appBar: AppBar(
           backgroundColor: Color(0xFF0A122F),
-          actions: isEditing
+          actions: widget.isEditing
               ? [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: TextButton(
-                      onPressed: _saveChanges,
+                      onPressed: () {
+                        _saveChanges(context);
+                      },
                       child: Text(
                         "Done",
                         style:
-                            TextStyle(color: Color(0xff8D6AEE), fontSize: 18),
+                            TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
                       ),
                     ),
                   ),
@@ -123,22 +170,23 @@ class _SettingsPageState extends State<SettingsPage> {
                   IconButton(
                     icon: Icon(Icons.edit, color: Colors.white),
                     onPressed: () {
-                      setState(() {
-                        isEditing = true; // Enter edit mode
-                      });
+                      context.read<SettingsCubit>().toggleEditing();
                     },
                   ),
                 ],
-          title: isEditing
+          title: widget.isEditing
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: _cancelEdit,
+                      onPressed: () {
+                        resetUpdateFlags();
+                        context.read<SettingsCubit>().toggleEditing();
+                      },
                       child: Text(
                         "Cancel",
                         style:
-                            TextStyle(color: Color(0xff8D6AEE), fontSize: 18),
+                            TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
                       ),
                     ),
                     SizedBox(width: 60), // Placeholder for alignment
@@ -149,43 +197,58 @@ class _SettingsPageState extends State<SettingsPage> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildProfileSection(),
-              if (isEditing) _buildEditFields(),
-              if (!isEditing) ...[
-                SizedBox(height: 30),
-                _buildInfoRow(
-                    context, phoneController.text, 'Phone', Icons.phone),
-                _buildInfoRow(
-                    context, usernameController.text, 'Username', Icons.person),
-                _buildInfoRow(
-                    context, emailController.text, 'Email', Icons.email),
-              ],
-              if (!isEditing) SizedBox(height: 8),
-              if (!isEditing) Divider(color: Colors.grey),
-              if (!isEditing) SizedBox(height: 8),
-              if (!isEditing) ...[
-                Text(
-                  "Privacy Settings",
-                  style: TextStyle(
-                    color: Color(0xff8D6AEE),
-                    fontSize: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildProfileSection(),
+                if (widget.isEditing) _buildEditFields(),
+                if (!widget.isEditing) ...[
+                  const SizedBox(height: 30),
+                  _buildInfoRow(
+                      widget.userState!.phoneNumber, 'Phone', Icons.phone),
+                  _buildInfoRow(
+                      widget.userState!.username, 'Username', Icons.person),
+                  _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
+                ],
+                if (!widget.isEditing) const SizedBox(height: 8),
+                if (!widget.isEditing)
+                  const Divider(
+                    color: Color(0xFF0A254A),
+                    thickness: 4.0,
                   ),
-                ),
-                SizedBox(height: 16),
-                _buildPrivacyCard('Visibility Settings', FontAwesomeIcons.eye,
-                    const VisibilitySettingsPage()),
-                _buildPrivacyCard('Blocked Users', FontAwesomeIcons.userSlash,
-                    const BlockedUsersPage()),
-                _buildPrivacyCard('Who can see my profile picture?',
-                    FontAwesomeIcons.image, const ProfilePictureSettingsPage()),
-              ]
-            ]),
+                if (!widget.isEditing) const SizedBox(height: 8),
+                if (!widget.isEditing) ...[
+                  const Text(
+                    "Privacy Settings",
+                    style: TextStyle(color: Color(0xff8D6AEE), fontSize: 20),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildPrivacyCard('Visibility Settings', FontAwesomeIcons.eye,
+                      const VisibilitySettingsPage()),
+                  _buildPrivacyCard('Blocked Users', FontAwesomeIcons.userSlash,
+                      const BlockedUsersPage()),
+                  _buildPrivacyCard(
+                      'Who can see my profile picture?',
+                      FontAwesomeIcons.image,
+                      const ProfilePictureSettingsPage()),
+                ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+// Method to reset all update flags
+  void resetUpdateFlags() {
+    setState(() {
+      isNameUpdated = false;
+      isUsernameUpdated = false;
+      isPhoneUpdated = false;
+      isEmailUpdated = false;
+      isBioUpdated = false;
+    });
   }
 
   Widget _buildProfileSection() {
@@ -208,57 +271,35 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              if (!isEditing)
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xff8D6AEE),
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.add, size: 24),
-                    color: Colors.white,
-                    onPressed: () {
-                      // Add functionality to upload a profile picture
-                    },
-                  ),
-                ),
             ],
           ),
-          if (isEditing)
+          if (widget.isEditing)
             PopupMenuButton<String>(
               onSelected: (value) {
                 print("Selected: $value");
-                if (value == 'Camera') {
-                  // Logic to take a photo
-                } else if (value == 'Gallery') {
-                  // Logic to select a photo from the gallery
-                } else if (value == 'Remove') {
-                  // Logic to remove the profile photo
-                }
+                // Logic for selecting profile picture options
               },
               itemBuilder: (BuildContext context) => [
                 PopupMenuItem<String>(
                   value: 'Camera',
-                  child: Text('Take Photo'),
+                  child: const Text('Take Photo'),
                 ),
                 PopupMenuItem<String>(
                   value: 'Gallery',
-                  child: Text('Select from Gallery'),
+                  child: const Text('Select from Gallery'),
                 ),
                 PopupMenuItem<String>(
                   value: 'Remove',
-                  child: Text('Remove Photo'),
+                  child: const Text('Remove Photo'),
                 ),
               ],
               child: TextButton(
                 onPressed: null,
                 style: TextButton.styleFrom(
-                  foregroundColor: Color(0xff8D6AEE),
+                  foregroundColor: const Color(0xff8D6AEE),
                   backgroundColor: Colors.transparent,
                 ),
-                child: Text(
+                child: const Text(
                   "Set New Photo",
                   style: TextStyle(
                     fontSize: 16,
@@ -267,30 +308,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-          SizedBox(height: 16),
-          if (isEditing)
-            TextField(
-              controller: nameController,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Name',
-                labelStyle: TextStyle(color: Colors.grey),
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey)),
-                focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff8D6AEE))),
-              ),
-            )
-          else ...[
+          const SizedBox(height: 16),
+          if (!widget.isEditing) ...[
             Text(
-              nameController.text,
-              style: TextStyle(color: Colors.white, fontSize: 20),
+              widget.userState!.name,
+              style: const TextStyle(color: Colors.white, fontSize: 20),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              isOnline ? "Online" : "Offline",
-              style:
-                  TextStyle(color: isOnline ? Color(0xFF4CB9CF) : Colors.grey),
+              widget.userState?.status == "Online" ? "Online" : "offline",
+              style: TextStyle(
+                color: widget.userState?.status == "Online"
+                    ? const Color(0xFF4CB9CF)
+                    : Colors.grey,
+              ),
             ),
           ],
         ],
@@ -300,86 +331,79 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildEditFields() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: usernameController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Username',
-            labelStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
-          ),
+        _buildTextField(nameController, 'Name', isUpdated: isNameUpdated),
+        _buildTextField(usernameController, 'Username',
+            errorText: usernameError, isUpdated: isUsernameUpdated),
+        _buildTextField(phoneController, 'Phone Number',
+            isUpdated: isPhoneUpdated),
+        _buildTextField(emailController, 'Email',
+            errorText: emailError, isUpdated: isEmailUpdated),
+        _buildTextField(bioController, 'Bio', isUpdated: isBioUpdated),
+      ],
+    );
+  }
+
+  // Modified text field to show success indicator
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      {String? errorText, bool isUpdated = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              labelText,
+              style: const TextStyle(
+                color: Color(0xff8D6AEE),
+                fontSize: 15,
+              ),
+            ),
+            if (isUpdated) // Show green circle if field is successfully updated
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Icon(Icons.check_circle, color: Colors.green, size: 16),
+              ),
+          ],
         ),
-        TextField(
-          controller: emailController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Email',
-            labelStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+        const SizedBox(height: 5),
+        Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A254A),
+            borderRadius: BorderRadius.circular(25),
           ),
-        ),
-        TextField(
-          controller: bioController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Bio',
-            labelStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
-          ),
-        ),
-        TextField(
-          controller: phoneController,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Phone Number',
-            labelStyle: TextStyle(color: Colors.grey),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey)),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff8D6AEE))),
+          child: TextField(
+            controller: controller,
+            style: const TextStyle(color: Color(0xFFFBFBFB)),
+            decoration: const InputDecoration(
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: InputBorder.none,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildInfoRow(
-      BuildContext context, String value, String label, IconData icon) {
+  Widget _buildInfoRow(String value, String label, IconData icon) {
     return InkWell(
-      onTap: () => _copyToClipboard(value), // Copy value to clipboard on tap
+      onTap: () => _copyToClipboard(value),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 13.0),
         child: Row(
           children: [
-            Icon(icon,
-                color: Colors.grey, size: 20), // Add icon for each info row
-            SizedBox(width: 8), // Spacing between icon and text
+            Icon(icon, color: Colors.grey, size: 20),
+            const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                value,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
+              child: Text(value,
+                  style:
+                      const TextStyle(color: Color(0xFFFBFBFB), fontSize: 18)),
             ),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
+            Text(label,
+                style: const TextStyle(color: Colors.grey, fontSize: 14)),
           ],
         ),
       ),
@@ -389,16 +413,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage) {
     return SizedBox(
       child: Card(
-        color: Color(0xFF1A1E2D),
+        color: const Color(0xFF1A1E2D),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
         child: InkWell(
           onTap: () {
-            // Navigate to the target page when tapped
             Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => targetPage),
-            );
+                context, MaterialPageRoute(builder: (context) => targetPage));
           },
           child: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -408,14 +429,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 Row(
                   children: [
                     Icon(icon, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      setting,
-                      style: TextStyle(color: Colors.white, fontSize: 15),
-                    ),
+                    const SizedBox(width: 8),
+                    Text(setting,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 15)),
                   ],
                 ),
-                Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios, color: Colors.grey),
               ],
             ),
           ),

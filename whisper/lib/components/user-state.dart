@@ -31,7 +31,7 @@ class UserState extends Equatable {
     required this.readReceipts,
   });
 
-  // CopyWith method
+// CopyWith method
   Future<UserState> copyWith({
     String? name,
     String? username,
@@ -46,7 +46,8 @@ class UserState extends Equatable {
     String? pfpPrivacy,
     bool? readReceipts,
   }) async {
-    final updatedUserState = UserState(
+    // Create a new instance with the updated values or existing values if none are provided
+    UserState updatedUserState = UserState(
       name: name ?? this.name,
       username: username ?? this.username,
       email: email ?? this.email,
@@ -61,8 +62,10 @@ class UserState extends Equatable {
       readReceipts: readReceipts ?? this.readReceipts,
     );
 
-    await saveUserState(updatedUserState); // Save the updated state
-    return updatedUserState; // Return updated UserState
+    // Save the updated state after any changes
+    await saveUserState(updatedUserState);
+
+    return updatedUserState; // Return the updated UserState
   }
 
   // From JSON method
@@ -116,62 +119,4 @@ class UserState extends Equatable {
         pfpPrivacy,
         readReceipts,
       ];
-
-  // Method to update user name
-  Future<UserState?> updateName(String newName) async {
-    if (await updateUserField('name', newName)) {
-      return await copyWith(
-          name: newName); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
-
-  // Method to update user username
-  Future<UserState?> updateUsername(String newUsername) async {
-    if (await updateUserField('username', newUsername)) {
-      return await copyWith(
-          username:
-              newUsername); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
-
-  // Method to update user phone number
-  Future<UserState?> updatePhoneNumber(String newPhoneNumber) async {
-    if (await updateUserField('phoneNumber', newPhoneNumber)) {
-      return await copyWith(
-          phoneNumber:
-              newPhoneNumber); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
-
-  // Method to update user email
-  Future<UserState?> updateEmail(String newEmail) async {
-    if (await updateUserField('email', newEmail)) {
-      return await copyWith(
-          email:
-              newEmail); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
-
-  // Method to update user bio
-  Future<UserState?> updateBio(String newBio) async {
-    if (await updateUserField('bio', newBio)) {
-      return await copyWith(
-          bio: newBio); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
-
-  // Method to update user profile picture
-  Future<UserState?> updateProfilePic(String newProfilePic) async {
-    if (await updateUserField('profilePic', newProfilePic)) {
-      return await copyWith(
-          profilePic:
-              newProfilePic); // Call copyWith to save and return updated UserState
-    }
-    return null; // Indicate failure
-  }
 }

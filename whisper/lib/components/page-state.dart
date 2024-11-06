@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/components/app-navigator.dart';
 import 'package:whisper/components/tap-bar.dart';
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/services/get-userinfo.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/cubit/profile-setting-cubit.dart'; // Import your SettingsCubit
 
+// this file to put the 3 screens and navigate with them
 class PageState extends StatefulWidget {
   static const String id = '/page_state';
   const PageState({super.key});
@@ -29,7 +32,7 @@ class _MyPageState extends State<PageState> {
     if (!_isUserInfoLoaded) {
       // Only load if not already loaded
       userState = await fetchUserInfo();
-      await saveUserState(userState!); // save in shared performance
+      await saveUserState(userState!); // save in shared preferences
       _isUserInfoLoaded = true;
       setState(() {});
     }
@@ -37,8 +40,10 @@ class _MyPageState extends State<PageState> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return BlocProvider(
+      create: (context) =>
+          SettingsCubit()..loadUserState(), // Provide the cubit
+      child: Scaffold(
         bottomNavigationBar: buildBottomNavigationBar(
           _selectedIndex,
           (index) {

@@ -23,8 +23,8 @@ Future<UserState?> fetchUserInfo() async {
     );
 
     if (response.statusCode == 200) {
-      var data =
-          jsonDecode(response.body)['data'] ?? {}; // Access 'data' key safely
+      print(response.body);
+      var data = jsonDecode(response.body) ?? {}; // Access 'data' key safely
       print('User Info: $data');
 
       // Create and return a UserState object with all fields, handling null values
