@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../keys/visibility_settings_keys.dart';
+import '../constants/colors.dart';
 
 enum VisibilityState { everyone, contacts, nobody }
 
@@ -13,19 +15,20 @@ void showVisibilityOptions(
     builder: (BuildContext context) {
       return SingleChildScrollView(
         child: Container(
-          color: Color(0xFF0A122F),
+          color: firstNeutralColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
                 title: Text(
                   title,
-                  style: TextStyle(color: Color(0xff8D6AEE)),
+                  style: TextStyle(color:secondNeutralColor),
                 ),
               ),
               RadioListTile<VisibilityState>(
-                title:
-                    Text("Everyone", style: TextStyle(color: Color(0xff8D6AEE))),
+                key: VisibilitySettingsKeys.everyoneRadio,
+                title: Text("Everyone",
+                    style: TextStyle(color: primaryColor)),
                 value: VisibilityState.everyone,
                 groupValue: currentValue,
                 onChanged: (VisibilityState? value) {
@@ -34,8 +37,9 @@ void showVisibilityOptions(
                 },
               ),
               RadioListTile<VisibilityState>(
+                key: VisibilitySettingsKeys.contactsRadio,
                 title: Text("My Contacts",
-                    style: TextStyle(color: Color(0xff8D6AEE))),
+                    style: TextStyle(color: primaryColor)),
                 value: VisibilityState.contacts,
                 groupValue: currentValue,
                 onChanged: (VisibilityState? value) {
@@ -44,7 +48,9 @@ void showVisibilityOptions(
                 },
               ),
               RadioListTile<VisibilityState>(
-                title: Text("Nobody", style: TextStyle(color: Color(0xff8D6AEE))),
+                key: VisibilitySettingsKeys.nobodyRadio,
+                title:
+                    Text("Nobody", style: TextStyle(color: primaryColor)),
                 value: VisibilityState.nobody,
                 groupValue: currentValue,
                 onChanged: (VisibilityState? value) {

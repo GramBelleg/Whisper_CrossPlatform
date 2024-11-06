@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../constants/colors.dart';
 import '../cubit/visibility_cubit.dart';
 import '../utils/visibility_utils.dart';
+import '../keys/visibility_settings_keys.dart';
 
 class VisibilitySettingsPage extends StatefulWidget {
   const VisibilitySettingsPage({super.key});
@@ -30,6 +31,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
           return ListView(
             children: [
               ListTile(
+                key: VisibilitySettingsKeys.profilePictureTile,
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -39,8 +41,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                     ),
                     Text(
                       getVisibilityText(privacyState['profilePicture']),
-                      style:
-                          TextStyle(color: primaryColor.withOpacity(0.6)),
+                      style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -48,7 +49,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   if (kDebugMode) print("profile picture visibility");
                   showVisibilityOptions(
                     context,
-                    "Who can see my profile picture ?",
+                    "Who can see my profile picture?",
                     privacyState['profilePicture'],
                     (value) {
                       context
@@ -59,6 +60,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 },
               ),
               ListTile(
+                key: VisibilitySettingsKeys.storiesTile,
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -68,8 +70,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                     ),
                     Text(
                       getVisibilityText(privacyState['stories']),
-                      style:
-                          TextStyle(color: primaryColor.withOpacity(0.6)),
+                      style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -88,6 +89,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 },
               ),
               ListTile(
+                key: VisibilitySettingsKeys.lastSeenTile,
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -97,8 +99,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                     ),
                     Text(
                       getVisibilityText(privacyState['lastSeen']),
-                      style:
-                          TextStyle(color: primaryColor.withOpacity(0.6)),
+                      style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
                 ),
@@ -121,6 +122,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Switch(
+                      key: VisibilitySettingsKeys.readReceiptsSwitch,
                       value: privacyState['readReceipts'],
                       onChanged: (bool value) {
                         if (kDebugMode) print("read receipts");

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/keys/visibility_settings_keys.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
@@ -123,11 +124,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   'Visibility Settings',
                   FontAwesomeIcons.eye,
                   const VisibilitySettingsPage(),
+                  VisibilitySettingsKeys.visibilitySettingsTile
                 ),
                 _buildPrivacyCard(
                   'Blocked Users',
                   FontAwesomeIcons.userSlash,
                   const BlockedUsersPage(),
+                  VisibilitySettingsKeys.blockedUsersTile
                 ),
                 SizedBox(
                   height: 6,
@@ -135,6 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
                   builder: (context, privacyState) {
                     return ListTile(
+                      key: VisibilitySettingsKeys.addMeToGroupsTile,
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -378,13 +382,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage) {
+  Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage, Key key) {
     return SizedBox(
       child: Card(
         color: Color(0xFF1A1E2D),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
         child: InkWell(
+          key: key,
           onTap: () {
             // Navigate to the target page when tapped
             Navigator.push(
