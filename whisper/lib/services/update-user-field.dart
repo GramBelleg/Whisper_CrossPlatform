@@ -6,7 +6,7 @@ import 'package:whisper/services/shared-preferences.dart';
 Future<bool> updateUserField(String field, String value) async {
   String? token = await GetToken();
   final url = Uri.parse(
-      'http://172.20.192.1:5000/api/user/$field'); // Your update API endpoint
+      'http://192.168.1.11:5000/api/user/$field'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   if (token == null) {

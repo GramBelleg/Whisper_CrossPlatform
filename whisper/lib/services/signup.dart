@@ -37,3 +37,4 @@ Future<void> signup(SignupCredentials user, BuildContext context) async {
     );
   }
 }
+

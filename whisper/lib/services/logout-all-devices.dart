@@ -37,3 +37,4 @@ Future<void> logoutFromAllDevices(BuildContext context) async {
     );
   }
 }
+

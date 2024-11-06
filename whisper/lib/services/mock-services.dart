@@ -1,7 +1,7 @@
 import '../database-mock/database-helper.dart';
 import '../modules/signup-credentials.dart';
 
-class SignupServices {
+class MockService {
   static final DatabaseHelper _dbHelper = DatabaseHelper();
 
   static Future<void> addUser(SignupCredentials user) async {

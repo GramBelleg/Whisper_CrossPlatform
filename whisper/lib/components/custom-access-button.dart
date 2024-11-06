@@ -8,8 +8,11 @@ class CustomAccessButton extends StatelessWidget {
   final VoidCallback onPressed; // Accept an onPressed callback
 
   // Remove formKey from constructor parameters
-  const CustomAccessButton(
-      {super.key, required this.label, required this.onPressed});
+  CustomAccessButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class CustomAccessButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed, // Use the passed onPressed function
         style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all(
+          backgroundColor: MaterialStateProperty.all(
               primaryColor), // Correctly set the background color
         ),
         child: Text(

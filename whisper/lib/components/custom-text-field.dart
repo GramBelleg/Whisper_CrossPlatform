@@ -38,7 +38,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.controller,
+      enableInteractiveSelection: widget.isPassword! ? false : true,
+      controller: this.widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,
       style: TextStyle(

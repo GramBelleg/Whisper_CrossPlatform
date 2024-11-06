@@ -1,18 +1,18 @@
 class SignupCredentials {
-  final String? email;
-  final String? password;
-  final String? phoneNumber;
-  final String? name;
-  final String? userName;
-  final String? confirmPassword;
-  SignupCredentials({
-    this.email,
-    this.password,
-    this.confirmPassword,
-    this.phoneNumber,
-    this.name,
-    this.userName
-  });
+  String? email;
+  String? password;
+  String? phoneNumber;
+  String? name;
+  String? userName;
+  String? confirmPassword;
+
+  SignupCredentials(
+      {this.email,
+      this.password,
+      this.confirmPassword,
+      this.phoneNumber,
+      this.name,
+      this.userName});
 
   // Method to convert User object to a Map
   Map<String, dynamic> toMap() {
@@ -20,9 +20,9 @@ class SignupCredentials {
       'email': email,
       'password': password,
       'phoneNumber': phoneNumber,
-      'confirmPassword':confirmPassword,
-      'name':name,
-      'userName':userName
+      'confirmPassword': confirmPassword,
+      'name': name,
+      'userName': userName
     };
   }
 

@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-phone-field.dart';
+import 'package:whisper/keys/signup-keys.dart';
 import 'package:whisper/pages/login.dart';
-import 'package:whisper/services/signup-services.dart';
-import 'package:whisper/services/signup.dart';
+import 'package:whisper/pages/recaptcha.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import 'package:whisper/validators/form-validation/name-field-validation.dart';
-import 'package:whisper/validators/form-validation/repassword-signup-validation.dart';
+import 'package:whisper/validators/form-validation/similar-passwords-validation.dart';
+import 'package:whisper/validators/form-validation/username-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-highlight-text.dart';
 import '../components/custom-text-field.dart';
@@ -38,15 +39,26 @@ class _SignupState extends State<Signup> {
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
-      SignupCredentials user = SignupCredentials(
-        email: emailController.text,
-        password: passwordController.text,
-        confirmPassword: rePasswordController.text,
-        name: nameController.text,
-        userName: userNameController.text,
-        phoneNumber: phoneController.getFullPhoneNumber(),
-      );
-      await signup(user, context);
+      if (!ValidateSimilarPasswords(
+          passwordController.text, rePasswordController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'The two passwords are not similar',
+            ),
+          ),
+        );
+      } else {
+        SignupCredentials user = SignupCredentials(
+          email: emailController.text,
+          password: passwordController.text,
+          confirmPassword: rePasswordController.text,
+          name: nameController.text,
+          userName: userNameController.text,
+          phoneNumber: phoneController.getFullPhoneNumber(),
+        );
+        Navigator.pushNamed(context, Recaptcha.id,arguments: user);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -72,7 +84,7 @@ class _SignupState extends State<Signup> {
     return Scaffold(
       backgroundColor: firstNeutralColor,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
         child: Form(
           key: formKey,
           child: ListView(
@@ -84,6 +96,7 @@ class _SignupState extends State<Signup> {
                 height: 10,
               ),
               CustomTextField(
+                key: ValueKey(SignupKeys.emailTextFieldKey),
                 label: "Email",
                 prefixIcon: FontAwesomeIcons.envelope,
                 isObscure: false,
@@ -95,6 +108,7 @@ class _SignupState extends State<Signup> {
                 height: 10,
               ),
               CustomTextField(
+                key: ValueKey(SignupKeys.nameTextFieldKey),
                 label: "Name",
                 prefixIcon: FontAwesomeIcons.signature,
                 isObscure: false,
@@ -106,17 +120,19 @@ class _SignupState extends State<Signup> {
                 height: 10,
               ),
               CustomTextField(
+                key: ValueKey(SignupKeys.usernameTextFieldKey),
                 label: "User Name",
                 prefixIcon: FontAwesomeIcons.user,
                 isObscure: false,
                 isPassword: false,
-                validate: ValidateNameField,
+                validate: ValidateUsernameField,
                 controller: userNameController,
               ),
               SizedBox(
                 height: 10,
               ),
               CustomTextField(
+                key: ValueKey(SignupKeys.passwordTextFieldKey),
                 label: "Password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,
@@ -128,6 +144,7 @@ class _SignupState extends State<Signup> {
                 height: 10,
               ),
               CustomTextField(
+                key: ValueKey(SignupKeys.rePasswordTextFieldKey),
                 label: "Re-Password",
                 prefixIcon: FontAwesomeIcons.lock,
                 isObscure: true,
@@ -139,12 +156,14 @@ class _SignupState extends State<Signup> {
                 height: 10,
               ),
               CustomPhoneField(
+                key: ValueKey(SignupKeys.phoneNumberFieldKey),
                 controller: phoneController, // Pass the custom controller
               ),
               SizedBox(
                 height: 5,
               ),
               CustomAccessButton(
+                key: ValueKey(SignupKeys.goToRecaptchaButtonKey),
                 label: "Signup",
                 onPressed: _submitForm,
               ),
@@ -161,6 +180,7 @@ class _SignupState extends State<Signup> {
                     ),
                   ),
                   CustomHighlightText(
+                    key: ValueKey(SignupKeys.goBackToLoginHighlightTextKey),
                     callToActionText: "Login",
                     onTap: () {
                       Navigator.pushNamed(context, Login.id);
