@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whisper/components/user-state.dart';
 
 Future<void> SaveEmail(String email) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -37,4 +40,26 @@ Future<int?> GetId() async {
   int? id = prefs.getInt('id');
   print('Loaded Id: $id');
   return id;
+}
+
+Future<void> saveUserState(UserState userState) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String userStateJson = jsonEncode(userState.toJson());
+  await prefs.setString('user_state', userStateJson);
+  print('UserState saved: $userStateJson');
+}
+
+Future<UserState?> getUserState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userStateJson = prefs.getString('user_state');
+
+  if (userStateJson == null) {
+    print('No UserState found');
+    return null;
+  }
+
+  Map<String, dynamic> userStateMap = jsonDecode(userStateJson);
+  UserState userState = UserState.fromJson(userStateMap);
+  print('Loaded UserState: $userState');
+  return userState;
 }

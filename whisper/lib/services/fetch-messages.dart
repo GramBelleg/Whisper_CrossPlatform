@@ -11,7 +11,7 @@ class ChatViewModel {
   List<ChatMessage> get messages => _messages;
 
   Future<void> fetchChatMessages(int chatId) async {
-    final url = Uri.parse('http://localhost:5000/api/chats/$chatId');
+    final url = Uri.parse('http://172.20.192.1:5000/api/chats/$chatId');
     String? token = await GetToken();
 
     if (token == null) {
@@ -40,7 +40,7 @@ class ChatViewModel {
 
   // Future<void> deleteMessages(int chatId, List<int> messageIds) async {
   //   final url = Uri.parse(
-  //       'http://localhost:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
+  //       'http://172.20.192.1:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
   //   String? token = await GetToken();
 
   //   if (token == null) {

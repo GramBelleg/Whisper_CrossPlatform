@@ -18,35 +18,38 @@ class MainChats extends StatefulWidget {
 class _MainChatsState extends State<MainChats> {
   final ScrollController _scrollController = ScrollController();
   final ChatList chatList = ChatList();
-  // bool isLoading = true; // Add a loading state
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: DraggableHome(
-        title: _buildTitle(),
-        actions: _buildActions(),
-        body: [
-          FutureBuilder<Widget>(
-            future: _body(), // Use FutureBuilder for the async body
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return snapshot.data!; // Display the body content
-              }
-            },
-          ),
-        ],
-        headerWidget: headerWidget(context),
-        fullyStretchable: true,
-        expandedBody: const SearchPage(),
-        backgroundColor: const Color(0xFF0A122F),
-        appBarColor: const Color(0xFF0A122F),
-        scrollController: _scrollController,
-      ),
+      body: _buildDraggableHome(),
+    );
+  }
+
+  Widget _buildDraggableHome() {
+    return DraggableHome(
+      title: _buildTitle(),
+      actions: _buildActions(),
+      body: [
+        FutureBuilder<Widget>(
+          future: _body(), // Use FutureBuilder for the async body
+          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return snapshot.data!; // Display the body content
+            }
+          },
+        ),
+      ],
+      headerWidget: headerWidget(context),
+      fullyStretchable: true,
+      expandedBody: const SearchPage(),
+      backgroundColor: const Color(0xFF0A122F),
+      appBarColor: const Color(0xFF0A122F),
+      scrollController: _scrollController,
     );
   }
 

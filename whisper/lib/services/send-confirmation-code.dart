@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> sendConfirmationCode(String email, BuildContext context) async {

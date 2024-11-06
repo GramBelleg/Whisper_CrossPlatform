@@ -6,14 +6,14 @@ import 'package:whisper/services/shared-preferences.dart';
 class ChatDeletionService {
   Future<void> deleteMessages(int chatId, List<int> messageIds) async {
     final url = Uri.parse(
-        'http://localhost:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
+        'http://172.20.192.1:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
 
     String? token = await GetToken();
 
     if (token == null) {
       throw Exception('Authorization token is missing');
     }
-    
+
     final response = await http.delete(
       url,
       headers: {
