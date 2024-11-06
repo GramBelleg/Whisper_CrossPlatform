@@ -1,12 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/keys/visibility_settings_keys.dart';
 import 'package:whisper/components/user-state.dart'; // Your UserState model
 import 'package:whisper/cubit/profile-setting-cubit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/profile-picture-settings.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/utils/visibility_utils.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -147,10 +152,10 @@ class _SettingsContentState extends State<SettingsContent> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0xFF0A122F),
+        backgroundColor: firstNeutralColor,
         appBar: AppBar(
-          backgroundColor: Color(0xFF0A122F),
-          actions: widget.isEditing
+          backgroundColor: firstNeutralColor,
+          actions: isEditing
               ? [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -168,7 +173,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ]
               : [
                   IconButton(
-                    icon: Icon(Icons.edit, color: Colors.white),
+                    icon: Icon(Icons.edit, color: secondNeutralColor),
                     onPressed: () {
                       context.read<SettingsCubit>().toggleEditing();
                     },
@@ -186,7 +191,7 @@ class _SettingsContentState extends State<SettingsContent> {
                       child: Text(
                         "Cancel",
                         style:
-                            TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
+                            TextStyle(color: primaryColor, fontSize: 18),
                       ),
                     ),
                     SizedBox(width: 60), // Placeholder for alignment
@@ -197,43 +202,86 @@ class _SettingsContentState extends State<SettingsContent> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildProfileSection(),
-                if (widget.isEditing) _buildEditFields(),
-                if (!widget.isEditing) ...[
-                  const SizedBox(height: 30),
-                  _buildInfoRow(
-                      widget.userState!.phoneNumber, 'Phone', Icons.phone),
-                  _buildInfoRow(
-                      widget.userState!.username, 'Username', Icons.person),
-                  _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
-                ],
-                if (!widget.isEditing) const SizedBox(height: 8),
-                if (!widget.isEditing)
-                  const Divider(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _buildProfileSection(),
+              if (isEditing)
+                _buildEditFields(), // Show edit fields if in editing mode
+              if (!isEditing) ...[
+                SizedBox(height: 30),
+                _buildInfoRow(
+                    context, phoneController.text, 'Phone', Icons.phone),
+                _buildInfoRow(
+                    context, usernameController.text, 'Username', Icons.person),
+                _buildInfoRow(
+                    context, emailController.text, 'Email', Icons.email),
+              ],
+              if (!isEditing) SizedBox(height: 8),
+              if (!isEditing) const Divider(
                     color: Color(0xFF0A254A),
                     thickness: 4.0,
                   ),
-                if (!widget.isEditing) const SizedBox(height: 8),
-                if (!widget.isEditing) ...[
-                  const Text(
-                    "Privacy Settings",
-                    style: TextStyle(color: Color(0xff8D6AEE), fontSize: 20),
+              if (!isEditing) SizedBox(height: 8),
+              if (!isEditing) ...[
+                Text(
+                  "Privacy Settings",
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 20,
                   ),
-                  const SizedBox(height: 16),
-                  _buildPrivacyCard('Visibility Settings', FontAwesomeIcons.eye,
-                      const VisibilitySettingsPage()),
-                  _buildPrivacyCard('Blocked Users', FontAwesomeIcons.userSlash,
-                      const BlockedUsersPage()),
-                  _buildPrivacyCard(
-                      'Who can see my profile picture?',
-                      FontAwesomeIcons.image,
-                      const ProfilePictureSettingsPage()),
-                ],
-              ],
-            ),
+                ),
+                SizedBox(
+                    height: 16), // Add vertical space between title and buttons
+                // Privacy Settings buttons
+                _buildPrivacyCard(
+                  'Visibility Settings',
+                  FontAwesomeIcons.eye,
+                  const VisibilitySettingsPage(),
+                  VisibilitySettingsKeys.visibilitySettingsTile
+                ),
+                _buildPrivacyCard(
+                  'Blocked Users',
+                  FontAwesomeIcons.userSlash,
+                  const BlockedUsersPage(),
+                  VisibilitySettingsKeys.blockedUsersTile
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
+                  builder: (context, privacyState) {
+                    return ListTile(
+                      key: VisibilitySettingsKeys.addMeToGroupsTile,
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Who can add me to groups?",
+                              style: TextStyle(color: secondNeutralColor)),
+                          Text(
+                            getVisibilityText(privacyState['addMeToGroups']),
+                            style: TextStyle(
+                                color: primaryColor.withOpacity(0.6)),
+                          )
+                        ],
+                      ),
+                      onTap: () {
+                        if (kDebugMode) print("add me to groups");
+                        showVisibilityOptions(
+                          context,
+                          "Who can add me to groups?",
+                          privacyState['addMeToGroups'],
+                          (value) {
+                            context
+                                .read<VisibilityCubit>()
+                                .updateAddMeToGroupsVisibility(value);
+                          },
+                        );
+                      },
+                    );
+                  },
+                )
+              ]
+            ]),
           ),
         ),
       ),
@@ -271,6 +319,22 @@ class _SettingsContentState extends State<SettingsContent> {
                   ),
                 ),
               ),
+              if (!isEditing)
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.add, size: 24),
+                    color: secondNeutralColor,
+                    onPressed: () {
+                      // Add functionality to upload a profile picture
+                    },
+                  ),
+                ),
             ],
           ),
           if (widget.isEditing)
@@ -296,7 +360,7 @@ class _SettingsContentState extends State<SettingsContent> {
               child: TextButton(
                 onPressed: null,
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xff8D6AEE),
+                  foregroundColor: primaryColor, // Set the text color
                   backgroundColor: Colors.transparent,
                 ),
                 child: const Text(
@@ -401,6 +465,7 @@ class _SettingsContentState extends State<SettingsContent> {
               child: Text(value,
                   style:
                       const TextStyle(color: Color(0xFFFBFBFB), fontSize: 18)),
+
             ),
             Text(label,
                 style: const TextStyle(color: Colors.grey, fontSize: 14)),
@@ -410,13 +475,14 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
-  Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage) {
+  Widget _buildPrivacyCard(String setting, IconData icon, Widget targetPage, Key key) {
     return SizedBox(
       child: Card(
         color: const Color(0xFF1A1E2D),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
         child: InkWell(
+          key: key,
           onTap: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => targetPage));
@@ -429,10 +495,11 @@ class _SettingsContentState extends State<SettingsContent> {
                 Row(
                   children: [
                     Icon(icon, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Text(setting,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 15)),
+                    SizedBox(width: 8),
+                    Text(
+                      setting,
+                      style: const TextStyle(color: secondNeutralColor, fontSize: 15),
+                    ),
                   ],
                 ),
                 const Icon(Icons.arrow_forward_ios, color: Colors.grey),
