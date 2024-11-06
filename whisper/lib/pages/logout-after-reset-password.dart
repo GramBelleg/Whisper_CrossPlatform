@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/components/page-state.dart';
 import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/pages/signup.dart';
@@ -49,8 +50,8 @@ class LogoutAfterResetPassword extends StatelessWidget {
                     onTap: () async {
                       Navigator.pushNamedAndRemoveUntil(
                         context,
-                        ChatPage.id,
-                            (Route<dynamic> route) => false,
+                        PageState.id,
+                        (Route<dynamic> route) => false,
                       );
                     },
                   ),

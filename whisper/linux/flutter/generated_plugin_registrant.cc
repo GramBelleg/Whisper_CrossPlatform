@@ -6,11 +6,11 @@
 
 #include "generated_plugin_registrant.h"
 
+#include <emoji_picker_flutter/emoji_picker_flutter_plugin.h>
+#include <file_selector_linux/file_selector_plugin.h>
 #include <flutter_secure_storage_linux/flutter_secure_storage_linux_plugin.h>
 #include <gtk/gtk_plugin.h>
 #include <url_launcher_linux/url_launcher_plugin.h>
-#include <emoji_picker_flutter/emoji_picker_flutter_plugin.h>
-#include <file_selector_linux/file_selector_plugin.h>
 
 void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) emoji_picker_flutter_registrar =

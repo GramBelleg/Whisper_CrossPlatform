@@ -150,137 +150,133 @@ class _SettingsContentState extends State<SettingsContent> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return Scaffold(
+      backgroundColor: firstNeutralColor,
+      appBar: AppBar(
         backgroundColor: firstNeutralColor,
-        appBar: AppBar(
-          backgroundColor: firstNeutralColor,
-          actions: widget.isEditing
-              ? [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextButton(
-                      onPressed: () {
-                        _saveChanges(context);
-                      },
-                      child: Text(
-                        "Done",
-                        style:
-                            TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
-                      ),
+        actions: widget.isEditing
+            ? [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextButton(
+                    onPressed: () {
+                      _saveChanges(context);
+                    },
+                    child: Text(
+                      "Done",
+                      style: TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
                     ),
                   ),
-                ]
-              : [
-                  IconButton(
-                    icon: Icon(Icons.edit, color: secondNeutralColor),
+                ),
+              ]
+            : [
+                IconButton(
+                  icon: Icon(Icons.edit, color: secondNeutralColor),
+                  onPressed: () {
+                    context.read<SettingsCubit>().toggleEditing();
+                  },
+                ),
+              ],
+        title: widget.isEditing
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
                     onPressed: () {
+                      resetUpdateFlags();
                       context.read<SettingsCubit>().toggleEditing();
                     },
-                  ),
-                ],
-          title: widget.isEditing
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        resetUpdateFlags();
-                        context.read<SettingsCubit>().toggleEditing();
-                      },
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(color: primaryColor, fontSize: 18),
-                      ),
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(color: primaryColor, fontSize: 18),
                     ),
-                    SizedBox(width: 60), // Placeholder for alignment
-                  ],
-                )
-              : null,
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildProfileSection(),
-              if (widget.isEditing)
-                _buildEditFields(), // Show edit fields if in editing mode
-              if (!widget.isEditing) ...[
-                SizedBox(height: 30),
-                _buildInfoRow(
-                    widget.userState!.phoneNumber, 'Phone', Icons.phone),
-                _buildInfoRow(
-                    widget.userState!.username, 'Username', Icons.person),
-                _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
-              ],
-              if (!widget.isEditing) SizedBox(height: 8),
-              if (!widget.isEditing)
-                const Divider(
-                  color: Color(0xFF0A254A),
-                  thickness: 4.0,
-                ),
-              if (!widget.isEditing) SizedBox(height: 8),
-              if (!widget.isEditing) ...[
-                Text(
-                  "Privacy Settings",
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 20,
                   ),
+                  SizedBox(width: 60), // Placeholder for alignment
+                ],
+              )
+            : null,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _buildProfileSection(),
+            if (widget.isEditing)
+              _buildEditFields(), // Show edit fields if in editing mode
+            if (!widget.isEditing) ...[
+              SizedBox(height: 30),
+              _buildInfoRow(
+                  widget.userState!.phoneNumber, 'Phone', Icons.phone),
+              _buildInfoRow(
+                  widget.userState!.username, 'Username', Icons.person),
+              _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
+            ],
+            if (!widget.isEditing) SizedBox(height: 8),
+            if (!widget.isEditing)
+              const Divider(
+                color: Color(0xFF0A254A),
+                thickness: 4.0,
+              ),
+            if (!widget.isEditing) SizedBox(height: 8),
+            if (!widget.isEditing) ...[
+              Text(
+                "Privacy Settings",
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 20,
                 ),
-                SizedBox(
-                    height: 16), // Add vertical space between title and buttons
-                // Privacy Settings buttons
-                _buildPrivacyCard(
-                    'Visibility Settings',
-                    FontAwesomeIcons.eye,
-                    const VisibilitySettingsPage(),
-                    VisibilitySettingsKeys.visibilitySettingsTile),
-                _buildPrivacyCard(
-                    'Blocked Users',
-                    FontAwesomeIcons.userSlash,
-                    const BlockedUsersPage(),
-                    VisibilitySettingsKeys.blockedUsersTile),
-                SizedBox(
-                  height: 6,
-                ),
-                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
-                  builder: (context, privacyState) {
-                    return ListTile(
-                      key: VisibilitySettingsKeys.addMeToGroupsTile,
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Who can add me to groups?",
-                              style: TextStyle(color: secondNeutralColor)),
-                          Text(
-                            getVisibilityText(privacyState['addMeToGroups']),
-                            style:
-                                TextStyle(color: primaryColor.withOpacity(0.6)),
-                          )
-                        ],
-                      ),
-                      onTap: () {
-                        if (kDebugMode) print("add me to groups");
-                        showVisibilityOptions(
-                          context,
-                          "Who can add me to groups?",
-                          privacyState['addMeToGroups'],
-                          (value) {
-                            context
-                                .read<VisibilityCubit>()
-                                .updateAddMeToGroupsVisibility(value);
-                          },
-                        );
-                      },
-                    );
-                  },
-                )
-              ]
-            ]),
-          ),
+              ),
+              SizedBox(
+                  height: 16), // Add vertical space between title and buttons
+              // Privacy Settings buttons
+              _buildPrivacyCard(
+                  'Visibility Settings',
+                  FontAwesomeIcons.eye,
+                  const VisibilitySettingsPage(),
+                  VisibilitySettingsKeys.visibilitySettingsTile),
+              _buildPrivacyCard(
+                  'Blocked Users',
+                  FontAwesomeIcons.userSlash,
+                  const BlockedUsersPage(),
+                  VisibilitySettingsKeys.blockedUsersTile),
+              SizedBox(
+                height: 6,
+              ),
+              BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
+                builder: (context, privacyState) {
+                  return ListTile(
+                    key: VisibilitySettingsKeys.addMeToGroupsTile,
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Who can add me to groups?",
+                            style: TextStyle(color: secondNeutralColor)),
+                        Text(
+                          getVisibilityText(privacyState['addMeToGroups']),
+                          style:
+                              TextStyle(color: primaryColor.withOpacity(0.6)),
+                        )
+                      ],
+                    ),
+                    onTap: () {
+                      if (kDebugMode) print("add me to groups");
+                      showVisibilityOptions(
+                        context,
+                        "Who can add me to groups?",
+                        privacyState['addMeToGroups'],
+                        (value) {
+                          context
+                              .read<VisibilityCubit>()
+                              .updateAddMeToGroupsVisibility(value);
+                        },
+                      );
+                    },
+                  );
+                },
+              )
+            ]
+          ]),
         ),
       ),
     );

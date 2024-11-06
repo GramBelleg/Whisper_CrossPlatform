@@ -1,32 +1,30 @@
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.whisper">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-
-
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
- 
-
+    <!-- Application -->
     <application
         android:label="whisper"
-        android:name="${applicationName}"
+        android:name="${applicationName}" 
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true"
-        android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher">
+        android:usesCleartextTraffic="true"> <!-- Only one occurrence of this attribute -->
 
+        <!-- Meta Data -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="552904583797848"/>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="YOUR_ADMOB_APP_ID" />
+            android:value="YOUR_ADMOB_APP_ID" /> <!-- Replace with actual AdMob ID -->
 
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -55,6 +53,7 @@
             </intent-filter>
         </activity>
 
+        <!-- Flutter Embedding -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>

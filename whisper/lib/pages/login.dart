@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/page-state.dart';
 import 'package:whisper/keys/login-keys.dart';
 import 'package:whisper/modules/login-credentials.dart';
 import 'package:whisper/pages/chat-page.dart';
@@ -55,7 +56,6 @@ class _LoginState extends State<Login> {
   Future<bool?> _checkLoginStatus() async {
     return await LoginService.CheckAlreadyLoggedIn(context);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +169,7 @@ class _LoginState extends State<Login> {
               ),
             );
           } else if (snap.hasData && snap.data != null && snap.data!) {
-            return ChatPage();
+            return PageState();
             //todo: this should be replaced with the real chat page
           }
           return Scaffold(

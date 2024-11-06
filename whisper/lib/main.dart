@@ -30,8 +30,6 @@ void main() {
   ], child: Whisper()));
 }
 
-
-
 class Whisper extends StatefulWidget {
   @override
   _WhisperState createState() => _WhisperState();
@@ -57,7 +55,7 @@ class _WhisperState extends State<Whisper> {
         PageState.id: (context) => PageState(),
         Recaptcha.id: (context) => Recaptcha(
               apiKey: "6Lc1eGIqAAAAAGOSheGWYAKiGSZfgWqbOm2X1BdP",
-              controller: recaptchaV2Controller,
+              controller: RecaptchaV2Controller(),
               onVerifiedError: (err) {
                 print(err);
               },
@@ -66,7 +64,7 @@ class _WhisperState extends State<Whisper> {
               },
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
-        ChatPage.id: (context) => ChatPage(),
+        // ChatPage.id: (context) => ChatPage(),
       },
     );
   }

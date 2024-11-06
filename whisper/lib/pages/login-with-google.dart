@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisper/components/page-state.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
@@ -26,14 +27,12 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
   final String clientId =
       '17818726142-7fd5nu3iima7cf78kb1abf3shfuo4vqh.apps.googleusercontent.com';
 
-
   final String redirectUri = 'http://localhost:5173';
   late final String oauthUrl;
 
   @override
   void initState() {
     super.initState();
-
 
     oauthUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
         '?client_id=$clientId'
@@ -46,7 +45,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
@@ -56,7 +55,6 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
             debugPrint('Page finished loading: $url');
           },
           onNavigationRequest: (NavigationRequest request) async {
-
             if (request.url.startsWith(redirectUri)) {
               Uri uri = Uri.parse(request.url);
               String? code = uri.queryParameters["code"];
@@ -75,12 +73,12 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                       },
                     ),
                   );
-                  final data=jsonDecode(response.body);
-                  if(data['status']=='success') {
+                  final data = jsonDecode(response.body);
+                  if (data['status'] == 'success') {
                     await SaveToken(data['userToken']);
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      ChatPage.id,
+                      PageState.id,
                       (Route<dynamic> route) => false,
                     );
                     // Close the WebView and return the code
@@ -88,7 +86,6 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                 } catch (e) {
                   print(e);
                 }
-
               }
               return NavigationDecision.prevent;
             }
@@ -123,7 +120,6 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
     if (Platform.isAndroid) {
       await _controller.clearCache();
     }
-
   }
 
   @override

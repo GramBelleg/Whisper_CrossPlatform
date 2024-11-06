@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisper/components/page-state.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
@@ -40,7 +41,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
@@ -73,7 +74,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                     await SaveToken(data['userToken']);
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      ChatPage.id,
+                      PageState.id,
                       (Route<dynamic> route) => false,
                     );
                   }
