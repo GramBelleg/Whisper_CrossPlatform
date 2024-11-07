@@ -53,13 +53,11 @@ class _ChatPageState extends State<ChatPage> {
       GlobalKey<FormFieldState<String>>();
   int lastVisibleMessageIndex = 0;
   List<int> isSelected = [];
-  // late IO.Socket socket;
-  List<ChatMessage> fetchedmessages = []; // fetch messages
   List<ChatMessage> messages = [];
-  final chatViewModel = ChatViewModel();
   ParentMessage? _replyingTo; // Stores the message being replied to
   bool _isReplying = false; // Tracks if in reply mode
   double paddingSpaceForReplay = 0;
+
   @override
   void initState() {
     super.initState();
@@ -220,6 +218,8 @@ class _ChatPageState extends State<ChatPage> {
                 setState(() {
                   messages = state
                       .messages; // Assume state.messages is the list of messages
+                      //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
+                      
                 });
                 _scrollToBottom(messages.length * 1);
               } else if (state is MessageFetchedWrong) {
@@ -290,6 +290,7 @@ class _ChatPageState extends State<ChatPage> {
                           : MediaQuery.of(context).viewInsets.bottom != 0
                               ? MediaQuery.of(context).size.height - 450
                               : MediaQuery.of(context).size.height - 145,
+
                       child: Padding(
                         padding: EdgeInsets.only(bottom: paddingSpaceForReplay),
                         child: ListView.builder(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/forward-menu.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/services/fetch-messages.dart';
 
@@ -180,6 +181,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
               IconButton(
                 onPressed: () {
                   // Add forward action here
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => ForwardMenu(
+                      clearSelection: widget.clearSelection!,
+                    ),
+                  );
                 },
                 icon: const Icon(
                   Icons.forward,
@@ -193,6 +200,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       // Handle info action
                     } else if (value == 'Pin') {
                       // Handle pin action
+                      
                     } else if (value == 'Edit') {
                       // Handle edit action
                     } else if (value == 'Copy') {
@@ -207,6 +215,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     const PopupMenuItem(
                       value: 'Pin',
                       child: Text('Pin'),
+                      //todo if messages is pin make text unpin 
                     ),
                     const PopupMenuItem(
                       value: 'Edit',

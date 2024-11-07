@@ -97,7 +97,6 @@ class MessagesCubit extends Cubit<MessagesState> {
       'type': 'TEXT',
       'sentAt': DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true)
           .toIso8601String(),
-      'mentions': [],
       'parentMessage': parentMessage,
     };
 
