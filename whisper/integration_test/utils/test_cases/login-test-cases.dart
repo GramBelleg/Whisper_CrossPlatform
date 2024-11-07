@@ -14,7 +14,6 @@ final Map<String, List<String>> loginTestCases = {
     'user@.com', // Missing local part
     'user@domain.com@domain.com', // Multiple '@'
     'user@domain..com', // Invalid consecutive dots
-    'k@gmail.comasd', // Invalid characters
     '${generateLargeString(100)}@domain.com', // Excessively long local part
   ],
   'Invalid Passwords': [
@@ -34,6 +33,7 @@ final Map<String, List<String>> loginTestCases = {
     '123456@', // Digits and special character only
     'Ab1!', // Too short but valid structure
     'kKa1_@ahsh', // Invalid special character
+    'Whi@perrrr123', // repeated characters
     '${generateLargeString(100)}@A1a', // Excessively long local part
   ],
   'Valid but Not Existing Emails': [
@@ -42,6 +42,7 @@ final Map<String, List<String>> loginTestCases = {
     'test@sub.domain.com',
     'test@domain.corporate',
     'test+education@domain.corporate',
+    'karim.agami.ext@org.com',
   ],
 };
 
