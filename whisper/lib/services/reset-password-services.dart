@@ -5,12 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/show-loading-dialog.dart';
 
 import '../modules/reset-password-credentials.dart';
 import '../pages/logout-after-reset-password.dart';
 class ResetPasswordService{
   static Future<void> sendResetCode(String email, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/auth/sendResetCode');
+    showLoadingDialog(context);
     try {
       final response = await http.post(
         url,
@@ -23,10 +25,12 @@ class ResetPasswordService{
           },
         ),
       );
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');
         await SaveEmail(email);
+        if (ModalRoute.of(context)?.settings.name != ResetPassword.id)
         Navigator.pushNamed(context, ResetPassword.id);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -48,6 +52,7 @@ class ResetPasswordService{
     final url = Uri.parse('http://$ip:5000/api/auth/resetPassword');
     resetPassCred.email = await GetEmail();
     try {
+      showLoadingDialog(context);
       final response = await http.post(
         url,
         headers: {
@@ -55,6 +60,7 @@ class ResetPasswordService{
         },
         body: jsonEncode(resetPassCred.toMap()),
       );
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');

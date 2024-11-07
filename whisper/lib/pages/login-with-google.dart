@@ -8,6 +8,7 @@ import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 import '../constants/ip-for-services.dart';
+import '../services/show-loading-dialog.dart';
 import 'chat-page.dart';
 
 class LoginWithGoogle extends StatefulWidget {
@@ -64,6 +65,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                 debugPrint("Authorization code: $code");
                 try {
                   final url = Uri.parse('http://$ip:5000/api/auth/google');
+                  showLoadingDialog(context);
                   final response = await http.post(
                     url,
                     headers: {
@@ -75,6 +77,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                       },
                     ),
                   );
+                  Navigator.pop(context);
                   final data=jsonDecode(response.body);
                   if(data['status']=='success') {
                     await SaveToken(data['userToken']);

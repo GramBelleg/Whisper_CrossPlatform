@@ -15,6 +15,7 @@ import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
 import '../controllers/phone-number-controller.dart';
 import '../modules/signup-credentials.dart';
+import '../services/show-loading-dialog.dart';
 import '../validators/form-validation/password-field-validation.dart';
 
 class Signup extends StatefulWidget {
@@ -38,6 +39,7 @@ class _SignupState extends State<Signup> {
   final TextEditingController userNameController = TextEditingController();
 
   void _submitForm() async {
+    showLoadingDialog(context);
     if (formKey.currentState!.validate()) {
       if (!ValidateSimilarPasswords(
           passwordController.text, rePasswordController.text)) {
@@ -48,7 +50,9 @@ class _SignupState extends State<Signup> {
             ),
           ),
         );
+        Navigator.pop(context);
       } else {
+
         SignupCredentials user = SignupCredentials(
           email: emailController.text,
           password: passwordController.text,
@@ -57,9 +61,11 @@ class _SignupState extends State<Signup> {
           userName: userNameController.text,
           phoneNumber: phoneController.getFullPhoneNumber(),
         );
+        Navigator.pop(context);
         Navigator.pushNamed(context, Recaptcha.id,arguments: user);
       }
     } else {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Form is invalid'),
@@ -183,7 +189,7 @@ class _SignupState extends State<Signup> {
                     key: ValueKey(SignupKeys.goBackToLoginHighlightTextKey),
                     callToActionText: "Login",
                     onTap: () {
-                      Navigator.pushNamed(context, Login.id);
+                      Navigator.pop(context, Login.id);
                     },
                   ),
                 ],

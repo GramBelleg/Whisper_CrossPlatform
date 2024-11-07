@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/show-loading-dialog.dart';
 class LogoutService{
   static Future<void> logoutFromAllDevices(BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/user/logoutAll');
     final token = await GetToken();
+    showLoadingDialog(context);
     try {
       final response = await http.get(
         url,
@@ -17,6 +19,7 @@ class LogoutService{
           'Authorization': 'Bearer $token',
         },
       );
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');
