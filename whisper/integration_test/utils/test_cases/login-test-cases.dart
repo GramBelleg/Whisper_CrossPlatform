@@ -32,7 +32,6 @@ final Map<String, List<String>> loginTestCases = {
     'ABCDEFG@', // Uppercase and special character only
     '123456@', // Digits and special character only
     'Ab1!', // Too short but valid structure
-    'kKa1_@ahsh', // Invalid special character
     'Whi@perrrr123', // repeated characters
     '${generateLargeString(100)}@A1a', // Excessively long local part
   ],

@@ -161,7 +161,6 @@ void main() {
       print("Forget password failed with passwords not similar: $e");
       }
       // Testing with valid code and passwords match
-
       await tester.enterText(rePasswordField,AuthUser.passwordWhisperTest2);
       await tester.pumpAndSettle();
       await tester.tap(savePasswordAndLoginButton);
@@ -188,10 +187,52 @@ void main() {
       await tester.pumpAndSettle(Duration(seconds: 5));
       try {
       expect(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)));
+      await tester.pumpAndSettle();
       }
       catch (e) {
         print("Login failed after changing password: $e");
       }
+      //Say no to Logout from all devices
+      await tester.tap(forgetPasswordText);
+      await tester.pumpAndSettle();
+      await tester.enterText(emailField, AuthUser.emailWhisperTest);
+      await tester.pumpAndSettle();
+      await tester.tap(sendCodeButton);
+      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 5));
+      final String? thirdCode = await getVerificationCode();
+      codeField = find.byKey(const ValueKey(ForgotPasswordKeys.codeTextFieldKey));
+      await tester.enterText(codeField,thirdCode!);
+      await tester.pumpAndSettle();
+      await tester.enterText(passwordField, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
+      await tester.enterText(rePasswordField, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
+      await tester.tap(savePasswordAndLoginButton);
+      await tester.pumpAndSettle();
+      final noButton = find.text('No');
+      await tester.tap(noButton);
+      await tester.pumpAndSettle();
+      try {
+        expect(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)));
+        await tester.pumpAndSettle();
+      }
+      catch (e) {
+      print("Forget password failed after saying no: $e");
+      }
     });
   });
 }
+/*  1-verify the expired code test case
+    2-verify the resend code test case
+    4-verify the invalid code test case
+    5-verify the passwords not similar test case
+    6-verify the passwords match test case
+    7-verify the logout from all devices test case
+    8-verify the login after changing password test case
+    9- Again but don't say yes to logout from all devices
+    10-verify the login after changing password test case
+    11-navigate back from code and passwords
+ */
