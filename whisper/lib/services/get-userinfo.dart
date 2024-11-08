@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
 
 Future<UserState?> fetchUserInfo() async {
   final url =
-      Uri.parse('http://192.168.1.11:5000/api/user/info'); // API endpoint
+      Uri.parse('http://$ip:5000/api/user/info'); // API endpoint
   String? token = await GetToken(); // Retrieve token
 
   if (token == null) {

@@ -5,9 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/modules/signup-credentials.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
+
 
 Future<void> signup(SignupCredentials user, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/signup');
+  final url = Uri.parse('http://$ip:5000/api/auth/signup');
   try {
     final response = await http.post(
       url,

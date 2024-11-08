@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
+
 
 Future<void> sendConfirmationCode(String email, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/resendConfirmCode');
+  final url = Uri.parse('http://$ip:5000/api/auth/resendConfirmCode');
   try {
     final response = await http.post(
       url,

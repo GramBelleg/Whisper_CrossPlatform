@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/modules/reset-password-credentials.dart';
 import 'package:whisper/pages/logout-after-reset-password.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
+
 
 Future<void> resetPassword(
     ResetPasswordCredentials resetPassCred, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/resetPassword');
+  final url = Uri.parse('http://$ip:5000/api/auth/resetPassword');
   resetPassCred.email = await GetEmail();
   try {
     final response = await http.post(

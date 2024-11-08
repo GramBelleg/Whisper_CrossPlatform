@@ -2,11 +2,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
 
 class ChatDeletionService {
   Future<void> deleteMessages(int chatId, List<int> messageIds) async {
     final url = Uri.parse(
-        'http://192.168.1.11:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
+        'http://$ip:5000/api/chats/$chatId/deleteForMe'); // Use chatId in the URL
 
     String? token = await GetToken();
 

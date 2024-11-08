@@ -6,6 +6,9 @@ import 'package:whisper/services/chat-deletion-service.dart';
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../constants/ip-for-services.dart';
+
+
 class MessagesCubit extends Cubit<MessagesState> {
   MessagesCubit(this.chatViewModel, this.chatDeletionService)
       : super(MessagseInitial());
@@ -33,7 +36,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   void connectSocket(String token) {
     print("send token: $token");
 
-    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
+    socket = IO.io("http://$ip:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}

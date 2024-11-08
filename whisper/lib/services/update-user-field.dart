@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
+import '../constants/ip-for-services.dart';
 
 // Private method to handle the update API request
 Future<bool> updateUserField(String field, String value) async {
   String? token = await GetToken();
   final url = Uri.parse(
-      'http://192.168.1.11:5000/api/user/$field'); // Your update API endpoint
+      'http://$ip:5000/api/user/$field'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   if (token == null) {
