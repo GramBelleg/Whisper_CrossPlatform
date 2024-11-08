@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../utils/visibility_utils.dart';
 
+import '../services/visibility_service.dart';
+
 class VisibilityCubit extends Cubit<Map<String, dynamic>> {
   VisibilityCubit()
       : super({
