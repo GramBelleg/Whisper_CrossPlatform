@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/models/chat-messages';
 import 'package:whisper/services/chats-services.dart';
+import 'package:whisper/services/fetch-message-by-id.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import '../pages/chat-page.dart'; // Import your ChatPage
 
 class ForwardMenu extends StatefulWidget {
   final VoidCallback clearSelection;
-
+  final List<int> isSelected; // List of selected message IDs
   ForwardMenu({
     required this.clearSelection,
+    required this.isSelected,
   });
 
   @override
@@ -69,8 +74,45 @@ class _ForwardMenuState extends State<ForwardMenu> {
   }
 
   Future<void> _handleForwardAction() async {
+    String? token = await GetToken();
+    int? senderId = await GetId();
+
     if (selectedFriends.length > 1) {
-      print("More than one friend selected. Please select only one.");
+      for (int selectedIndex = 0;
+          selectedIndex < filteredFriends.length;
+          selectedIndex++) {
+        String userName = filteredFriends[selectedIndex]["name"];
+        String avatarUrl = filteredFriends[selectedIndex]["icon"];
+        int chatId =
+            friends[selectedIndex]['id']; // Assuming you have the chat ID
+
+        try {
+          // Loop through all selected message IDs in the isSelected list
+          for (int messageId in widget.isSelected) {
+            ChatMessage messageToForward = await fetchMessage(messageId);
+            print("Message fetched successfully for ID: $messageId");
+
+            // Send the message to the selected friend
+            String friendUserName = filteredFriends[selectedIndex]["name"];
+            int friendChatId = friends[selectedIndex]['id'];
+            ParentMessage? parentMessage = messageToForward.parentMessage;
+
+            context.read<MessagesCubit>().sendMessage(
+                  messageToForward.content, // Message content
+                  friendChatId, // Chat ID for the current friend
+                  senderId!, // Sender ID
+                  parentMessage, // Parent message if forwarding a reply
+                  friendUserName, // Sender name
+                  false, // Set isReplying to false (since it's a forward)
+                  true, // Set isForward to true
+                );
+
+            print("Message forwarded to: $friendUserName");
+          }
+        } catch (e) {
+          print('Error fetching or sending message: $e');
+        }
+      }
       Navigator.pop(context); // Close the dialog
     } else if (selectedFriends.length == 1) {
       int selectedIndex = selectedFriends.first;
@@ -79,9 +121,37 @@ class _ForwardMenuState extends State<ForwardMenu> {
       int chatId =
           friends[selectedIndex]['id']; // Assuming you have the chat ID
 
-      String? token = await GetToken();
-      int? senderId = await GetId();
+      // final messagesCubit = BlocProvider.of<MessagesCubit>(context);
 
+      try {
+        // Loop through all selected message IDs in the isSelected list
+        for (int messageId in widget.isSelected) {
+          ChatMessage messageToForward = await fetchMessage(messageId);
+          print("Message fetched successfully for ID: $messageId");
+
+          // Send the message to the selected friend
+          String friendUserName = filteredFriends[selectedIndex]["name"];
+          int friendChatId = friends[selectedIndex]['id'];
+          ParentMessage? parentMessage = messageToForward.parentMessage;
+
+          context.read<MessagesCubit>().sendMessage(
+                messageToForward.content, // Message content
+                friendChatId, // Chat ID for the current friend
+                senderId!, // Sender ID
+                parentMessage, // Parent message if forwarding a reply
+                friendUserName, // Sender name
+                false, // Set isReplying to false (since it's a forward)
+                true, // Set isForward to true
+              );
+
+          print("Message forwarded to: $friendUserName");
+        }
+      } catch (e) {
+        print('Error fetching or sending message: $e');
+      }
+
+      Navigator.pop(context); // Close the dialog first
+      Navigator.pop(context); // Close the page that called the dialog
       Navigator.push(
         context,
         MaterialPageRoute(

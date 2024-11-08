@@ -45,7 +45,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
     });
-
+    print("zeyyyyyyyyyyyyyyyyyyyyy");
     socket?.connect();
 
     socket?.onConnect((_) {
@@ -84,8 +84,14 @@ class MessagesCubit extends Cubit<MessagesState> {
     print("Socket disconnected");
   }
 
-  void sendMessage(String content, int chatId, int senderId,
-      ParentMessage? parentMessage, String senderName, bool isReplying) {
+  void sendMessage(
+      String content,
+      int chatId,
+      int senderId,
+      ParentMessage? parentMessage,
+      String senderName,
+      bool isReplying,
+      bool isForward) {
     int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     print("Current time in milliseconds: $nowMillis");
@@ -98,6 +104,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       'sentAt': DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true)
           .toIso8601String(),
       'parentMessage': parentMessage,
+      'forwarded': isForward
     };
 
     final newMessage = ChatMessage(

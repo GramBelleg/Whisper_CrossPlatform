@@ -185,6 +185,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     context: context,
                     builder: (BuildContext context) => ForwardMenu(
                       clearSelection: widget.clearSelection!,
+                      isSelected: widget.isSelected,
                     ),
                   );
                 },
@@ -200,7 +201,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       // Handle info action
                     } else if (value == 'Pin') {
                       // Handle pin action
-                      
                     } else if (value == 'Edit') {
                       // Handle edit action
                     } else if (value == 'Copy') {
@@ -215,7 +215,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     const PopupMenuItem(
                       value: 'Pin',
                       child: Text('Pin'),
-                      //todo if messages is pin make text unpin 
+                      //todo if messages is pin make text unpin
                     ),
                     const PopupMenuItem(
                       value: 'Edit',

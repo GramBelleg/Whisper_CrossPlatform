@@ -64,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
 
     if (widget.token != null && widget.token!.isNotEmpty) {
       try {
-        context.read<MessagesCubit>().connectSocket(widget.token!);
+        // context.read<MessagesCubit>().connectSocket(widget.token!);
       } catch (e) {
         print("Error connecting to socket: $e");
       }
@@ -218,8 +218,7 @@ class _ChatPageState extends State<ChatPage> {
                 setState(() {
                   messages = state
                       .messages; // Assume state.messages is the list of messages
-                      //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
-                      
+                  //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
                 });
                 _scrollToBottom(messages.length * 1);
               } else if (state is MessageFetchedWrong) {
@@ -290,7 +289,6 @@ class _ChatPageState extends State<ChatPage> {
                           : MediaQuery.of(context).viewInsets.bottom != 0
                               ? MediaQuery.of(context).size.height - 450
                               : MediaQuery.of(context).size.height - 145,
-
                       child: Padding(
                         padding: EdgeInsets.only(bottom: paddingSpaceForReplay),
                         child: ListView.builder(
@@ -347,6 +345,8 @@ class _ChatPageState extends State<ChatPage> {
                                                   .contains(messageData.id!),
                                           repliedMessage:
                                               messageData.parentMessage,
+                                          isForwarded:
+                                              messageData.forwarded ?? false,
                                         )
                                       : ReceivedMessageCard(
                                           message: messageData.content,
@@ -505,7 +505,8 @@ class _ChatPageState extends State<ChatPage> {
                                                 widget.senderId!, // Sender ID,
                                                 _replyingTo,
                                                 widget.userName,
-                                                _isReplying);
+                                                _isReplying,
+                                                false);
                                         print("heyda");
                                         _controller
                                             .clear(); // Clear the text field after sending
