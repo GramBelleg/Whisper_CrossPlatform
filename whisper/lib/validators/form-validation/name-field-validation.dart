@@ -4,7 +4,9 @@ String? ValidateNameField(String? data) {
   if (data == null || data.isEmpty) {
     return 'This field is required';
   }
-
+  if (data.length > 50) {
+    return 'name should be at most 50 characters';
+  }
   if (!data.contains(' ')) {
     return 'Please provide both first and last names';
   }

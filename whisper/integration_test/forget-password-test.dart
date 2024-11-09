@@ -247,14 +247,3 @@ void main() {
     });
   });
 }
-/*  1-verify the expired code test case
-    2-verify the resend code test case
-    4-verify the invalid code test case
-    5-verify the passwords not similar test case
-    6-verify the passwords match test case
-    7-verify the logout from all devices test case
-    8-verify the login after changing password test case
-    9- Again but don't say yes to logout from all devices
-    10-verify the login after changing password test case
-    11-navigate back from code and passwords
- */

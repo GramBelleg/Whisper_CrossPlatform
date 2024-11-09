@@ -14,6 +14,7 @@ class CustomTextField extends StatefulWidget {
     required this.isPassword,
     required this.validate,
     this.controller,
+    this.focusNode,
   });
 
   final TextEditingController? controller;
@@ -22,6 +23,7 @@ class CustomTextField extends StatefulWidget {
   bool? isObscure;
   bool? isPassword;
   String? Function(String?) validate;
+  final FocusNode? focusNode;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -38,6 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       enableInteractiveSelection: widget.isPassword! ? false : true,
+      focusNode: widget.focusNode,
       controller: this.widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,
