@@ -408,6 +408,7 @@ class _SettingsContentState extends State<SettingsContent> {
             children: [
               // Gray scale photo
               InkWell(
+                key: SettingsPageKeys.picUpdatePicInkWell,
                 onTap: () {
                   if (widget.isEditing) {
                     // Show options to pick an image
@@ -452,6 +453,7 @@ class _SettingsContentState extends State<SettingsContent> {
               if (widget.isEditing) ...[
                 Positioned(
                   child: InkWell(
+                    key: SettingsPageKeys.iconUpdatePicInkWell,
                     onTap: () {
                       // Open the dialog to pick an image
                       _showImageSourceDialog();
@@ -521,6 +523,7 @@ class _SettingsContentState extends State<SettingsContent> {
             children: [
               ListTile(
                 title: Center(
+                  key: SettingsPageKeys.takePhotoListTile,
                   child: const Text(
                     'Take Photo',
                     style: TextStyle(
@@ -533,6 +536,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
+                key: SettingsPageKeys.selectPhotoListTile,
                 title: Center(
                   child: const Text(
                     'Select from Gallery',
@@ -546,6 +550,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
+                key: SettingsPageKeys.removePhotoListTile,
                 title: Center(
                   child: const Text(
                     'Remove Photo',
