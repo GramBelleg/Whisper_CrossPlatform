@@ -9,10 +9,11 @@ class CustomPhoneField extends StatefulWidget {
   const CustomPhoneField({
     Key? key,
     required this.controller,
+    this.focusNode,
   }) : super(key: key);
 
   final CustomPhoneController controller;
-
+  final FocusNode? focusNode;
   @override
   State<CustomPhoneField> createState() => _CustomPhoneFieldState();
 }
@@ -29,6 +30,7 @@ class _CustomPhoneFieldState extends State<CustomPhoneField> {
   Widget build(BuildContext context) {
     return IntlPhoneField(
       controller: widget.controller,
+      focusNode: widget.focusNode,
       style: TextStyle(
         color: secondNeutralColor,
       ),
