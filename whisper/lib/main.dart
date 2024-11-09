@@ -16,6 +16,7 @@ import 'package:whisper/pages/recaptcha.dart';
 import 'package:whisper/pages/mainchats.dart';
 import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/pages/signup.dart';
+import 'package:whisper/services/blocked_users_service.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:whisper/services/visibility_service.dart';
@@ -27,7 +28,7 @@ void main() {
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
     // BlocProvider(create: (context) => UserCubit()),
     BlocProvider(create: (context) => VisibilityCubit(VisibilityService())),
-    BlocProvider(create: (context) => BlockedUsersCubit()),
+    BlocProvider(create: (context) => BlockedUsersCubit(BlockedUsersService())),
   ], child: Whisper()));
 }
 

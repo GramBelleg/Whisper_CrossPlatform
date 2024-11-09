@@ -15,10 +15,13 @@ class VisibilityService {
       // final response = await _dio.get("http://$ip:5000/api/user/info");
       final Uri url = Uri.parse("http://$ip:5000/api/user/info");
 
-      final response = await http.get(url, headers: {
-        'Authorization': 'Bearer $_token',
-        'Content-Type': 'application/json',
-      });
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'application/json',
+        },
+      );
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
@@ -68,8 +71,7 @@ class VisibilityService {
       );
       if (response.statusCode == 200) {
         if (kDebugMode) print("Updated $key to $value");
-      }
-      else {
+      } else {
         throw Exception('Failed to update visibility setting of key $key');
       }
     }
