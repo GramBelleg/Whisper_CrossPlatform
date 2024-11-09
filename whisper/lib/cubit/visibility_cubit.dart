@@ -1,36 +1,51 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../utils/visibility_utils.dart';
 
 import '../services/visibility_service.dart';
 
 class VisibilityCubit extends Cubit<Map<String, dynamic>> {
-  VisibilityCubit()
-      : super({
-          'profilePicture': VisibilityState.everyone,
-          'lastSeen': VisibilityState.everyone,
-          'stories': VisibilityState.everyone,
-          'readReceipts': true,
-          'addMeToGroups': VisibilityState.everyone,
-        });
-  
-  void updateProfilePictureVisibility(VisibilityState visibility) {
-    emit({...state, 'profilePicture': visibility});
+  final VisibilityService _visibilityService;
+
+  VisibilityCubit(this._visibilityService) : super({}) {
+    _loadVisibilitySettings();
   }
 
-  void updateLastSeenVisibility(VisibilityState visibility) {
-    emit({...state, 'lastSeen': visibility});
+  Future<void> _loadVisibilitySettings() async {
+    try {
+      final settings = await _visibilityService.getVisibilitySettings();
+      emit(settings);
+    } catch (e) {
+      if (kDebugMode) print("FAILED TO LOAD VISIBILITY SETTINGS: $e");
+    }
   }
 
-  void updateStoriesVisibility(VisibilityState visibility) {
-    emit({...state, 'stories': visibility});
+  void updateProfilePictureVisibility(String visibility) {
+    _updateVisibilitySetting('pfp', visibility);
+  }
+
+  void updateLastSeenVisibility(String visibility) {
+    _updateVisibilitySetting('lastSeen', visibility);
+  }
+
+  void updateStoriesVisibility(String visibility) {
+    _updateVisibilitySetting('story', visibility);
   }
 
   void updateReadReceipts(bool value) {
-    emit({...state, 'readReceipts': value});
+    _updateVisibilitySetting('readReceipts', value);
   }
 
-  void updateAddMeToGroupsVisibility(VisibilityState visibility) {
-    emit({...state, 'addMeToGroups': visibility});
+  void updateAddMeToGroupsVisibility(String visibility) {
+    _updateVisibilitySetting('addMeToGroups', visibility);
+  }
+
+  Future<void> _updateVisibilitySetting(String key, dynamic value) async {
+    try {
+      await _visibilityService.updateVisibilitySetting(key, value);
+      final updatedSettings = await _visibilityService.getVisibilitySettings();
+      emit(updatedSettings);
+    } catch (e) {
+      if (kDebugMode) print("FAILED TO UPDATE VISIBILITY SETTINGS $e");
+    }
   }
 }

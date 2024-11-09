@@ -1,54 +1,75 @@
-import 'package:dio/dio.dart';
-import '../utils/visibility_utils.dart';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
 import '../constants/ip-for-services.dart';
+import 'shared-preferences.dart';
+import 'package:http/http.dart' as http;
 
 class VisibilityService {
-  final Dio _dio = Dio();
+  String? _token;
 
   Future<Map<String, dynamic>> getVisibilitySettings() async {
-    final response = await _dio.get("http://$ip:5000/api/user/info");
-    if (response.statusCode == 200) {
-      return response.data;
-    } else {
-      throw Exception("Failed to Load Visibility settings");
+    _token = await GetToken();
+
+    try {
+      // final response = await _dio.get("http://$ip:5000/api/user/info");
+      final Uri url = Uri.parse("http://$ip:5000/api/user/info");
+
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $_token',
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception("Failed to Load visibility settings");
+      }
+    } catch (e) {
+      throw Exception("Failed to load visibility settings: $e");
     }
   }
 
   Future<void> updateVisibilitySetting(String key, dynamic value) async {
-    String endpoint = "";
-
-    switch (key) {
-      case 'profilePicture':
-        endpoint = "http://$ip:5000/api/user/pfp/privacy";
-        break;
-      case 'lastSeen':
-        endpoint = "http://$ip:5000/api/user/lastSeen/privacy";
-        break;
-      case 'stories':
-        endpoint = "http://$ip:5000/api/user/story/privacy";
-        break;
-      case 'readReceipts':
-        // Exists in the post request down below
-        break;
-      case 'addMeToGroups':
-        // TODO: call nour to implement this endpoint
-        break;
-
-      default:
-        throw Exception("This is not a valid visibility key");
-    }
-
     if (key == "readReceipts") {
-      final response = _dio.post("http://$ip:5000/api/user/readReceipts",
-          data: {"readReceipts": value});
+      // it is a post request here
 
-      // TODO: handle if there was an error in post request ?
-    } else {
-      final response = await _dio.put(
-        endpoint,
-        data: {'privacy': value},
+      final Uri url = Uri.parse("http://$ip:5000/api/user/readReceipts");
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          {"readReceipts": value},
+        ),
       );
-      if (response.statusCode != 200) {
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) print("Updated readreceipts to $value");
+      } else {
+        throw Exception("Failed to update readReceipts to $value");
+      }
+    } else {
+      // it is a put request here
+      final Uri url = Uri.parse("http://$ip:5000/api/user/$key/privacy");
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(
+          {"privacy": value},
+        ),
+      );
+      if (response.statusCode == 200) {
+        if (kDebugMode) print("Updated $key to $value");
+      }
+      else {
         throw Exception('Failed to update visibility setting of key $key');
       }
     }

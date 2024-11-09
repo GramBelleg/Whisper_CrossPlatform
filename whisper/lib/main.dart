@@ -18,6 +18,7 @@ import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/pages/signup.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
 import 'package:whisper/services/fetch-messages.dart';
+import 'package:whisper/services/visibility_service.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
@@ -25,7 +26,7 @@ void main() {
         create: (context) =>
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
     // BlocProvider(create: (context) => UserCubit()),
-    BlocProvider(create: (context) => VisibilityCubit()),
+    BlocProvider(create: (context) => VisibilityCubit(VisibilityService())),
     BlocProvider(create: (context) => BlockedUsersCubit()),
   ], child: Whisper()));
 }

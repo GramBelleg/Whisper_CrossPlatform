@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import '../keys/visibility_settings_keys.dart';
 import '../constants/colors.dart';
 
-enum VisibilityState { everyone, contacts, nobody }
-
 void showVisibilityOptions(
   BuildContext context,
   String title,
-  VisibilityState currentValue,
-  Function(VisibilityState) onChanged,
+  String currentValue,
+  Function(String) onChanged,
 ) {
   showModalBottomSheet(
     context: context,
@@ -25,35 +23,35 @@ void showVisibilityOptions(
                   style: TextStyle(color:secondNeutralColor),
                 ),
               ),
-              RadioListTile<VisibilityState>(
+              RadioListTile<String>(
                 key: VisibilitySettingsKeys.everyoneRadio,
                 title: Text("Everyone",
                     style: TextStyle(color: primaryColor)),
-                value: VisibilityState.everyone,
+                value: "Everyone",
                 groupValue: currentValue,
-                onChanged: (VisibilityState? value) {
+                onChanged: (String? value) {
                   onChanged(value!);
                   Navigator.pop(context);
                 },
               ),
-              RadioListTile<VisibilityState>(
+              RadioListTile<String>(
                 key: VisibilitySettingsKeys.contactsRadio,
-                title: Text("My Contacts",
+                title: Text("Contacts",
                     style: TextStyle(color: primaryColor)),
-                value: VisibilityState.contacts,
+                value: "Contacts",
                 groupValue: currentValue,
-                onChanged: (VisibilityState? value) {
+                onChanged: (String? value) {
                   onChanged(value!);
                   Navigator.pop(context);
                 },
               ),
-              RadioListTile<VisibilityState>(
+              RadioListTile<String>(
                 key: VisibilitySettingsKeys.nobodyRadio,
                 title:
                     Text("Nobody", style: TextStyle(color: primaryColor)),
-                value: VisibilityState.nobody,
+                value: "Nobody",
                 groupValue: currentValue,
-                onChanged: (VisibilityState? value) {
+                onChanged: (String? value) {
                   onChanged(value!);
                   Navigator.pop(context);
                 },
@@ -64,17 +62,4 @@ void showVisibilityOptions(
       );
     },
   );
-}
-
-String getVisibilityText(VisibilityState state) {
-  switch (state) {
-    case VisibilityState.everyone:
-      return "Everyone";
-    case VisibilityState.contacts:
-      return "My Contacts";
-    case VisibilityState.nobody:
-      return "Nobody";
-    default:
-      return "";
-  }
 }

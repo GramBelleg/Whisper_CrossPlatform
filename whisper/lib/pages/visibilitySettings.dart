@@ -40,7 +40,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      getVisibilityText(privacyState['profilePicture']),
+                      privacyState['pfpPrivacy'],
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -50,7 +50,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   showVisibilityOptions(
                     context,
                     "Who can see my profile picture?",
-                    privacyState['profilePicture'],
+                    privacyState['pfpPrivacy'],
                     (value) {
                       context
                           .read<VisibilityCubit>()
@@ -69,7 +69,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      getVisibilityText(privacyState['stories']),
+                      privacyState['storyPrivacy'],
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -79,7 +79,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   showVisibilityOptions(
                     context,
                     "Who can see my stories?",
-                    privacyState['stories'],
+                    privacyState['storyPrivacy'],
                     (value) {
                       context
                           .read<VisibilityCubit>()
@@ -98,7 +98,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      getVisibilityText(privacyState['lastSeen']),
+                      privacyState['lastSeenPrivacy'],
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -106,7 +106,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 onTap: () {
                   if (kDebugMode) print("last seen visibility");
                   showVisibilityOptions(context, "Who can see my last seen?",
-                      privacyState['lastSeen'], (value) {
+                      privacyState['lastSeenPrivacy'], (value) {
                     context
                         .read<VisibilityCubit>()
                         .updateLastSeenVisibility(value);

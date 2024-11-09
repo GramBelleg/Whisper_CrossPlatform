@@ -253,7 +253,7 @@ class _SettingsContentState extends State<SettingsContent> {
                         Text("Who can add me to groups?",
                             style: TextStyle(color: secondNeutralColor)),
                         Text(
-                          getVisibilityText(privacyState['addMeToGroups']),
+                          privacyState['addMeToGroups'] ?? "No Backend Endpoint",
                           style:
                               TextStyle(color: primaryColor.withOpacity(0.6)),
                         )
