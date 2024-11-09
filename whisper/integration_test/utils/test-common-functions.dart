@@ -1,6 +1,7 @@
 // this file contains common functions that are used in multiple tests
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'auth-user.dart';
 String generateLargeString(int length) {
@@ -57,7 +58,6 @@ Future<String?> getVerificationCode() async {
   if (messageId != null) {
     final bodyText = await getMessageBody(messageId);
     if (bodyText != null) {
-      print(bodyText);
       String code;
       for(int i=0;i<bodyText.length;i++){
         if(bodyText[i]=='c' && bodyText[i+1]=='o' && bodyText[i+2]=='d' && bodyText[i+3]=='e'){
@@ -69,3 +69,13 @@ Future<String?> getVerificationCode() async {
   }
   return null;
 }
+Future<void> waitUntilVisible(WidgetTester tester, String text, {Duration timeout = const Duration(seconds: 5)}) async {
+  final endTime = DateTime.now().add(timeout);
+  final finder = find.text(text);
+
+  while (DateTime.now().isBefore(endTime) && finder.evaluate().isEmpty) {
+    await tester.pump(const Duration(milliseconds: 100)); // Pump to allow UI updates
+  }
+  expect(finder, findsOneWidget, reason: 'Text "$text" not found within timeout.');
+}
+

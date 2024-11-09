@@ -4,7 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:whisper/main.dart' as app;
 import 'package:whisper/keys/login-keys.dart';
 import 'package:whisper/keys/home-keys.dart';
-import 'utils/test_cases/login-test-cases.dart';
+import 'test_cases/test-cases.dart';
 import 'package:whisper/keys/forgot-password-keys.dart';
 import 'package:whisper/keys/signup-keys.dart';
 import 'utils/auth-user.dart';
@@ -42,7 +42,7 @@ void main() {
       await tester.enterText(passwordField, 'ValidPass@@13');
 
       // Test invalid emails
-      for (String testcase in loginTestCases['Invalid Emails']!) {
+      for (String testcase in testCases['Invalid Emails']!) {
         await tester.enterText(emailField, testcase);
         await tester.tap(loginButton);
         await tester.pumpAndSettle();
@@ -80,7 +80,7 @@ void main() {
       await tester.enterText(emailField, AuthUser.email);
 
       // Test invalid passwords
-      for (String testcase in loginTestCases['Invalid Passwords']!) {
+      for (String testcase in testCases['Invalid Passwords']!) {
         await tester.enterText(passwordField, testcase);
         await tester.tap(loginButton);
         await tester.pumpAndSettle();
@@ -119,7 +119,7 @@ void main() {
       await tester.enterText(passwordField, 'ValidPass@@13');
 
       // Test valid but non-existing emails
-      for (String testcase in loginTestCases['Valid but Not Existing Emails']!) {
+      for (String testcase in testCases['Valid but Not Existing Emails']!) {
         await tester.enterText(emailField, testcase);
         await tester.tap(loginButton);
         await tester.pumpAndSettle();

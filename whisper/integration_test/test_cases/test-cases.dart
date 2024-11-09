@@ -1,7 +1,7 @@
-import '../test-common-functions.dart';
+import '../utils/test-common-functions.dart';
 
 // Define different groups for login using a Map
-final Map<String, List<String>> loginTestCases = {
+final Map<String, List<String>> testCases = {
   'Invalid Emails': [
     'invalidate',
     '@domain.com',
@@ -43,5 +43,20 @@ final Map<String, List<String>> loginTestCases = {
     'test+education@domain.corporate',
     'karim.agami.ext@org.com',
   ],
+  'Invalid Names': [
+    'John', // Only first name, no last name
+    'JohnSmith', // No space between first and last names
+    'John123 Smith', // Contains numbers
+    'John! Smith@', // Contains special characters
+    ' ', // Only space
+    'a a', // Only two characters
+    '1234 1234', // Only numbers
+    '%%%% %%%%', // Only special characters
+  ],
+
+  'Invalid Usernames': [
+    'john', // Less than 6 characters
+  ],
+
 };
 
