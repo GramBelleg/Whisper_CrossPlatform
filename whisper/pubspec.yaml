@@ -31,7 +31,6 @@ dependencies:
   emoji_picker_flutter: ^3.1.0
   flutter_svg: ^1.0.0
   flashy_tab_bar2: ^0.0.10
-  font_awesome_flutter: ^10.7.0
   draggable_home: ^1.0.5
   story: ^1.1.0
   flutter_slidable: ^3.1.1
@@ -47,6 +46,9 @@ dependencies:
   quickalert: ^1.1.0
   image: ^3.0.1
   universal_html: ^2.0.1
+  story_view: ^0.16.5
+  video_player: ^2.9.2
+  path: ^1.8.3
 
   # audioplayers: ^6.1.0
   # path_provider: ^2.0.11

@@ -14,6 +14,8 @@ import 'package:whisper/components/user-state.dart';
 import 'package:whisper/cubit/profile-setting-cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/services/read-file.dart';
+import 'package:whisper/services/uploud-file.dart';
 import 'package:whisper/utils/visibility_utils.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
@@ -94,9 +96,9 @@ class SettingsContent extends StatefulWidget {
 }
 
 class _SettingsContentState extends State<SettingsContent> {
+  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
 // Save changes method with success indicators
   File? _image; // Variable to hold the picked image
-  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
 
   Future<bool> _confirmCode(String email) async {
     if (email != widget.userState?.email) {
@@ -428,15 +430,16 @@ class _SettingsContentState extends State<SettingsContent> {
                               Colors.transparent, // No filter when not editing
                               BlendMode.saturation,
                             ),
-                      child: _image == null
-                          ? Image.asset(
-                              'assets/images/el-gayar.jpg', // Default image
+                      child: widget.userState!.profilePic == ''
+                          ? Image.network(
+                              'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(widget.userState!.name)}', // Default online avatar URL
                               fit: BoxFit.cover,
                               width: 140,
                               height: 140,
                             )
-                          : Image.file(
-                              _image!, // Display the picked image
+                          : Image.network(
+                              widget.userState!
+                                  .profilePic!, // Display the picked image
                               fit: BoxFit.cover,
                               width: 140,
                               height: 140,
@@ -485,6 +488,18 @@ class _SettingsContentState extends State<SettingsContent> {
         ],
       ),
     );
+  }
+
+  String formatName(String fullName) {
+    List<String> names = fullName.split(" ");
+
+    if (names.length > 1) {
+      // Get the first and last name
+      return "${names[0]}+${names[names.length - 1]}";
+    } else {
+      // If only one name is present, return as is
+      return fullName;
+    }
   }
 
 // Function to show dialog for image source
@@ -555,26 +570,26 @@ class _SettingsContentState extends State<SettingsContent> {
   Future<void> _pickImageFromGallery() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path); // Set the image
-      } else {
-        print('No image selected.');
-      }
-    });
+
+    if (pickedFile != null) {
+      String blobName = await uploadFile(pickedFile.path);
+      await context.read<SettingsCubit>().updateProfilePic(blobName);
+    } else {
+      print('No image selected.');
+    }
   }
 
   // Function to take a photo using the camera
   Future<void> _pickImageFromCamera() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path); // Set the image
-      } else {
-        print('No image selected.');
-      }
-    });
+
+    if (pickedFile != null) {
+      String blobName = await uploadFile(pickedFile.path);
+      await context.read<SettingsCubit>().updateProfilePic(blobName);
+    } else {
+      print('No image selected.');
+    }
   }
 
   Widget _buildEditFields() {

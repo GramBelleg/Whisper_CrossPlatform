@@ -5,6 +5,7 @@ import 'package:whisper/components/tap-bar.dart';
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/services/get-userinfo.dart';
+import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/cubit/profile-setting-cubit.dart'; // Import your SettingsCubit
 
@@ -34,10 +35,12 @@ class _MyPageState extends State<PageState> {
         await GetToken(); // Make sure GetToken is awaited to fetch the token
     print("dammmmmmmmmn$token");
     // Pass the token to connectSocket
-    context.read<MessagesCubit>().connectSocket(token!);
+    //context.read<MessagesCubit>().connectSocket(token!);
     if (!_isUserInfoLoaded) {
       // Only load if not already loaded
       userState = await fetchUserInfo();
+      String? urlProfilePic = await generatePresignedUrl(userState!.profilePic);
+      userState!.copyWith(profilePic: urlProfilePic);
       await saveUserState(userState!); // save in shared preferences
       _isUserInfoLoaded = true;
       setState(() {});

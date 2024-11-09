@@ -131,28 +131,28 @@ class _MainChatsState extends State<MainChats> {
           Flexible(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: sampleUsers.length,
+              //itemCount: sampleUsers.length,
               itemBuilder: (context, index) {
-                final user = sampleUsers[index];
+                //final user = sampleUsers[index];
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StoryPage(userIndex: index),
-                        ),
-                      );
+                      //Navigator.push(
+                      //context,
+                      // MaterialPageRoute(
+                      //  builder: (context) => StoryPage(userIndex: index),
+                      //),
+                      //);
                     },
                     child: Column(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(user.imageUrl),
+                          // backgroundImage: NetworkImage(user.imageUrl),
                           radius: 30,
                         ),
                         const SizedBox(height: 5),
-                        Text(user.userName),
+                        // Text(user.userName),
                       ],
                     ),
                   ),

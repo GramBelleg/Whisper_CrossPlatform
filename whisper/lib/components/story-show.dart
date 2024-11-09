@@ -1,27 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-
-class Story {
-  final String mediaUrl; // Media URL for image/video/text
-  final bool isVideo; // Flag to check if it's a video
-  final String userName; // User's name for the story
-  final String userProfilePic; // User profile picture
-  final String? text; // Text for text-based stories (nullable)
-
-  Story({
-    required this.mediaUrl,
-    this.isVideo = false,
-    required this.userName,
-    required this.userProfilePic,
-    this.text, // Can be null if it's not a text story
-  });
-}
+import 'package:whisper/components/story.dart';
 
 class StoryViewer extends StatefulWidget {
   final List<Story> stories;
 
-  StoryViewer({required this.stories});
+  const StoryViewer({super.key, required this.stories});
 
   @override
   _StoryViewerState createState() => _StoryViewerState();
@@ -60,13 +45,20 @@ class _StoryViewerState extends State<StoryViewer> {
   }
 
   // Load the media (image/video)
-  void _loadMedia(String url) async {
-    setState(() {
-      _isLoading = true;
+  void _loadMedia(String url) {
+    // Use post-frame callback to delay setState() calls
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _isLoading = true;
+      });
     });
-    await Future.delayed(Duration(seconds: 2)); // Simulate loading delay
-    setState(() {
-      _isLoading = false;
+    Future.delayed(Duration(seconds: 2), () {
+      // Simulate loading delay
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
     });
   }
 
@@ -74,10 +66,12 @@ class _StoryViewerState extends State<StoryViewer> {
   void _initializeVideo(String url) {
     _videoPlayerController = VideoPlayerController.network(url)
       ..initialize().then((_) {
-        setState(() {
-          _isLoading = false;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _isLoading = false;
+          });
+          _videoPlayerController.play();
         });
-        _videoPlayerController.play();
       });
   }
 
@@ -111,8 +105,10 @@ class _StoryViewerState extends State<StoryViewer> {
 
   // Dynamically add a story
   void _addStory(Story story) {
-    setState(() {
-      widget.stories.add(story); // Add new story to the list
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        widget.stories.add(story); // Add new story to the list
+      });
     });
   }
 

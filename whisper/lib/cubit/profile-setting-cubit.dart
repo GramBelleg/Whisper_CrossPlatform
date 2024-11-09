@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/services/confirm-code-email-update.dart';
 import 'package:whisper/services/email-code-update.dart';
+import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/shared-preferences.dart'; // Your UserState model
 import 'package:whisper/services/update-user-field.dart'; // Assuming this is where the update functions are defined
 
@@ -252,6 +253,27 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
 
     return {'success': success, 'message': message};
+  }
+
+  Future<void> updateProfilePic(String blobname) async {
+    String response = await generatePresignedUrl(blobname);
+    final userState = (state as SettingsLoaded).userState;
+    userState?.copyWith(profilePic: response);
+
+    emit(SettingsLoaded(
+      userState: await getUserState(),
+      isEditing: isEditing,
+      nameController: nameController,
+      usernameController: usernameController,
+      emailController: emailController,
+      bioController: bioController,
+      phoneController: phoneController,
+      nameState: nameState,
+      usernameState: usernameState,
+      emailState: emailState,
+      phoneNumberState: phoneNumberState,
+      bioState: bioState,
+    ));
   }
 
   Future<Map<String, dynamic>> sendCode(
