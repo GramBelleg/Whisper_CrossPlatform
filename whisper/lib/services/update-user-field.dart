@@ -3,15 +3,18 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
 
 // Private method to handle the update API request
-Future<bool> updateUserField(String field, String value) async {
+Future<Map<String, dynamic>> updateUserField(String field, String value) async {
   String? token = await GetToken();
   final url = Uri.parse(
-      'http://192.168.1.11:5000/api/user/$field'); // Your update API endpoint
+      'http://172.20.192.1:5000/api/user/$field'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   if (token == null) {
     print('Token is null, cannot update user field.');
-    return false; // Indicate failure
+    return {
+      'success': false,
+      'message': 'Token is null, cannot update user field.'
+    };
   }
 
   try {
@@ -25,16 +28,31 @@ Future<bool> updateUserField(String field, String value) async {
         field: value,
       }),
     );
-
+    final responseData = jsonDecode(response.body);
+    print("here in the respoooncccce     " + response.body);
     if (response.statusCode == 200) {
-      print("done                " + value);
-      return true; // Indicate success
+      // Assuming the response contains a 'data' field with the updated value
+      return {
+        'success': true,
+        'message': responseData['data'],
+      };
+    } else if (response.statusCode == 400) {
+      return {
+        'success': false,
+        'message': responseData['message'] ?? 'Error updating user field',
+      };
     } else {
       print('Update failed: ${response.statusCode}, ${response.body}');
-      return false; // Indicate failure
+      return {
+        'success': false,
+        'message': responseData['message'],
+      };
     }
   } catch (e) {
     print('Error updating user field: $e');
-    return false; // Indicate failure
+    return {
+      'success': false,
+      'message': 'Error updating user field: $e',
+    };
   }
 }

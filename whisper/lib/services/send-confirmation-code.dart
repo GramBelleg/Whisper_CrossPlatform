@@ -38,4 +38,3 @@ Future<void> sendConfirmationCode(String email, BuildContext context) async {
     );
   }
 }
-

@@ -11,7 +11,7 @@ class ChatViewModel {
   List<ChatMessage> get messages => _messages;
 
   Future<void> fetchChatMessages(int chatId) async {
-    final url = Uri.parse('http://192.168.1.11:5000/api/chats/$chatId');
+    final url = Uri.parse('http://172.20.192.1:5000/api/chats/$chatId');
     String? token = await GetToken();
 
     if (token == null) {

@@ -5,7 +5,7 @@ import 'package:whisper/services/shared-preferences.dart';
 
 Future<UserState?> fetchUserInfo() async {
   final url =
-      Uri.parse('http://192.168.1.11:5000/api/user/info'); // API endpoint
+      Uri.parse('http://172.20.192.1:5000/api/user/info'); // API endpoint
   String? token = await GetToken(); // Retrieve token
 
   if (token == null) {

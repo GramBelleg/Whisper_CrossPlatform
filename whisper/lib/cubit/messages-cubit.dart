@@ -33,7 +33,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   void connectSocket(String token) {
     print("send token: $token");
 
-    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
+    socket = IO.io("http://172.20.192.1:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
@@ -46,6 +46,10 @@ class MessagesCubit extends Cubit<MessagesState> {
       print("Connected to server");
     });
 
+    // Listen for messages directly and handle them
+    socket?.on('receiveMessage', (data) {
+      receiveMessage(data); // Handle incoming messages directly
+    });
     // Listen for messages directly and handle them
     socket?.on('receiveMessage', (data) {
       receiveMessage(data); // Handle incoming messages directly
@@ -89,6 +93,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.emit('sendMessage', messageData);
     emit(MessageSent(newMessage));
     print("Message sent: $content");
+  }
+
+  void sendProfilePhoto(String image) {
+    socket?.emit('profilePic', image);
   }
 
   // Handle incoming messages without events

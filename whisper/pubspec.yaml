@@ -44,6 +44,9 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
   meta: ^1.7.0
+  quickalert: ^1.1.0
+  image: ^3.0.1
+  universal_html: ^2.0.1
 
   # audioplayers: ^6.1.0
   # path_provider: ^2.0.11

@@ -6,7 +6,7 @@ import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> logoutFromAllDevices(BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/user/logoutAll');
+  final url = Uri.parse('http://172.20.192.1:5000/api/user/logoutAll');
   final token = await GetToken();
   try {
     final response = await http.get(
@@ -37,4 +37,3 @@ Future<void> logoutFromAllDevices(BuildContext context) async {
     );
   }
 }
-

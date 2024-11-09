@@ -6,6 +6,7 @@ import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page-state.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/pages/confirmatio-code-update.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
 import 'package:whisper/pages/login-with-github.dart';
@@ -34,6 +35,8 @@ class Whisper extends StatefulWidget {
   @override
   _WhisperState createState() => _WhisperState();
   RecaptchaV2Controller recaptchaV2Controller = RecaptchaV2Controller();
+
+  Whisper({super.key});
 }
 
 class _WhisperState extends State<Whisper> {
@@ -64,6 +67,8 @@ class _WhisperState extends State<Whisper> {
               },
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
+
+        ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
         // ChatPage.id: (context) => ChatPage(),
       },
     );

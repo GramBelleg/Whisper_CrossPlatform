@@ -1,38 +1,56 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
 
-// Private method to handle the update API request
-Future<bool> verifyEmailCode(String field, String email, String code) async {
+Future<Map<String, dynamic>> verifyEmailCode(
+    String code, String email, BuildContext context) async {
+  final url = Uri.parse('http://172.20.192.1:5000/api/user/email');
   String? token = await GetToken();
-  final url = Uri.parse(
-      'http://192.168.1.11:5000/api/user/email'); // Your update API endpoint
-
-  // Ensure token is not null before making the request
-  if (token == null) {
-    print('Token is null, cannot update user field.');
-    return false; // Indicate failure
-  }
-
+  print(code + "      " + email);
+  print("in verifyEmailCode");
   try {
-    final response = await http.post(
+    final response = await http.put(
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
-      body: jsonEncode({field: email, "code": code}),
+      body: jsonEncode(
+        {
+          'email': email,
+          'code': code,
+        },
+      ),
     );
-
-    if (response.statusCode == 200) {
-      print("done                " + email);
-      return true; // Indicate success
+    var data = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print('Response: $data');
+      return {
+        'success': true,
+        'message': data['data'],
+      };
     } else {
-      print('Update failed: ${response.statusCode}, ${response.body}');
-      return false; // Indicate failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Something went wrong: ${data['message']}"),
+        ),
+      );
+      print('Response: $data');
+      return {
+        'success': false,
+        'message': data['message'],
+      };
     }
   } catch (e) {
-    print('Error updating user field: $e');
-    return false; // Indicate failure
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Something went wrong: ${e}"),
+      ),
+    );
+    return {
+      'success': false,
+      'message': "Verify Field",
+    };
   }
 }

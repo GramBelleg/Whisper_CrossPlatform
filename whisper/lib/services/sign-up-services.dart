@@ -6,10 +6,7 @@ import 'package:whisper/components/page-state.dart';
 import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/modules/signup-credentials.dart';
 import 'package:whisper/pages/confirmation-code.dart';
-import 'package:whisper/pages/recaptcha.dart';
 import 'package:whisper/services/shared-preferences.dart';
-
-import '../pages/chat-page.dart';
 
 class SignupService {
   static Future<void> signup(
