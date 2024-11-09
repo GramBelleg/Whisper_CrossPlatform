@@ -26,7 +26,6 @@ void main() {
     testWidgets('Forget Password with invalid email', (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
-      await tester.pumpAndSettle(Duration(seconds: 3));
       forgetPasswordText = find.byKey(const ValueKey(LoginKeys.forgotPasswordHighlightText));
       // Navigate to Forget Password screen
       await tester.tap(forgetPasswordText);
@@ -43,7 +42,7 @@ void main() {
       try {
         expect(find.text(invalidEmailErrorMessage), findsOneWidget);
       } catch (e) {
-        errors.add("Forget password failed with invalid email: $e");
+        errors.add("Forget password failed with invalid email: ");
       }
 
       await tester.enterText(emailField, '');
@@ -52,7 +51,7 @@ void main() {
       try {
         expect(find.text(emptyField), findsOneWidget);
       } catch (e) {
-        errors.add("Forget password failed with empty email field: $e");
+        errors.add("Forget password failed with empty email field: ");
       }
       if (errors.isNotEmpty) {
         fail(errors.join('\n'));
@@ -71,7 +70,7 @@ void main() {
       try {
         expect(find.textContaining(notExistingEmailErrorMessage), findsOneWidget);
       } catch (e) {
-        fail("Forget password failed with not existing email: $e");
+        fail("Forget password failed with not existing email: ");
       }
     });
     testWidgets("Forget Password with valid email", (WidgetTester tester) async {
@@ -84,7 +83,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(sendCodeButton);
       await tester.pumpAndSettle();
-      await tester.pumpAndSettle(Duration(seconds: 5));
+      await tester.pumpAndSettle(Duration(seconds: 10));
       //Navigate back
       goBackFromCodeAndPasswords = find.byKey(const ValueKey(
           ForgotPasswordKeys.goBackFromCodeAndPasswordsHighlightTextKey));
@@ -102,6 +101,7 @@ void main() {
           const ValueKey(ForgotPasswordKeys.resendCodeHighlightTextKey));
       await tester.tap(resendCodeButton);
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 5));
       // Get the second code from the email
       final String? secondCode = await getVerificationCode();
       expect(firstCode, isNot(secondCode));
@@ -128,7 +128,7 @@ void main() {
       try {
         expect(find.textContaining('Invalid code'), findsOneWidget);
       } catch (e) {
-        print("Forget password failed with invalid code: $e");
+        fail("Forget password failed with invalid code: ");
       }
     });
     testWidgets("Forget Password with valid code and not similar passwords", (WidgetTester tester) async {
@@ -158,7 +158,7 @@ void main() {
         expect(find.textContaining('not similar'), findsOneWidget);
       }
       catch (e) {
-        print("Forget password failed with passwords not similar: $e");
+        fail("Forget password failed with passwords not similar: ");
       }
     });
     testWidgets("Forget Password with valid code and passwords match", (WidgetTester tester) async {
@@ -185,7 +185,7 @@ void main() {
         expect(find.text('Yes'), findsOneWidget);
       }
       catch (e) {
-        print("Forget password failed with valid code and passwords match: $e");
+        fail("Forget password failed with valid code and passwords match: ");
       }
       //Say yes to Logout from all devices
       final yesButton = find.text('Yes');
@@ -210,7 +210,7 @@ void main() {
         await tester.pumpAndSettle();
       }
       catch (e) {
-        print("Login failed after changing password: $e");
+        fail("Login failed after changing password: ");
       }
     });
     testWidgets("Forget Password with valid code and passwords match but don't logout from all devices", (WidgetTester tester) async {
@@ -242,7 +242,7 @@ void main() {
         await tester.pumpAndSettle();
       }
       catch (e) {
-      print("Forget password failed after saying no: $e");
+      fail("Forget password failed after saying no: ");
       }
     });
   });

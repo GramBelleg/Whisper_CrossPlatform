@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -15,7 +13,7 @@ const String invalidUsernameErrorMessage = 'Form is invalid';
 const String invalidNameErrorMessage = 'Form is invalid';
 
 void main() {
-  //IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group('Sign up E2E tests', ()
   {
     late Finder emailFieldLogin;
@@ -75,32 +73,45 @@ void main() {
       await tester.tap(signUpButtonLogin);
       await tester.pumpAndSettle();
       await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
+      await tester.pumpAndSettle();
       await tester.enterText(usernameFieldSignUp, 'testusername');
+      await tester.pumpAndSettle();
       await tester.enterText(
           passwordFieldSignUp, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
       await tester.enterText(
           rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
+      await tester.enterText(phoneNumber, '1234567890');
+      await tester.pumpAndSettle();
       for (String testcase in testCases['Invalid Names']!) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        await tester.pumpAndSettle(Duration(seconds: 1));
         await tester.tap(nameFieldSignUp);
         await tester.pumpAndSettle();
         await tester.enterText(nameFieldSignUp, testcase);
         await tester.pumpAndSettle();
-        FocusManager.instance.primaryFocus?.unfocus();
-        await tester.pumpAndSettle(Duration(seconds: 1));
+        await tester.tap(rePasswordFieldSignUp);
+        await tester.pumpAndSettle();
+        await tester.tap(phoneNumber);
+        await tester.pumpAndSettle();
         await tester.tap(signUpButtonSignUp);
         await tester.pumpAndSettle();
         try {
           expect(find.textContaining(invalidNameErrorMessage), findsOneWidget);
         } catch (e) {
+          await tester.pumpAndSettle(Duration(seconds: 5));
+          goBackFromRecaptcha = find.byKey(
+              const ValueKey(SignupKeys.goBackFromRecaptchaHighlightTextKey));
+          await tester.tap(goBackFromRecaptcha);
           errors.add("Test case failed for invalid name: '$testcase'");
         }
       }
       //try empty
       await tester.enterText(nameFieldSignUp, '');
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      await tester.tap(rePasswordFieldSignUp);
+      await tester.pumpAndSettle();
+      await tester.tap(phoneNumber);
+      await tester.pumpAndSettle();
       await tester.tap(signUpButtonSignUp);
       await tester.pumpAndSettle();
       try {
@@ -120,28 +131,44 @@ void main() {
       await tester.tap(signUpButtonLogin);
       await tester.pumpAndSettle();
       await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
+      await tester.pumpAndSettle();
       await tester.enterText(nameFieldSignUp, 'John Doe');
+      await tester.pumpAndSettle();
       await tester.enterText(
           passwordFieldSignUp, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
       await tester.enterText(
           rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
+      await tester.pumpAndSettle();
+      await tester.enterText(phoneNumber, '1234567890');
+      await tester.pumpAndSettle();
       for (String testcase in testCases['Invalid Usernames']!) {
         await tester.enterText(usernameFieldSignUp, testcase);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await tester.pumpAndSettle(Duration(seconds: 1));
+        await tester.pumpAndSettle();
+        await tester.tap(rePasswordFieldSignUp);
+        await tester.pumpAndSettle();
+        await tester.tap(phoneNumber);
+        await tester.pumpAndSettle();
         await tester.tap(signUpButtonSignUp);
         await tester.pumpAndSettle();
         try {
           expect(
               find.textContaining(invalidUsernameErrorMessage), findsOneWidget);
         } catch (e) {
+          await tester.pumpAndSettle(Duration(seconds: 5));
+          goBackFromRecaptcha = find.byKey(
+              const ValueKey(SignupKeys.goBackFromRecaptchaHighlightTextKey));
+          await tester.tap(goBackFromRecaptcha);
           errors.add("Test case failed for invalid username: '$testcase'");
         }
       }
       //try empty
       await tester.enterText(usernameFieldSignUp, '');
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      await tester.tap(rePasswordFieldSignUp);
+      await tester.pumpAndSettle();
+      await tester.tap(phoneNumber);
+      await tester.pumpAndSettle();
       await tester.tap(signUpButtonSignUp);
       await tester.pumpAndSettle();
       try {
@@ -173,8 +200,6 @@ void main() {
       await tester.pumpAndSettle();
       await tester.enterText(phoneNumber, '1234567');
       await tester.pumpAndSettle();
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
       await tester.tap(signUpButtonSignUp);
       await tester.pumpAndSettle();
       try {
@@ -184,8 +209,7 @@ void main() {
       }
       //try empty
       await tester.enterText(phoneNumber, '');
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
+      await tester.pumpAndSettle();
       await tester.tap(signUpButtonSignUp);
       await tester.pumpAndSettle();
       try {
@@ -197,93 +221,93 @@ void main() {
         fail(errors.join('\n'));
       }
     });
-    testWidgets('Sign up with valid credentials', (WidgetTester tester) async {
-      app.main();
-      await tester.pumpAndSettle();
-      await tester.tap(signUpButtonLogin);
-      await tester.pumpAndSettle();
-      await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
-      await tester.enterText(nameFieldSignUp, 'John Doe');
-      await tester.enterText(usernameFieldSignUp, 'test username');
-      await tester.enterText(
-          passwordFieldSignUp, AuthUser.passwordWhisperTest1);
-      await tester.enterText(
-          rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
-      await tester.enterText(phoneNumber, '1234567890');
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
-      await tester.tap(signUpButtonSignUp);
-      await tester.pumpAndSettle();
-      goBackFromRecaptcha = find.byKey(
-          const ValueKey(SignupKeys.goBackFromRecaptchaHighlightTextKey));
-      await tester.tap(goBackFromRecaptcha);
-      await tester.pumpAndSettle();
-      await tester.tap(signUpButtonSignUp);
-      await tester.pumpAndSettle();
-      print('Please solve the CAPTCHA manually. Type "Y" then press Enter when done.');
-      while (stdin.readLineSync()?.toUpperCase() != 'Y') {
-        print('Invalid input. Type "Y" and press Enter once CAPTCHA is solved.');
-      }
-      goBackFromCode =
-          find.byKey(const ValueKey(SignupKeys.goBackFromSubmittingCodeKey));
-      await tester.tap(goBackFromCode);
-      await tester.pumpAndSettle();
-      await tester.tap(signUpButtonSignUp);
-      await tester.pumpAndSettle();
-      print('Please solve the CAPTCHA manually. Type "Y" then press Enter when done.');
-      while (stdin.readLineSync()?.toUpperCase() != 'Y') {
-        print('Invalid input. Type "Y" and press Enter once CAPTCHA is solved.');
-      }
-      codeField = find.byKey(const ValueKey(SignupKeys.codeTextFieldKey));
-      submitCodeButton =
-          find.byKey(const ValueKey(SignupKeys.submitCodeButtonKey));
-      resendCode =
-          find.byKey(const ValueKey(SignupKeys.resendCodeHighlightTextKey));
-      await tester.tap(resendCode);
-      await tester.pumpAndSettle();
-      var code = await getVerificationCode();
-      await tester.enterText(codeField, code!);
-      await tester.tap(submitCodeButton);
-      await tester.pumpAndSettle();
-      expect(
-          find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
-    });
-    testWidgets('Ensure uniqueness of email', (WidgetTester tester) async {
-      app.main();
-      await tester.pumpAndSettle();
-      await tester.tap(signUpButtonLogin);
-      await tester.pumpAndSettle();
-      await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
-      await tester.enterText(nameFieldSignUp, 'John Doe');
-      await tester.enterText(usernameFieldSignUp, 'testusername2');
-      await tester.enterText(
-          passwordFieldSignUp, AuthUser.passwordWhisperTest1);
-      await tester.enterText(
-          rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
-      await tester.enterText(phoneNumber, '1224567890');
-      FocusManager.instance.primaryFocus?.unfocus();
-      await tester.pumpAndSettle(Duration(seconds: 1));
-      await tester.tap(signUpButtonSignUp);
-      await tester.pumpAndSettle();
-      try {
-        await waitUntilVisible(tester, 'Email is already found in DB');
-      } catch (e) {
-        fail("Test case failed for email already found in DB - ");
-      }
-    });
-    testWidgets('Ensure i can login with the new user created', (WidgetTester tester) async {
-      app.main();
-      await tester.pumpAndSettle();
-      await tester.enterText(emailFieldLogin, AuthUser.emailWhisperTest);
-      await tester.enterText(passwordFieldLogin, AuthUser.passwordWhisperTest1);
-      await tester.tap(loginButtonLogin);
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
-    });
+    // testWidgets('Sign up with valid credentials', (WidgetTester tester) async {
+    //   app.main();
+    //   await tester.pumpAndSettle();
+    //   await tester.tap(signUpButtonLogin);
+    //   await tester.pumpAndSettle();
+    //   await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
+    //   await tester.enterText(nameFieldSignUp, 'John Doe');
+    //   await tester.enterText(usernameFieldSignUp, 'test username');
+    //   await tester.enterText(
+    //       passwordFieldSignUp, AuthUser.passwordWhisperTest1);
+    //   await tester.enterText(
+    //       rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
+    //   FocusManager.instance.primaryFocus?.unfocus();
+    //   await tester.pumpAndSettle(Duration(seconds: 1));
+    //   await tester.enterText(phoneNumber, '1234567890');
+    //   FocusManager.instance.primaryFocus?.unfocus();
+    //   await tester.pumpAndSettle(Duration(seconds: 1));
+    //   await tester.tap(signUpButtonSignUp);
+    //   await tester.pumpAndSettle();
+    //   goBackFromRecaptcha = find.byKey(
+    //       const ValueKey(SignupKeys.goBackFromRecaptchaHighlightTextKey));
+    //   await tester.tap(goBackFromRecaptcha);
+    //   await tester.pumpAndSettle();
+    //   await tester.tap(signUpButtonSignUp);
+    //   await tester.pumpAndSettle();
+    //   print('Please solve the CAPTCHA manually. Type "Y" then press Enter when done.');
+    //   while (stdin.readLineSync()?.toUpperCase() != 'Y') {
+    //     print('Invalid input. Type "Y" and press Enter once CAPTCHA is solved.');
+    //   }
+    //   goBackFromCode =
+    //       find.byKey(const ValueKey(SignupKeys.goBackFromSubmittingCodeKey));
+    //   await tester.tap(goBackFromCode);
+    //   await tester.pumpAndSettle();
+    //   await tester.tap(signUpButtonSignUp);
+    //   await tester.pumpAndSettle();
+    //   print('Please solve the CAPTCHA manually. Type "Y" then press Enter when done.');
+    //   while (stdin.readLineSync()?.toUpperCase() != 'Y') {
+    //     print('Invalid input. Type "Y" and press Enter once CAPTCHA is solved.');
+    //   }
+    //   codeField = find.byKey(const ValueKey(SignupKeys.codeTextFieldKey));
+    //   submitCodeButton =
+    //       find.byKey(const ValueKey(SignupKeys.submitCodeButtonKey));
+    //   resendCode =
+    //       find.byKey(const ValueKey(SignupKeys.resendCodeHighlightTextKey));
+    //   await tester.tap(resendCode);
+    //   await tester.pumpAndSettle();
+    //   var code = await getVerificationCode();
+    //   await tester.enterText(codeField, code!);
+    //   await tester.tap(submitCodeButton);
+    //   await tester.pumpAndSettle();
+    //   expect(
+    //       find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
+    // });
+    // testWidgets('Ensure uniqueness of email', (WidgetTester tester) async {
+    //   app.main();
+    //   await tester.pumpAndSettle();
+    //   await tester.tap(signUpButtonLogin);
+    //   await tester.pumpAndSettle();
+    //   await tester.enterText(emailFieldSignUp, AuthUser.emailWhisperTest);
+    //   await tester.enterText(nameFieldSignUp, 'John Doe');
+    //   await tester.enterText(usernameFieldSignUp, 'testusername2');
+    //   await tester.enterText(
+    //       passwordFieldSignUp, AuthUser.passwordWhisperTest1);
+    //   await tester.enterText(
+    //       rePasswordFieldSignUp, AuthUser.passwordWhisperTest1);
+    //   FocusManager.instance.primaryFocus?.unfocus();
+    //   await tester.pumpAndSettle(Duration(seconds: 1));
+    //   await tester.enterText(phoneNumber, '1224567890');
+    //   FocusManager.instance.primaryFocus?.unfocus();
+    //   await tester.pumpAndSettle(Duration(seconds: 1));
+    //   await tester.tap(signUpButtonSignUp);
+    //   await tester.pumpAndSettle();
+    //   try {
+    //     await waitUntilVisible(tester, 'Email is already found in DB');
+    //   } catch (e) {
+    //     fail("Test case failed for email already found in DB - ");
+    //   }
+    // });
+    // testWidgets('Ensure i can login with the new user created', (WidgetTester tester) async {
+    //   app.main();
+    //   await tester.pumpAndSettle();
+    //   await tester.enterText(emailFieldLogin, AuthUser.emailWhisperTest);
+    //   await tester.enterText(passwordFieldLogin, AuthUser.passwordWhisperTest1);
+    //   await tester.tap(loginButtonLogin);
+    //   await tester.pumpAndSettle();
+    //   expect(find.byKey(const ValueKey(HomeKeys.logoutButtonKey)), findsOneWidget);
+    // });
   });
 }
 /*

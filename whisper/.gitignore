@@ -42,5 +42,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 #testing related
-*auth_user*
+*auth-user.dart*
 coverage
