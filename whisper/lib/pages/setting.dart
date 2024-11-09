@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/keys/profile-keys.dart';
@@ -92,6 +95,8 @@ class SettingsContent extends StatefulWidget {
 
 class _SettingsContentState extends State<SettingsContent> {
 // Save changes method with success indicators
+  File? _image; // Variable to hold the picked image
+  final ImagePicker _picker = ImagePicker(); // ImagePicker instance
 
   Future<bool> _confirmCode(String email) async {
     if (email != widget.userState?.email) {
@@ -104,7 +109,7 @@ class _SettingsContentState extends State<SettingsContent> {
       }
     } else {
       // Set state if email is the same as the current one
-      context.read<SettingsCubit>().setEmailState("past email");
+      context.read<SettingsCubit>().setEmailState("Same Email");
     }
 
     return true;
@@ -215,11 +220,6 @@ class _SettingsContentState extends State<SettingsContent> {
       success &= response['success'];
       context.read<SettingsCubit>().setBioState(response['message']);
     }
-    // Check if email is updated
-    // if (widget.emailController.text != widget.userState?.email) {
-    //   bool sendCodeSuccess=_confirmCode(widget.emailController.text) as bool;
-    //   success &= sendCodeSuccess;
-    // }
 
     if (success) {
       context.read<SettingsCubit>().toggleEditing();
@@ -290,6 +290,7 @@ class _SettingsContentState extends State<SettingsContent> {
           padding: const EdgeInsets.all(16.0),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            SizedBox(height: 15),
             _buildProfileSection(),
             if (widget.isEditing)
               _buildEditFields(), // Show edit fields if in editing mode
@@ -394,79 +395,77 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
+// Function to build the profile section
   Widget _buildProfileSection() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Stack(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment.center,
             children: [
-              CircleAvatar(
-                radius: 70,
-                backgroundColor: Colors.grey,
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/images/el-gayar.jpg',
-                    fit: BoxFit.cover,
-                    width: 140,
-                    height: 140,
+              // Gray scale photo
+              InkWell(
+                onTap: () {
+                  if (widget.isEditing) {
+                    // Show options to pick an image
+                    _showImageSourceDialog();
+                  }
+                },
+                splashColor: Colors.transparent, // Remove splash color
+                highlightColor: Colors.transparent, // Remove highlight color
+                child: CircleAvatar(
+                  radius: 70,
+                  backgroundColor: Colors.grey,
+                  child: ClipOval(
+                    child: ColorFiltered(
+                      colorFilter: widget.isEditing
+                          ? ColorFilter.mode(
+                              Colors.grey, // Apply gray filter when editing
+                              BlendMode.saturation, // Desaturate the color
+                            )
+                          : ColorFilter.mode(
+                              Colors.transparent, // No filter when not editing
+                              BlendMode.saturation,
+                            ),
+                      child: _image == null
+                          ? Image.asset(
+                              'assets/images/el-gayar.jpg', // Default image
+                              fit: BoxFit.cover,
+                              width: 140,
+                              height: 140,
+                            )
+                          : Image.file(
+                              _image!, // Display the picked image
+                              fit: BoxFit.cover,
+                              width: 140,
+                              height: 140,
+                            ),
+                    ),
                   ),
                 ),
               ),
-              if (!widget.isEditing)
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: primaryColor,
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.add, size: 24),
-                    color: secondNeutralColor,
-                    onPressed: () {
-                      // Add functionality to upload a profile picture
+              // Camera icon overlay with action
+              if (widget.isEditing) ...[
+                Positioned(
+                  child: InkWell(
+                    onTap: () {
+                      // Open the dialog to pick an image
+                      _showImageSourceDialog();
                     },
+                    splashColor: Colors.transparent, // Remove splash color
+                    highlightColor:
+                        Colors.transparent, // Remove highlight color
+                    child: Icon(
+                      Icons.camera_alt, // Camera icon
+                      color: Colors.white,
+                      size: 40,
+                    ),
                   ),
-                ),
-            ],
-          ),
-          if (widget.isEditing)
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                print("Selected: $value");
-                // Logic for selecting profile picture options
-              },
-              itemBuilder: (BuildContext context) => [
-                PopupMenuItem<String>(
-                  value: 'Camera',
-                  child: const Text('Take Photo'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'Gallery',
-                  child: const Text('Select from Gallery'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'Remove',
-                  child: const Text('Remove Photo'),
                 ),
               ],
-              child: TextButton(
-                onPressed: null,
-                style: TextButton.styleFrom(
-                  foregroundColor: primaryColor, // Set the text color
-                  backgroundColor: Colors.transparent,
-                ),
-                child: const Text(
-                  "Set New Photo",
-                  style: TextStyle(
-                    fontSize: 16,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ),
+            ],
+          ),
           const SizedBox(height: 16),
           if (!widget.isEditing) ...[
             Text(
@@ -475,7 +474,7 @@ class _SettingsContentState extends State<SettingsContent> {
             ),
             const SizedBox(height: 4),
             Text(
-              widget.userState?.status == "Online" ? "Online" : "offline",
+              widget.userState?.status == "Online" ? "Online" : "Offline",
               style: TextStyle(
                 color: widget.userState?.status == "Online"
                     ? const Color(0xFF4CB9CF)
@@ -488,10 +487,105 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
+// Function to show dialog for image source
+  void _showImageSourceDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color(0xFF0A254A), // Set dialog background color
+          title: Center(
+            child: const Text(
+              'Choose an Option',
+              style: TextStyle(
+                  color: Colors.white), // Set title text color to white
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Center(
+                  child: const Text(
+                    'Take Photo',
+                    style: TextStyle(
+                        color: Colors.white), // Set text color to white
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImageFromCamera();
+                },
+              ),
+              ListTile(
+                title: Center(
+                  child: const Text(
+                    'Select from Gallery',
+                    style: TextStyle(
+                        color: Colors.white), // Set text color to white
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImageFromGallery();
+                },
+              ),
+              ListTile(
+                title: Center(
+                  child: const Text(
+                    'Remove Photo',
+                    style: TextStyle(
+                        color: Colors.white), // Set text color to white
+                  ),
+                ),
+                onTap: () {
+                  setState(() {
+                    _image = null; // Remove the photo
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path); // Set the image
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  // Function to take a photo using the camera
+  Future<void> _pickImageFromCamera() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path); // Set the image
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
   Widget _buildEditFields() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildTextField(
+          widget.bioController,
+          'Bio',
+          StateText: widget.bioState,
+        ),
         _buildTextField(
           widget.nameController,
           'Name',
@@ -509,11 +603,6 @@ class _SettingsContentState extends State<SettingsContent> {
         ),
         _buildTextField(widget.emailController, 'Email',
             StateText: widget.emailState, needCode: true),
-        _buildTextField(
-          widget.bioController,
-          'Bio',
-          StateText: widget.bioState,
-        ),
       ],
     );
   }
