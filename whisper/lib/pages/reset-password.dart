@@ -113,7 +113,7 @@ class ResetPassword extends StatelessWidget {
                         .goBackFromCodeAndPasswordsHighlightTextKey),
                     callToActionText: "Go Back",
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.popUntil(context, ModalRoute.withName('/ForgotPasswordEmail'));
                     },
                   ),
                   CustomHighlightText(
@@ -121,7 +121,7 @@ class ResetPassword extends StatelessWidget {
                     callToActionText: "Resend code",
                     onTap: () async {
                       final email = await GetEmail();
-                      ResetPasswordService.sendResetCode(email!, context);
+                      await ResetPasswordService.sendResetCode(email!, context);
                     },
                   ),
                 ],

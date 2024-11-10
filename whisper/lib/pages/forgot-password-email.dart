@@ -18,7 +18,7 @@ class ForgotPasswordEmail extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      await ResetPasswordService.sendResetCode(
+       ResetPasswordService.sendResetCode(
         _emailController.text,
         context,
       );

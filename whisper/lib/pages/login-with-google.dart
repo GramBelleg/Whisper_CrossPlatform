@@ -9,6 +9,7 @@ import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 import '../constants/ip-for-services.dart';
+import '../services/show-loading-dialog.dart';
 import 'chat-page.dart';
 
 class LoginWithGoogle extends StatefulWidget {
@@ -45,7 +46,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
+          "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36")
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
@@ -62,6 +63,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                 debugPrint("Authorization code: $code");
                 try {
                   final url = Uri.parse('http://$ip:5000/api/auth/google');
+                  showLoadingDialog(context);
                   final response = await http.post(
                     url,
                     headers: {
@@ -73,8 +75,9 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                       },
                     ),
                   );
-                  final data = jsonDecode(response.body);
-                  if (data['status'] == 'success') {
+                  Navigator.pop(context);
+                  final data=jsonDecode(response.body);
+                  if(data['status']=='success') {
                     await SaveToken(data['userToken']);
                     Navigator.pushNamedAndRemoveUntil(
                       context,

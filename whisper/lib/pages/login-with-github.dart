@@ -9,6 +9,7 @@ import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 import '../constants/ip-for-services.dart';
+import '../services/show-loading-dialog.dart';
 import 'chat-page.dart';
 
 class LoginWithGithub extends StatefulWidget {
@@ -25,7 +26,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
   static const String id = '/LoginWithGithub';
 
   final String clientId = 'Iv23liQlV4tB3FkvC7JC';
-  final String redirectUri = 'http://localhost:5173';
+  final String redirectUri = 'http://localhost:5173/github-callback';
   late final String oauthUrl;
 
   @override
@@ -41,7 +42,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
+          "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Mobile Safari/537.36")
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
@@ -56,6 +57,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
               String? code = uri.queryParameters["code"];
               if (code != null) {
                 debugPrint("Authorization code: $code");
+                showLoadingDialog(context);;
                 try {
                   final url = Uri.parse('http://$ip:5000/api/auth/github');
                   final response = await http.post(
@@ -69,6 +71,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                       },
                     ),
                   );
+                  Navigator.pop(context);
                   final data = jsonDecode(response.body);
                   if (data['status'] == 'success') {
                     await SaveToken(data['userToken']);

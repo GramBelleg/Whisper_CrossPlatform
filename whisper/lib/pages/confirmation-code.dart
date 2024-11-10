@@ -99,7 +99,7 @@ class _ConfirmationCodeState extends State<ConfirmationCode> {
                           key: ValueKey(SignupKeys.goBackFromSubmittingCodeKey),
                           callToActionText: "Go back",
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.popUntil(context, ModalRoute.withName('/Signup'));
                           },
                         ),
                         CustomHighlightText(

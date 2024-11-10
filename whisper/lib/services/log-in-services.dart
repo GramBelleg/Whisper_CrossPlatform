@@ -7,12 +7,13 @@ import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/modules/login-credentials.dart';
 import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/show-loading-dialog.dart';
 
 class LoginService {
   static Future<void> login(
       LoginCredentials loginCred, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/auth/login');
-
+    showLoadingDialog(context);
     try {
       final response = await http.post(
         url,
@@ -21,6 +22,7 @@ class LoginService {
         },
         body: jsonEncode(loginCred.toMap()),
       );
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await SaveToken(data['userToken']);
@@ -44,6 +46,7 @@ class LoginService {
   static Future<bool?> CheckAlreadyLoggedIn(BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/user');
     final token = await GetToken();
+    showLoadingDialog(context);
     try {
       final response = await http.get(
         url,
@@ -52,6 +55,7 @@ class LoginService {
           'Authorization': 'Bearer $token',
         },
       );
+      Navigator.pop(context);
       print("Response:$response");
       final data = jsonDecode(response.body);
       print(data);

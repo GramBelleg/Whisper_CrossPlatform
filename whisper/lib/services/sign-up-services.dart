@@ -8,6 +8,7 @@ import 'package:whisper/modules/signup-credentials.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/recaptcha.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/show-loading-dialog.dart';
 
 import '../pages/chat-page.dart';
 
@@ -20,6 +21,7 @@ class SignupService {
     print("number is :${userMap['phoneNumber']}");
     userMap.addAll({"robotToken": robotToken});
     // print(userMap);
+    showLoadingDialog(context);
     try {
       final response = await http.post(
         url,
@@ -28,7 +30,7 @@ class SignupService {
         },
         body: jsonEncode(userMap),
       );
-
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await SaveEmail(user.email!);
@@ -89,6 +91,7 @@ class SignupService {
   static Future<void> confirmCode(String code, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/auth/confirmEmail');
     final email = await GetEmail();
+    showLoadingDialog(context);
     try {
       final response = await http.post(
         url,
@@ -102,6 +105,7 @@ class SignupService {
           },
         ),
       );
+      Navigator.pop(context);
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');
