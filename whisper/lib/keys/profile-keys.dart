@@ -12,6 +12,5 @@ class SettingsPageKeys {
   static const takePhotoListTile = Key('takePhotoListTile');
   static const removePhotoListTile = Key('removePhotoListTile');
   static const selectPhotoListTile = Key('selectPhotoListTile');
-
   static const String row = 'Row';
 }

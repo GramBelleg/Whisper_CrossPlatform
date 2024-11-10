@@ -440,7 +440,7 @@ class _SettingsContentState extends State<SettingsContent> {
                             )
                           : Image.network(
                               widget.userState!
-                                  .profilePic!, // Display the picked image
+                                  .profilePic, // Display the picked image
                               fit: BoxFit.cover,
                               width: 140,
                               height: 140,
@@ -559,10 +559,8 @@ class _SettingsContentState extends State<SettingsContent> {
                   ),
                 ),
                 onTap: () {
-                  setState(() {
-                    _image = null; // Remove the photo
-                  });
                   Navigator.pop(context);
+                  _removeImage();
                 },
               ),
             ],
@@ -595,6 +593,11 @@ class _SettingsContentState extends State<SettingsContent> {
     } else {
       print('No image selected.');
     }
+  }
+
+  // Function to remove a photo
+  Future<void> _removeImage() async {
+    await context.read<SettingsCubit>().removeProfilePic();
   }
 
   Widget _buildEditFields() {

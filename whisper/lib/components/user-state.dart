@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/update-user-field.dart';
 
 class UserState extends Equatable {
   final String name;
@@ -16,7 +15,7 @@ class UserState extends Equatable {
   final String pfpPrivacy;
   final bool readReceipts;
 
-  UserState({
+  const UserState({
     required this.name,
     required this.username,
     required this.email,

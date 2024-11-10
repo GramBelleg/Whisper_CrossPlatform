@@ -235,7 +235,6 @@ class SettingsCubit extends Cubit<SettingsState> {
       } else if (field == 'bio') {
         userState?.copyWith(bio: newValue);
       }
-
       emit(SettingsLoaded(
         userState: await getUserState(),
         isEditing: isEditing,
@@ -259,6 +258,26 @@ class SettingsCubit extends Cubit<SettingsState> {
     String response = await generatePresignedUrl(blobname);
     final userState = (state as SettingsLoaded).userState;
     userState?.copyWith(profilePic: response);
+
+    emit(SettingsLoaded(
+      userState: await getUserState(),
+      isEditing: isEditing,
+      nameController: nameController,
+      usernameController: usernameController,
+      emailController: emailController,
+      bioController: bioController,
+      phoneController: phoneController,
+      nameState: nameState,
+      usernameState: usernameState,
+      emailState: emailState,
+      phoneNumberState: phoneNumberState,
+      bioState: bioState,
+    ));
+  }
+
+  Future<void> removeProfilePic() async {
+    final userState = (state as SettingsLoaded).userState;
+    userState?.copyWith(profilePic: '');
 
     emit(SettingsLoaded(
       userState: await getUserState(),
