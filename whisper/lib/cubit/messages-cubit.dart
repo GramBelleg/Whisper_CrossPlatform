@@ -53,6 +53,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.on('receiveMessage', (data) {
       receiveMessage(data); // Handle incoming messages directly
     });
+    // Listen for messages directly and handle them
+    socket?.on('receiveMessage', (data) {
+      receiveMessage(data); // Handle incoming messages directly
+    });
 
     socket?.onConnectError((error) {
       emit(SocketConnectionError(error.toString()));
@@ -92,6 +96,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.emit('sendMessage', messageData);
     emit(MessageSent(newMessage));
     print("Message sent: $content");
+  }
+
+  void sendProfilePhoto(String image) {
+    socket?.emit('profilePic', image);
   }
 
   // Handle incoming messages without events

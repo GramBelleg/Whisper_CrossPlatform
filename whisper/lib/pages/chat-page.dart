@@ -61,15 +61,6 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
 
-    if (widget.token != null && widget.token!.isNotEmpty) {
-      try {
-        context.read<MessagesCubit>().connectSocket(widget.token!);
-      } catch (e) {
-        print("Error connecting to socket: $e");
-      }
-    } else {
-      print("Token is null or empty");
-    }
     context.read<MessagesCubit>().loadMessages(widget.ChatID);
     // // Listen for incoming messages
     // _chatBloc.stream.listen((state) {
@@ -115,7 +106,7 @@ class _ChatPageState extends State<ChatPage> {
     _controller.dispose(); // Dispose of the controller
     focusNode.dispose(); // Dispose of the focusNode
 
-    context.read<MessagesCubit>().disconnectSocket();
+    // context.read<MessagesCubit>().disconnectSocket();
     super.dispose();
   }
 
