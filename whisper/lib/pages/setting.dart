@@ -6,13 +6,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whisper/components/custom-access-button.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/keys/home-keys.dart';
 import 'package:whisper/keys/profile-keys.dart';
 import 'package:whisper/keys/visibility_settings_keys.dart';
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/cubit/profile-setting-cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
+import 'package:whisper/pages/logout-after-reset-password.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
 import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/uploud-file.dart';
@@ -290,85 +293,95 @@ class _SettingsContentState extends State<SettingsContent> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(height: 15),
-            _buildProfileSection(),
-            if (widget.isEditing)
-              _buildEditFields(), // Show edit fields if in editing mode
-            if (!widget.isEditing) ...[
-              SizedBox(height: 30),
-              _buildInfoRow(
-                  widget.userState!.phoneNumber, 'Phone', Icons.phone),
-              _buildInfoRow(
-                  widget.userState!.username, 'Username', Icons.person),
-              _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
-            ],
-            if (!widget.isEditing) SizedBox(height: 8),
-            if (!widget.isEditing)
-              const Divider(
-                color: Color(0xFF0A254A),
-                thickness: 4.0,
-              ),
-            if (!widget.isEditing) SizedBox(height: 8),
-            if (!widget.isEditing) ...[
-              Text(
-                "Privacy Settings",
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 20,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 15),
+              _buildProfileSection(),
+              if (widget.isEditing)
+                _buildEditFields(), // Show edit fields if in editing mode
+              if (!widget.isEditing) ...[
+                SizedBox(height: 30),
+                _buildInfoRow(
+                    widget.userState!.phoneNumber, 'Phone', Icons.phone),
+                _buildInfoRow(
+                    widget.userState!.username, 'Username', Icons.person),
+                _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
+              ],
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing)
+                const Divider(
+                  color: Color(0xFF0A254A),
+                  thickness: 4.0,
                 ),
-              ),
-              SizedBox(
-                  height: 16), // Add vertical space between title and buttons
-              // Privacy Settings buttons
-              _buildPrivacyCard(
-                  'Visibility Settings',
-                  FontAwesomeIcons.eye,
-                  const VisibilitySettingsPage(),
-                  VisibilitySettingsKeys.visibilitySettingsTile),
-              _buildPrivacyCard(
-                  'Blocked Users',
-                  FontAwesomeIcons.userSlash,
-                  const BlockedUsersPage(),
-                  VisibilitySettingsKeys.blockedUsersTile),
-              SizedBox(
-                height: 6,
-              ),
-              BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
-                builder: (context, privacyState) {
-                  return ListTile(
-                    key: VisibilitySettingsKeys.addMeToGroupsTile,
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Who can add me to groups?",
-                            style: TextStyle(color: secondNeutralColor)),
-                        Text(
-                          privacyState['addMeToGroups'] ?? "No Backend Endpoint",
-                          style:
-                              TextStyle(color: primaryColor.withOpacity(0.6)),
-                        )
-                      ],
-                    ),
-                    onTap: () {
-                      if (kDebugMode) print("add me to groups");
-                      showVisibilityOptions(
-                        context,
-                        "Who can add me to groups?",
-                        privacyState['addMeToGroups'],
-                        (value) {
-                          context
-                              .read<VisibilityCubit>()
-                              .updateAddMeToGroupsVisibility(value);
-                        },
-                      );
-                    },
-                  );
-                },
-              )
-            ]
-          ]),
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing) ...[
+                Text(
+                  "Privacy Settings",
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(
+                    height: 16), // Add vertical space between title and buttons
+                // Privacy Settings buttons
+                _buildPrivacyCard(
+                    'Visibility Settings',
+                    FontAwesomeIcons.eye,
+                    const VisibilitySettingsPage(),
+                    VisibilitySettingsKeys.visibilitySettingsTile),
+                _buildPrivacyCard(
+                    'Blocked Users',
+                    FontAwesomeIcons.userSlash,
+                    const BlockedUsersPage(),
+                    VisibilitySettingsKeys.blockedUsersTile),
+                SizedBox(
+                  height: 6,
+                ),
+                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
+                  builder: (context, privacyState) {
+                    return ListTile(
+                      key: VisibilitySettingsKeys.addMeToGroupsTile,
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Who can add me to groups?",
+                              style: TextStyle(color: secondNeutralColor)),
+                          Text(
+                            privacyState['addMeToGroups'] ??
+                                "No Backend Endpoint",
+                            style:
+                                TextStyle(color: primaryColor.withOpacity(0.6)),
+                          )
+                        ],
+                      ),
+                      onTap: () {
+                        if (kDebugMode) print("add me to groups");
+                        showVisibilityOptions(
+                          context,
+                          "Who can add me to groups?",
+                          privacyState['addMeToGroups'],
+                          (value) {
+                            context
+                                .read<VisibilityCubit>()
+                                .updateAddMeToGroupsVisibility(value);
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+                CustomAccessButton(
+                  key: Key(HomeKeys.logoutButtonKey),
+                  label: "Logout",
+                  onPressed: () {
+                    Navigator.pushNamed(context, LogoutAfterResetPassword.id);
+                  },
+                )
+              ]
+            ],
+          ),
         ),
       ),
     );
