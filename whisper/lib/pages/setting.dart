@@ -17,6 +17,7 @@ import 'package:whisper/cubit/profile-setting-cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/logout-after-reset-password.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/services/logout_confirmation_dialog.dart';
 import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/uploud-file.dart';
 import 'package:whisper/utils/visibility_utils.dart';
@@ -373,10 +374,20 @@ class _SettingsContentState extends State<SettingsContent> {
                   },
                 ),
                 CustomAccessButton(
-                  key: Key(HomeKeys.logoutButtonKey),
-                  label: "Logout",
+                  key: Key(HomeKeys.logoutFromOneButtonKey),
+                  label: "Logout From This Device",
                   onPressed: () {
-                    Navigator.pushNamed(context, LogoutAfterResetPassword.id);
+                    showLogoutConfirmationDialog(context, false);
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                CustomAccessButton(
+                  key: Key(HomeKeys.logoutFromAllButtonKey),
+                  label: "Logout From All Devices",
+                  onPressed: () {
+                    showLogoutConfirmationDialog(context, true);
                   },
                 )
               ]

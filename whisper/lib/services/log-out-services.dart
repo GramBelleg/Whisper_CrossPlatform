@@ -44,4 +44,42 @@ class LogoutService{
       );
     }
   }
+
+  static Future<void> logoutFromThisDevice(BuildContext context) async {
+    final url = Uri.parse('http://$ip:5000/api/user/logoutOne');
+    final token = await GetToken();
+    showLoadingDialog(context);
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      Navigator.pop(context);
+      var data = jsonDecode(response.body);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print('Response: $data');
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Login.id,
+              (Route<dynamic> route) => false,
+        );
+      } else {
+        print(response);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Something went wrong: ${data['message']}"),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Something went wrong: ${e}"),
+        ),
+      );
+    }
+  }
 }
