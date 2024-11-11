@@ -174,7 +174,7 @@ class _SettingsContentState extends State<SettingsContent> {
           return;
         }
         //verify my code
-        print("the code is:           " + message);
+        print("the code:           " + message);
         final response = await context
             .read<SettingsCubit>()
             .verifyCode(message, email, context);
@@ -201,7 +201,7 @@ class _SettingsContentState extends State<SettingsContent> {
     if (widget.usernameController.text != widget.userState?.username) {
       final response = await context
           .read<SettingsCubit>()
-          .updateField(widget.usernameController.text, 'username');
+          .updateField(widget.usernameController.text, 'userName');
       success &= response['success'];
       context.read<SettingsCubit>().setUsernameState(response['message']);
     }
