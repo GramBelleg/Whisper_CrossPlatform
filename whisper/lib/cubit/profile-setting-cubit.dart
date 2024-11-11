@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:whisper/components/user-state.dart'; // UserState model
-import 'package:whisper/services/confirm-code-email-update.dart'; // Service
-import 'package:whisper/services/email-code-update.dart'; // Service
-import 'package:whisper/services/read-file.dart'; // Service
-import 'package:whisper/services/shared-preferences.dart'; // Service
-import 'package:whisper/services/update-user-field.dart'; // Service
-import 'package:whisper/socket.dart'; // Assuming this is where the update functions are defined
+import 'package:whisper/components/user-state.dart'; 
+import 'package:whisper/services/confirm-code-email-update.dart'; 
+import 'package:whisper/services/email-code-update.dart';
+import 'package:whisper/services/read-file.dart';
+import 'package:whisper/services/shared-preferences.dart'; 
+import 'package:whisper/services/update-user-field.dart'; 
+import 'package:whisper/socket.dart'; 
 
-part 'profile-setting-state.dart'; // This connects to the state file
+part 'profile-setting-state.dart'; 
 
 class SettingsCubit extends Cubit<SettingsState> {
   bool isEditing = false;
