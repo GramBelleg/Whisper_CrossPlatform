@@ -1,5 +1,3 @@
-import 'package:whisper/validators/form-validation/longest-repeated-letter.dart';
-
 String? ValidateUsernameField(String? username) {
   if (username == null || username.isEmpty) {
     return 'This field is required';

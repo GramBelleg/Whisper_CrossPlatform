@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-eye-icon.dart';
-import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../constants/colors.dart';
 
 class CustomTextField extends StatefulWidget {

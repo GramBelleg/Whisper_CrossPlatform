@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/components/app-navigator.dart';
 import 'package:whisper/components/tap-bar.dart';
 import 'package:whisper/components/user-state.dart';
-import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/services/get-userinfo.dart';
 import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/cubit/profile-setting-cubit.dart'; // Import your SettingsCubit
+import 'package:whisper/cubit/profile-setting-cubit.dart';
+import 'package:whisper/socket.dart'; // Import your SettingsCubit
 
 // this file to put the 3 screens and navigate with them
 class PageState extends StatefulWidget {
@@ -35,7 +35,6 @@ class _MyPageState extends State<PageState> {
         await GetToken(); // Make sure GetToken is awaited to fetch the token
     print("dammmmmmmmmn$token");
     // Pass the token to connectSocket
-    //context.read<MessagesCubit>().connectSocket(token!);
     if (!_isUserInfoLoaded) {
       // Only load if not already loaded
       userState = await fetchUserInfo();
@@ -49,6 +48,7 @@ class _MyPageState extends State<PageState> {
 
   @override
   Widget build(BuildContext context) {
+    SocketService.instance.initSocket();
     return BlocProvider(
       create: (context) =>
           SettingsCubit()..loadUserState(), // Provide the cubit

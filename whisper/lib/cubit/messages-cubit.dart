@@ -2,12 +2,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/messages-state.dart';
 import 'package:whisper/models/chat-messages';
 import 'package:whisper/services/chat-deletion-service.dart';
-
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../constants/ip-for-services.dart';
-
 
 class MessagesCubit extends Cubit<MessagesState> {
   MessagesCubit(this.chatViewModel, this.chatDeletionService)
@@ -53,10 +51,10 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.on('receiveMessage', (data) {
       receiveMessage(data); // Handle incoming messages directly
     });
-    // Listen for messages directly and handle them
-    socket?.on('receiveMessage', (data) {
-      receiveMessage(data); // Handle incoming messages directly
-    });
+
+    // socket?.on('pfp', (data) {
+    //   receiveMessage(data); // Handle incoming pic directly
+    // });
 
     socket?.onConnectError((error) {
       emit(SocketConnectionError(error.toString()));
@@ -68,6 +66,10 @@ class MessagesCubit extends Cubit<MessagesState> {
       print("Disconnected from server");
     });
   }
+
+  // void receivePic(Map<String, dynamic> data) {
+  //     context.read<SettingsCubit>().setProfilePic(data);
+  // }
 
   void disconnectSocket() {
     socket?.disconnect();
@@ -96,10 +98,6 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.emit('sendMessage', messageData);
     emit(MessageSent(newMessage));
     print("Message sent: $content");
-  }
-
-  void sendProfilePhoto(String image) {
-    socket?.emit('profilePic', image);
   }
 
   // Handle incoming messages without events

@@ -7,8 +7,8 @@ import '../constants/ip-for-services.dart';
 Future<Map<String, dynamic>> verifyEmailCode(
     String code, String email, BuildContext context) async {
   String? token = await GetToken();
-  final url = Uri.parse(
-      'http://$ip:5000/api/user/email'); // Your update API endpoint
+  final url =
+      Uri.parse('http://$ip:5000/api/user/email'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   print(code + "      " + email);

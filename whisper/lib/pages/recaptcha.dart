@@ -1,10 +1,8 @@
 library flutter_recaptcha_v2;
 
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
-import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
@@ -43,9 +41,9 @@ class _RecaptchaState extends State<Recaptcha> {
   late RecaptchaV2Controller controller;
   late final WebViewController _controller;
 
-  void verifyToken(String token,SignupCredentials? user) async {
+  void verifyToken(String token, SignupCredentials? user) async {
     await SaveRobotToken(token);
-    await SignupService.signup(context,user);
+    await SignupService.signup(context, user);
   }
 
   @override
@@ -72,8 +70,8 @@ class _RecaptchaState extends State<Recaptcha> {
             _token = _token.substring(7);
           }
           final SignupCredentials? receivedData =
-          ModalRoute.of(context)?.settings.arguments as SignupCredentials?;
-          verifyToken(_token,receivedData);
+              ModalRoute.of(context)?.settings.arguments as SignupCredentials?;
+          verifyToken(_token, receivedData);
         },
       )
       ..loadRequest(Uri.parse("${widget.pluginURL}?api_key=${widget.apiKey}"));

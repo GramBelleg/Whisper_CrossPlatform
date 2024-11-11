@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whisper/components/user-state.dart';
-import 'package:whisper/modules/signup-credentials.dart';
 
 final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 

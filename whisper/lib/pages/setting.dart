@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,8 +13,7 @@ import 'package:whisper/components/user-state.dart';
 import 'package:whisper/cubit/profile-setting-cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
-import 'package:whisper/services/read-file.dart';
-import 'package:whisper/services/uploud-file.dart';
+import 'package:whisper/services/upload-file.dart';
 import 'package:whisper/utils/visibility_utils.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
@@ -127,14 +125,14 @@ class _SettingsContentState extends State<SettingsContent> {
       type: QuickAlertType.custom,
       barrierDismissible: true,
       confirmBtnText: 'Submit',
-      confirmBtnColor: Color(0xff8D6AEE),
+      confirmBtnColor: primaryColor,
       customAsset: 'assets/images/whisper-logo.png',
       widget: TextFormField(
         decoration: InputDecoration(
           alignLabelWithHint: true,
           hintText: 'Enter Your Code',
           hintStyle: TextStyle(
-            color: Color(0xFFfbfbfb)
+            color: secondNeutralColor
                 .withOpacity(0.7), // Hint color with opacity for visibility
             fontSize: 18, // Larger hint text size
           ),
@@ -155,7 +153,7 @@ class _SettingsContentState extends State<SettingsContent> {
           ),
         ),
         style: TextStyle(
-          color: Color(0xFFfbfbfb), // Text color
+          color: secondNeutralColor, // Text color
           fontSize: 18, // Larger font size for entered text
         ),
         textAlign: TextAlign.center, // Center-aligns text inside the field
@@ -253,7 +251,7 @@ class _SettingsContentState extends State<SettingsContent> {
                     },
                     child: Text(
                       "Done",
-                      style: TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
+                      style: TextStyle(color: secondNeutralColor, fontSize: 18),
                     ),
                   ),
                 )
@@ -279,7 +277,7 @@ class _SettingsContentState extends State<SettingsContent> {
                     },
                     child: Text(
                       "Cancel",
-                      style: TextStyle(color: Color(0xFFFBFBFB), fontSize: 18),
+                      style: TextStyle(color: secondNeutralColor, fontSize: 18),
                     ),
                   ),
                   SizedBox(width: 60), // Placeholder for alignment
@@ -306,8 +304,8 @@ class _SettingsContentState extends State<SettingsContent> {
             ],
             if (!widget.isEditing) SizedBox(height: 8),
             if (!widget.isEditing)
-              const Divider(
-                color: Color(0xFF0A254A),
+              Divider(
+                color: firstNeutralColor,
                 thickness: 4.0,
               ),
             if (!widget.isEditing) SizedBox(height: 8),
@@ -345,7 +343,8 @@ class _SettingsContentState extends State<SettingsContent> {
                         Text("Who can add me to groups?",
                             style: TextStyle(color: secondNeutralColor)),
                         Text(
-                          privacyState['addMeToGroups'] ?? "No Backend Endpoint",
+                          privacyState['addMeToGroups'] ??
+                              "No Backend Endpoint",
                           style:
                               TextStyle(color: primaryColor.withOpacity(0.6)),
                         )
@@ -386,8 +385,7 @@ class _SettingsContentState extends State<SettingsContent> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(value,
-                  style:
-                      const TextStyle(color: Color(0xFFFBFBFB), fontSize: 18)),
+                  style: TextStyle(color: secondNeutralColor, fontSize: 18)),
             ),
             Text(label,
                 style: const TextStyle(color: Colors.grey, fontSize: 14)),
@@ -463,7 +461,7 @@ class _SettingsContentState extends State<SettingsContent> {
                         Colors.transparent, // Remove highlight color
                     child: Icon(
                       Icons.camera_alt, // Camera icon
-                      color: Colors.white,
+                      color: secondNeutralColor,
                       size: 40,
                     ),
                   ),
@@ -475,7 +473,7 @@ class _SettingsContentState extends State<SettingsContent> {
           if (!widget.isEditing) ...[
             Text(
               widget.userState!.name,
-              style: const TextStyle(color: Colors.white, fontSize: 20),
+              style: TextStyle(color: secondNeutralColor, fontSize: 20),
             ),
             const SizedBox(height: 4),
             Text(
@@ -512,10 +510,10 @@ class _SettingsContentState extends State<SettingsContent> {
         return AlertDialog(
           backgroundColor: Color(0xFF0A254A), // Set dialog background color
           title: Center(
-            child: const Text(
+            child: Text(
               'Choose an Option',
               style: TextStyle(
-                  color: Colors.white), // Set title text color to white
+                  color: secondNeutralColor), // Set title text color to white
             ),
           ),
           content: Column(
@@ -524,10 +522,10 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 title: Center(
                   key: SettingsPageKeys.takePhotoListTile,
-                  child: const Text(
+                  child: Text(
                     'Take Photo',
                     style: TextStyle(
-                        color: Colors.white), // Set text color to white
+                        color: secondNeutralColor), // Set text color to white
                   ),
                 ),
                 onTap: () {
@@ -538,10 +536,10 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 key: SettingsPageKeys.selectPhotoListTile,
                 title: Center(
-                  child: const Text(
+                  child: Text(
                     'Select from Gallery',
                     style: TextStyle(
-                        color: Colors.white), // Set text color to white
+                        color: secondNeutralColor), // Set text color to white
                   ),
                 ),
                 onTap: () {
@@ -552,10 +550,10 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 key: SettingsPageKeys.removePhotoListTile,
                 title: Center(
-                  child: const Text(
+                  child: Text(
                     'Remove Photo',
                     style: TextStyle(
-                        color: Colors.white), // Set text color to white
+                        color: secondNeutralColor), // Set text color to white
                   ),
                 ),
                 onTap: () {
@@ -577,6 +575,7 @@ class _SettingsContentState extends State<SettingsContent> {
     if (pickedFile != null) {
       String blobName = await uploadFile(pickedFile.path);
       await context.read<SettingsCubit>().updateProfilePic(blobName);
+      context.read<SettingsCubit>().sendProfilePhoto(blobName);
     } else {
       print('No image selected.');
     }
@@ -590,6 +589,7 @@ class _SettingsContentState extends State<SettingsContent> {
     if (pickedFile != null) {
       String blobName = await uploadFile(pickedFile.path);
       await context.read<SettingsCubit>().updateProfilePic(blobName);
+      context.read<SettingsCubit>().sendProfilePhoto(blobName);
     } else {
       print('No image selected.');
     }
@@ -597,7 +597,7 @@ class _SettingsContentState extends State<SettingsContent> {
 
   // Function to remove a photo
   Future<void> _removeImage() async {
-    await context.read<SettingsCubit>().removeProfilePic();
+    context.read<SettingsCubit>().removeProfilePic();
   }
 
   Widget _buildEditFields() {
@@ -639,8 +639,8 @@ class _SettingsContentState extends State<SettingsContent> {
           children: [
             Text(
               labelText,
-              style: const TextStyle(
-                color: Color(0xff8D6AEE),
+              style: TextStyle(
+                color: primaryColor,
                 fontSize: 15,
               ),
             ),
@@ -652,8 +652,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
                   StateText,
-                  style:
-                      const TextStyle(color: Color(0xFF4CB9CF), fontSize: 14),
+                  style: TextStyle(color: highlightColor, fontSize: 14),
                 ),
               ),
             if (StateText != null &&
@@ -681,7 +680,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 child: TextField(
                   key: Key("$labelText${SettingsPageKeys.textField}"),
                   controller: controller,
-                  style: const TextStyle(color: Color(0xFFFBFBFB)),
+                  style: TextStyle(color: secondNeutralColor),
                   decoration: const InputDecoration(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -698,7 +697,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   },
                   child: const Text("Send Code"),
                   style: TextButton.styleFrom(
-                    foregroundColor: Color(0xFF4CB9CF),
+                    foregroundColor: highlightColor,
                     padding:
                         EdgeInsets.symmetric(horizontal: 12), // Button padding
                   ),

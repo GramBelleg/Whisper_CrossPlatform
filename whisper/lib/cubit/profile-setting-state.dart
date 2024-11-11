@@ -24,21 +24,17 @@ class SettingsLoaded extends SettingsState {
   SettingsLoaded({
     this.userState,
     this.isEditing = false,
-    required TextEditingController nameController,
-    required TextEditingController usernameController,
-    required TextEditingController emailController,
-    required TextEditingController bioController,
-    required TextEditingController phoneController,
+    required this.nameController,
+    required this.usernameController,
+    required this.emailController,
+    required this.bioController,
+    required this.phoneController,
     this.nameState = '',
     this.usernameState = '',
     this.emailState = '',
     this.phoneNumberState = '',
     this.bioState = '',
-  })  : nameController = nameController,
-        usernameController = usernameController,
-        emailController = emailController,
-        bioController = bioController,
-        phoneController = phoneController;
+  });
 }
 
 class SettingsLoadError extends SettingsState {

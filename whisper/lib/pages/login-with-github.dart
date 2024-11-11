@@ -5,12 +5,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/page-state.dart';
-import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared-preferences.dart';
-
 import '../constants/ip-for-services.dart';
 import '../services/show-loading-dialog.dart';
-import 'chat-page.dart';
 
 class LoginWithGithub extends StatefulWidget {
   const LoginWithGithub({super.key});
@@ -57,7 +54,8 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
               String? code = uri.queryParameters["code"];
               if (code != null) {
                 debugPrint("Authorization code: $code");
-                showLoadingDialog(context);;
+                showLoadingDialog(context);
+                ;
                 try {
                   final url = Uri.parse('http://$ip:5000/api/auth/github');
                   final response = await http.post(
@@ -75,6 +73,8 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                   final data = jsonDecode(response.body);
                   if (data['status'] == 'success') {
                     await SaveToken(data['userToken']);
+                    await SaveId(data['user']['id']);
+
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       PageState.id,

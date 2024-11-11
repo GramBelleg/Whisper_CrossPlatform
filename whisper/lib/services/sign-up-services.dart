@@ -107,6 +107,8 @@ class SignupService {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');
         await SaveToken(data['userToken']);
+        await SaveId(data['user']['id']);
+
         Navigator.pushNamedAndRemoveUntil(
           context,
           PageState.id,

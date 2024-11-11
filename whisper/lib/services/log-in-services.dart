@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/components/page-state.dart';
 import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/modules/login-credentials.dart';
-import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/services/show-loading-dialog.dart';
 
@@ -26,6 +25,7 @@ class LoginService {
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await SaveToken(data['userToken']);
+        await SaveId(data['user']['id']);
         print('Response: $data');
         await SaveEmail(loginCred.email!);
         Navigator.pushNamedAndRemoveUntil(

@@ -9,7 +9,8 @@ import 'package:whisper/services/show-loading-dialog.dart';
 
 import '../modules/reset-password-credentials.dart';
 import '../pages/logout-after-reset-password.dart';
-class ResetPasswordService{
+
+class ResetPasswordService {
   static Future<void> sendResetCode(String email, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/auth/sendResetCode');
     showLoadingDialog(context);
@@ -31,7 +32,7 @@ class ResetPasswordService{
         print('Response: $data');
         await SaveEmail(email);
         if (ModalRoute.of(context)?.settings.name != ResetPassword.id)
-        Navigator.pushNamed(context, ResetPassword.id);
+          Navigator.pushNamed(context, ResetPassword.id);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -47,6 +48,7 @@ class ResetPasswordService{
       );
     }
   }
+
   static Future<void> resetPassword(
       ResetPasswordCredentials resetPassCred, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/auth/resetPassword');
@@ -65,6 +67,8 @@ class ResetPasswordService{
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Response: $data');
         await SaveToken(data['userToken']);
+        await SaveId(data['user']['id']);
+
         Navigator.pushNamed(context, LogoutAfterResetPassword.id);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
