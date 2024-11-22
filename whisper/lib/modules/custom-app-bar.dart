@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/components/forward-menu.dart';
+import 'package:whisper/pages/forward-menu.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/services/fetch-messages.dart';
 
@@ -184,8 +184,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => ForwardMenu(
-                      clearSelection: widget.clearSelection!,
-                      isSelected: widget.isSelected,
+                      onClearSelection: widget.clearSelection!,
+                      selectedMessageIds: widget.isSelected,
                     ),
                   );
                 },

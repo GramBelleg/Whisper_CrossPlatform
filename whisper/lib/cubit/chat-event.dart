@@ -1,34 +1,34 @@
-import 'package:equatable/equatable.dart';
+// import 'package:equatable/equatable.dart';
 
-abstract class SocketEvent extends Equatable {
-  const SocketEvent();
+// abstract class SocketEvent extends Equatable {
+//   const SocketEvent();
 
-  @override
-  List<Object> get props => [];
-}
+//   @override
+//   List<Object> get props => [];
+// }
 
-class ConnectSocket extends SocketEvent {
-  final String token;
-  const ConnectSocket(this.token);
+// class ConnectSocket extends SocketEvent {
+//   final String token;
+//   const ConnectSocket(this.token);
 
-  @override
-  List<Object> get props => [token];
-}
+//   @override
+//   List<Object> get props => [token];
+// }
 
 
-class ReceiveMessage extends SocketEvent {
-  final Map<String, dynamic> data;
-  const ReceiveMessage(this.data);
-  @override
-  List<Object> get props => [data];
-}
+// class ReceiveMessage extends SocketEvent {
+//   final Map<String, dynamic> data;
+//   const ReceiveMessage(this.data);
+//   @override
+//   List<Object> get props => [data];
+// }
 
-class SendMessage extends SocketEvent {
-  final String inputMessage;
-  final int chatId;
-  final int? senderId;
-  const SendMessage(this.inputMessage, this.chatId, this.senderId);
+// class SendMessage extends SocketEvent {
+//   final String inputMessage;
+//   final int chatId;
+//   final int? senderId;
+//   const SendMessage(this.inputMessage, this.chatId, this.senderId);
 
-  @override
-  List<Object> get props => [inputMessage, chatId, senderId ?? 0];
-}
+//   @override
+//   List<Object> get props => [inputMessage, chatId, senderId ?? 0];
+// }

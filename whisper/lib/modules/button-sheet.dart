@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon-creation.dart';
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:whisper/services/upload-file.dart';
 
 class FileButtonSheet extends StatelessWidget {
   final ImagePicker _picker = ImagePicker();
@@ -35,23 +38,25 @@ class FileButtonSheet extends StatelessWidget {
 
   void _pickFile() async {
     // Use FilePicker to pick a file
-
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       // Get the selected file
-      print("fucckssss $result");
       String? filePath = result.files.single.path;
       String? fileName = result.files.single.name;
 
       if (filePath != null) {
         File selectedFile = File(filePath);
 
-        // You can now send or display the file in the chat
+        // Extract file extension
+        String? fileExtension = fileName?.split('.').last;
+        print("File extension: $fileExtension");
+
+        // You can now use fileBytes as a Blob
         print("File selected: $fileName at $filePath");
 
         // Example: Call a function to send/display the file
-        _sendFile(selectedFile, fileName);
+        _sendFile(fileName, fileExtension!, filePath);
       }
     } else {
       // User canceled the picker
@@ -59,10 +64,11 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
-  void _sendFile(File file, String fileName) {
-    // Here you can implement the logic to send the file
-    // For example, upload the file to a server or show it in a chat UI
-    print("Sending file: $fileName");
+// Example function to handle sending the file as a blob
+  void _sendFile(String? fileName, String fileExtension, String filePath) {
+    // Here you would handle the file blob (e.g., send it to a server)
+    print("Sending file: $fileName ");
+    uploadFile(filePath, fileExtension);
   }
 
   void _pickImageFromCamera() async {

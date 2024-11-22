@@ -1,4 +1,4 @@
-import 'package:whisper/models/chat-messages';
+import 'package:whisper/models/chat-messages.dart';
 
 abstract class MessagesState {}
 

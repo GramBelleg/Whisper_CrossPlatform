@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/components/reply-preview.dart';
-
 import 'package:whisper/cubit/messages-cubit.dart';
-import 'package:whisper/cubit/chat-event.dart';
 import 'package:whisper/cubit/messages-state.dart';
-import 'package:whisper/models/chat-messages';
+import 'package:whisper/models/chat-messages.dart';
+import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
@@ -225,7 +223,11 @@ class _ChatPageState extends State<ChatPage> {
                 print("erroor");
               } else if (state is MessageSent) {
                 setState(() {
-                  messages.add(state.message);
+                  print("zeeeeeeeeeeeeeeeeeeeeeeeeeeeeee555555555");
+                  if (state.message.chatId == widget.ChatID) {
+                    messages.add(state.message);
+                    print("anythingtochechsending");
+                  }
                 });
               } else if (state is MessageReceived) {
                 setState(() {
@@ -240,18 +242,23 @@ class _ChatPageState extends State<ChatPage> {
                 int index =
                     messages.indexWhere((msg) => msg.sentAt == receivedTime);
 
-                // print(messages[index].toString());
                 print({state.message.toString()});
-                if (index != -1) {
-                  setState(() {
-                    print("zzzzzzzzzzzzeeeeeeeeeeeeaaaaaaaaaaddddddddd");
-                    messages[index] = state.message; // Update the message
-                  });
-                } else {
-                  setState(() {
-                    messages.add(state.message);
-                  });
+                if (state.message.chatId == widget.ChatID) {
+                  if (index != -1) {
+                    setState(() {
+                      print(
+                          "zzzzzzzzzzzzeeeeeeeeeeeeaaaaaaaaaaddddddddd${state.message.content}");
+                      messages[index] = state.message; // Update the message
+                    });
+                  } else {
+                    setState(() {
+                      print(
+                          "daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamn111111111${state.message.content}");
+                      messages.add(state.message);
+                    });
+                  }
                 }
+                print(messages.length);
                 _scrollToBottom(messages.length * 1);
               } else if (state is MessagesDeletedSuccessfully) {
                 print("state.deletIds=${state.deletedIds}");
@@ -310,9 +317,10 @@ class _ChatPageState extends State<ChatPage> {
                                   _isReplying = true;
                                   _replyingTo = ParentMessage(
                                       id: messageData.id!,
+                                      // senderId: messageData.sender!.id!,
+                                      // type: messageData.type,
                                       content: messageData.content,
-                                      type: messageData.type,
-                                      senderName: widget.userName);
+                                      senderName: messageData.sender!.userName);
                                   paddingSpaceForReplay = 70;
                                   _scrollToBottom(messages.length * 1);
                                 });
@@ -320,8 +328,10 @@ class _ChatPageState extends State<ChatPage> {
                               child: GestureDetector(
                                   onLongPress: () {
                                     setState(() {
-                                      isSelected.add(messageData
-                                          .id!); // Add the index to isSelected list
+                                      if (!isSelected
+                                          .contains(messageData.id!)) {
+                                        isSelected.add(messageData.id!);
+                                      } // Add the index to isSelected list
                                     });
                                   },
                                   onTap: () {
@@ -334,7 +344,8 @@ class _ChatPageState extends State<ChatPage> {
                                       }
                                     });
                                   },
-                                  child: messageData.senderId == widget.senderId
+                                  child: messageData.sender!.id! ==
+                                          widget.senderId
                                       ? OwnMessageCard(
                                           message: messageData.content,
                                           time: messageData.time!,
@@ -347,6 +358,11 @@ class _ChatPageState extends State<ChatPage> {
                                               messageData.parentMessage,
                                           isForwarded:
                                               messageData.forwarded ?? false,
+                                          messageSenderName:
+                                              messageData.forwarded == true
+                                                  ? messageData
+                                                      .forwardedFrom!.userName
+                                                  : "",
                                         )
                                       : ReceivedMessageCard(
                                           message: messageData.content,
@@ -506,7 +522,8 @@ class _ChatPageState extends State<ChatPage> {
                                                 _replyingTo,
                                                 widget.userName,
                                                 _isReplying,
-                                                false);
+                                                false,
+                                                0);
                                         print("heyda");
                                         _controller
                                             .clear(); // Clear the text field after sending

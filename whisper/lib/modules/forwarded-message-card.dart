@@ -5,6 +5,7 @@ import 'package:whisper/modules/own-message-card.dart';
 
 class ForwardedMessageCard extends StatelessWidget {
   final String message;
+  final String messageSenderName;
   final DateTime time;
   final MessageStatus status;
   final bool isSelected;
@@ -14,6 +15,7 @@ class ForwardedMessageCard extends StatelessWidget {
     required this.time,
     required this.status,
     required this.isSelected,
+    required this.messageSenderName,
   });
 
   String _formatTime(DateTime dateTime) {
@@ -59,7 +61,7 @@ class ForwardedMessageCard extends StatelessWidget {
                             fontSize: 12, color: Colors.white70),
                       ),
                       Text(
-                        'Sender Name', // Replace with actual sender name if available
+                        messageSenderName, // Replace with actual sender name if available
                         style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,

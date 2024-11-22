@@ -13,8 +13,8 @@ class ChatDeletionService {
           '[${messageIds.join(',')}]', // Convert list of IDs to a comma-separated string with square brackets
     };
 
-    final url = Uri.http('192.168.1.11:5000',
-        '/api/messages/$chatId/deleteForMe', queryParameters);
+    final url = Uri.http(
+        'localhost:5000', '/api/messages/$chatId/deleteForMe', queryParameters);
 
     // Print the constructed URL to verify it's correct
     print('Constructed URL: ${url.toString()}');

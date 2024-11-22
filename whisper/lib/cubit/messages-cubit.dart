@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/messages-state.dart';
-import 'package:whisper/models/chat-messages';
+import 'package:whisper/models/chat-messages.dart';
+import 'package:whisper/models/forwarded-from.dart';
+import 'package:whisper/models/parent-message.dart';
+import 'package:whisper/models/sender.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
 
 import 'package:whisper/services/fetch-messages.dart';
@@ -18,7 +21,9 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(MessagesLoading());
     try {
       await chatViewModel.fetchChatMessages(chatId);
+      print("daaaaaaaaaaaaamn");
       List<ChatMessage> fetchedMessages = [];
+
       for (var chatMessage in chatViewModel.messages) {
         chatMessage.time = chatMessage.time?.toLocal();
         chatMessage.sentAt = chatMessage.sentAt?.toLocal();
@@ -33,14 +38,15 @@ class MessagesCubit extends Cubit<MessagesState> {
   void connectSocket(String token) {
     print("send token: $token");
     // Disconnect the socket if it's already connected
-    if (socket != null && socket!.connected) {
-      socket?.disconnect();
-    }
+    // if (socket != null && socket!.connected) {
+    //   socket?.disconnect();
+    // }
+    //
 
     // Remove existing listeners to avoid memory leaks or duplicate calls
     socket?.clearListeners();
 
-    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
+    socket = IO.io("http://localhost:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
@@ -91,26 +97,28 @@ class MessagesCubit extends Cubit<MessagesState> {
       ParentMessage? parentMessage,
       String senderName,
       bool isReplying,
-      bool isForward) {
+      bool isForward,
+      int? forwardedFromUserId) {
     int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     print("Current time in milliseconds: $nowMillis");
     // print("zzzzzzzzzzzzzzzzzzzzzzzz ${parentMessage?.content}");
-    print("hallllllllllllozeyad${parentMessage}");
+
     final messageData = {
       'content': content,
       'chatId': chatId,
       'type': 'TEXT',
       'sentAt': DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true)
           .toIso8601String(),
-      'parentMessage': parentMessage,
-      'forwarded': isForward
+      'parentMessageId': parentMessage == null ? null : parentMessage.id,
+      'forwarded': isForward,
+      'forwardedFromUserId': isForward == true ? forwardedFromUserId : null,
     };
-
+    final sender = Sender(id: senderId, userName: "zeyad");
     final newMessage = ChatMessage(
       content: content,
       chatId: chatId,
-      senderId: senderId,
+      sender: sender,
       sentAt:
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       type: 'TEXT',
@@ -118,40 +126,61 @@ class MessagesCubit extends Cubit<MessagesState> {
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       parentMessage: parentMessage,
     );
-
+    print("0000000000000000000$socket");
     socket?.emit('sendMessage', messageData);
+    print("hallllllllllllozeyad${messageData.toString()}");
     emit(MessageSent(newMessage));
     print("Message sent: $content");
   }
 
-  // Handle incoming messages without events
   void receiveMessage(Map<String, dynamic> data) {
+    print("Receiving message...");
+
+    // Parsing the parent message if it exists
     ParentMessage? parentMessage;
     if (data['parentMessage'] != null) {
+      print(data['parentMessage'].toString());
       parentMessage = ParentMessage.fromJson(data['parentMessage']);
     }
+    ForwardedFrom? forwardedFrom;
+    if (data['forwardedFrom'] != null) {
+      forwardedFrom = ForwardedFrom.fromJson(data['forwardedFrom']);
+      print("dddddddddddddddddddddddd${forwardedFrom.toString()}");
+    }
 
+    // Parsing the new message, with null-safety checks on optional fields
     ChatMessage newMessage = ChatMessage(
-        id: data['id'],
-        chatId: data['chatId'],
-        senderId: data["senderId"],
-        content: data['content'],
-        forwarded: data['forwarded'],
-        pinned: data['pinned'],
-        selfDestruct: data['selfDestruct'],
-        expiresAfter: data['expiresAfter'],
-        type: data['type'],
-        time: DateTime.parse(data['time']).toLocal(),
-        sentAt: DateTime.parse(data['sentAt']).toLocal(),
-        parentMessage: parentMessage,
-        isSecret: data['isSecret'],
-        isAnnouncement: data['isAnnouncement']);
-    print(newMessage.toString());
-//mentions->list
+      id: data['id'],
+      chatId: data['chatId'],
+      sender: data['sender'] != null ? Sender.fromJson(data['sender']) : null,
+      content: data['content'],
+      mentions:
+          data['mentions'] != null ? List<int>.from(data['mentions']) : null,
+      media: data['media'] != null ? List<dynamic>.from(data['media']) : null,
+      time:
+          data['time'] != null ? DateTime.parse(data['time']).toLocal() : null,
+      sentAt: data['sentAt'] != null
+          ? DateTime.parse(data['sentAt']).toLocal()
+          : null,
+      read: data['read'] ?? false,
+      delivered: data['delivered'] ?? false,
+      forwarded: data['forwarded'] ?? false,
+      pinned: data['pinned'] ?? false,
+      edited: data['edited'] ?? false,
+      selfDestruct: data['selfDestruct'] ?? false,
+      isAnnouncement: data['isAnnouncement'] ?? false,
+      isSecret: data['isSecret'] ?? false,
+      expiresAfter: data['expiresAfter'],
+      type: data['type'],
+      parentMessage: parentMessage,
+      forwardedFrom: forwardedFrom,
+    );
+
+    print("New message received: ${newMessage.toString()}");
+
     // Emit a state indicating the message has been received
-    print("daaaaaaaaaaaamn ${newMessage.toString()}");
     emit(MessageReceived(newMessage));
-    print("Message received: ${data["content"]}");
+    print("Message content: ${data["content"]}");
   }
 
   Future<void> deleteMessage(int chatId, List<int> ids) async {

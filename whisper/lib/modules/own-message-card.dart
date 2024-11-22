@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whisper/models/chat-messages';
 import 'package:whisper/models/chat-messages.dart';
+import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/modules/forwarded-message-card.dart';
 import 'package:whisper/modules/normal-message-card.dart';
 import 'package:whisper/modules/replied-message-card.dart';
@@ -18,7 +18,7 @@ class OwnMessageCard extends StatelessWidget {
   final bool isSelected;
   final bool isForwarded; // New property to check if the message is forwarded
   final ParentMessage? repliedMessage;
-
+  final String messageSenderName;
   OwnMessageCard({
     Key? key,
     required this.message,
@@ -27,6 +27,7 @@ class OwnMessageCard extends StatelessWidget {
     this.status = MessageStatus.sent,
     this.repliedMessage,
     this.isForwarded = false, // Default is false
+    this.messageSenderName = "",
   }) : super(key: key);
 
   @override
@@ -37,6 +38,7 @@ class OwnMessageCard extends StatelessWidget {
         time: time,
         status: status,
         isSelected: isSelected,
+        messageSenderName: messageSenderName,
       );
     } else if (repliedMessage != null) {
       return RepliedMessageCard(

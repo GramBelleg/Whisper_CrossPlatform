@@ -27,7 +27,7 @@ class ChatList {
 
     return {
       'chatid': chat['id'],
-      'userName': chat['other']?['userName'] ?? 'User ${chat['id']}',
+      'userName': chat['name'] ?? 'User ${chat['id']}',
       'lastMessage': chat['lastMessage']?['content'] ?? '',
       'time': formattedTime,
       'avatarUrl': chat['other']?['profilePic'] ?? 'assets/images/el-gayar.jpg',

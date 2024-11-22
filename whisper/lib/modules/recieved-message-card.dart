@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:whisper/models/chat-messages';
+import 'package:whisper/models/chat-messages.dart';
+import 'package:whisper/models/parent-message.dart';
 
 class ReceivedMessageCard extends StatelessWidget {
   final String message;
@@ -86,7 +87,7 @@ class ReceivedMessageCard extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        repliedMessage!.content,
+                                        repliedMessage!.content!,
                                         style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.white), // White text

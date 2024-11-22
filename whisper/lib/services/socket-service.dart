@@ -20,7 +20,7 @@
 //         : {}; // Empty map if token is null or empty
 
 //     // Replace with your server's IP and port
-//     socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
+//     socket = IO.io("http://localhost:5000", <String, dynamic>{
 //       "transports": ["websocket"],
 //       "autoConnect": false,
 //       'query': {'token': "Bearer $token"} // Use the query map
