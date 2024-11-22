@@ -16,7 +16,12 @@ abstract class ReceivedMessage extends StatelessWidget {
   }) : super(key: key);
 
   String formatTime(DateTime dateTime) {
-    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} ${dateTime.hour >= 12 ? 'PM' : 'AM'}";
+    final hour = dateTime.hour % 12 == 0
+        ? 12
+        : dateTime.hour % 12; // Handle 12 AM/PM correctly
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+    return "$hour:$minute $period";
   }
 
   @override

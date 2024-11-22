@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/pages/forward-menu.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/services/fetch-messages.dart';
+import 'package:whisper/view-models/custom-app-bar-view-model.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
@@ -30,6 +31,14 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
+  late CustomAppBarViewModel viewModel;
+  @override
+  void initState() {
+    super.initState();
+    viewModel = CustomAppBarViewModel(
+        messagesCubit: BlocProvider.of<MessagesCubit>(context));
+  }
+
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -69,9 +78,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       try {
         // Call the deleteMessage method from the MessagesCubit
 
-        await messagesCubit.deleteMessage(widget.chatId, widget.isSelected);
-        print("hhhhhhhhhhhhhhhhhhh");
-        print('Deleted for user: ${widget.isSelected}');
+        await viewModel.deleteMessagesForMe(widget.chatId, widget.isSelected);
 
         // Clear the selection after deletion
         if (widget.clearSelection != null) {
@@ -96,11 +103,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
     if (widget.isSelected.isNotEmpty) {
       final messagesCubit = BlocProvider.of<MessagesCubit>(context);
       try {
-        // Emit delete message for everyone
-        messagesCubit.emitDeleteMessageForEveryone(
-            widget.isSelected, widget.chatId);
-        print('Deleted for everyone: ${widget.isSelected}');
-
+        await viewModel.deleteMessagesForEveryone(
+            widget.chatId, widget.isSelected);
         // Clear the selection after deletion
         if (widget.clearSelection != null) {
           widget.clearSelection!();

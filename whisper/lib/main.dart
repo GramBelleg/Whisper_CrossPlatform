@@ -18,13 +18,29 @@ import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/pages/signup.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
 import 'package:whisper/services/fetch-messages.dart';
+import 'package:whisper/services/friend-service.dart';
+import 'package:whisper/view-models/forward-menu-view-model.dart';
 
 void main() {
-  runApp(BlocProvider(
-      create: (context) {
-        return MessagesCubit(ChatViewModel(), ChatDeletionService());
-      },
-      child: Whisper()));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        // Provide the MessagesCubit first
+        BlocProvider(
+          create: (context) =>
+              MessagesCubit(ChatViewModel(), ChatDeletionService()),
+        ),
+        // Provide the ForwardMenuCubit using the existing MessagesCubit
+        BlocProvider(
+          create: (context) => ForwardMenuCubit(
+            FriendService(),
+            context.read<MessagesCubit>(), // Reuse the MessagesCubit instance
+          ),
+        ),
+      ],
+      child: Whisper(),
+    ),
+  );
 }
 
 class Whisper extends StatelessWidget {
@@ -43,8 +59,9 @@ class Whisper extends StatelessWidget {
         LoginWithFacebook.id: (context) => LoginWithFacebook(),
         LoginWithGithub.id: (context) => LoginWithGithub(),
         LogoutAfterResetPassword.id: (context) => LogoutAfterResetPassword(),
-        MainChats.id: (context) => MainChats()
+        MainChats.id: (context) => MainChats(),
       },
+      // Uncomment this line if you want to set a default page
       // home: LoginWithFacebook(),
     );
   }

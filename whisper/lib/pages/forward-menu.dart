@@ -1,4 +1,3 @@
-// pages/forward_menu.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/constants/colors.dart';
@@ -185,7 +184,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
           suffixIcon: Icon(Icons.search, color: Colors.white),
         ),
         style: const TextStyle(color: Colors.white),
-        onChanged: (_) => setState(() {}),
+        onChanged: (_) => setState(() {}), // Update filtered list dynamically
       ),
     );
   }
