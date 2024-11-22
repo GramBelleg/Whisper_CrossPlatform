@@ -102,14 +102,15 @@ class _ForwardMenuState extends State<ForwardMenu> {
         final message =
             await fetchMessage(messageId); // Fetch the message details
         context.read<MessagesCubit>().sendMessage(
-              message.content, // Message content
-              friend.id, // Chat ID of the friend
-              senderId, // Current sender's ID
-              message.parentMessage, // Parent message (if any)
-              friend.name, // Friend's name
-              false, // Is it a reply?
-              true, // Is it a forwarded message?
-              message.sender?.id, // Original sender's ID (if applicable)
+              content: message.content, // Message content
+              chatId: friend.id, // Chat ID of the friend
+              senderId: senderId, // Current sender's ID
+              parentMessage: message.parentMessage, // Parent message (if any)
+              senderName: friend.name, // Friend's name
+              isReplying: false, // Is it a reply?
+              isForward: true, // Is it a forwarded message?
+              forwardedFromUserId:
+                  message.sender?.id, // Original sender's ID (if applicable)
             );
         debugPrint("Message forwarded to: ${friend.name}");
       } catch (e) {

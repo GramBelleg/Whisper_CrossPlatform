@@ -17,14 +17,12 @@ import 'package:whisper/modules/receive-message/normal-received-message-card.dar
 import 'package:whisper/modules/own-message/forwarded-message-card.dart';
 import 'package:whisper/modules/own-message/normal-message-card.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
-import 'package:whisper/modules/recieved-message-card.dart';
 import 'package:whisper/modules/own-message/replied-message-card.dart';
 import 'package:whisper/modules/receive-message/replied-received-message-card.dart';
 import 'package:whisper/services/fetch-messages.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
-
   final int ChatID;
   final String userName;
   final String userImage;
@@ -56,7 +54,7 @@ class _ChatPageState extends State<ChatPage> {
   final GlobalKey<FormFieldState<String>> _textFieldKey =
       GlobalKey<FormFieldState<String>>();
   int lastVisibleMessageIndex = 0;
-  List<int> isSelected = [];
+  List<int> isSelectedList = [];
   List<ChatMessage> messages = [];
   ParentMessage? _replyingTo; // Stores the message being replied to
   bool _isReplying = false; // Tracks if in reply mode
@@ -65,23 +63,12 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-
-    if (widget.token != null && widget.token!.isNotEmpty) {
-      try {
-        // context.read<MessagesCubit>().connectSocket(widget.token!);
-      } catch (e) {
-        print("Error connecting to socket: $e");
-      }
-    } else {
-      print("Token is null or empty");
-    }
     context.read<MessagesCubit>().loadMessages(widget.ChatID);
-    // _scrollToBottom(messages.length * 1);
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
           show = false; // Hide emoji picker when the text field is focused
-          isSelected.clear();
+          isSelectedList.clear();
         });
       }
     });
@@ -93,11 +80,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
-    // _chatBloc.close();
     _controller.dispose(); // Dispose of the controller
     focusNode.dispose(); // Dispose of the focusNode
-
-    // context.read<MessagesCubit>().disconnectSocket();
     super.dispose();
   }
 
@@ -114,22 +98,18 @@ class _ChatPageState extends State<ChatPage> {
         _textDirection = TextDirection.ltr; // Set text direction to LTR
       });
     }
-
     // Update the typing status based on the text input
     setState(() {
       _isTyping = text.isNotEmpty; // Check if the text field is not empty
     });
-
     // Calculate the number of lines in the text field
     int numberOfLines =
         (text.split('\n').length).clamp(1, 5); // Minimum 1, maximum 5
     double additionalHeight = numberOfLines * 40; // Height for the lines
-
     // Calculate the new scroll position based on the additional height
     if (_scrollController2.hasClients) {
       double lastMessagePosition =
           _scrollController2.position.maxScrollExtent + 100 + additionalHeight;
-
       // Animate scroll to the last message considering the additional height
       _scrollController2.animateTo(
         lastMessagePosition,
@@ -148,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     setState(() {
       show = !show; // Toggle the emoji picker
-      isSelected.clear();
+      isSelectedList.clear();
     });
   }
 
@@ -158,26 +138,19 @@ class _ChatPageState extends State<ChatPage> {
     if (_scrollController.hasClients) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     }
-
     // Check if the second scroll controller is attached and has clients
     if (_scrollController.hasClients) {
       // Assuming the last message is stored in a variable called `messages`
       String lastMessage = messages.isNotEmpty ? messages.last.content : '';
-
       // Count the number of lines in the last message
       int lastMessageLines = lastMessage.split('\n').length;
-
       // Calculate additional height based on the number of lines and the passed additional value
       double additionalHeight = (lastMessageLines * 50) +
           40 +
           additional; // Assuming each line takes 50 pixels
-
-      print("ddddd$additionalHeight");
-
       // Calculate the target scroll position
       double targetPosition = additionalHeight;
       // _scrollController2.position.maxScrollExtent +
-
       // Scroll to the target position
       _scrollController2.animateTo(
         targetPosition,
@@ -189,7 +162,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void clearIsSelected() {
     setState(() {
-      isSelected.clear();
+      isSelectedList.clear();
     });
   }
 
@@ -199,7 +172,6 @@ class _ChatPageState extends State<ChatPage> {
       final RenderBox renderBox =
           _textFieldKey.currentContext!.findRenderObject() as RenderBox;
       final position = renderBox.localToGlobal(Offset.zero); // Get the position
-      print("TextField Position: ${position.dx}, ${position.dy}");
     }
   }
 
@@ -207,7 +179,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(
-          isSelected: isSelected,
+          isSelected: isSelectedList,
           userImage: widget.userImage,
           userName: widget.userName,
           clearSelection: clearIsSelected,
@@ -229,10 +201,8 @@ class _ChatPageState extends State<ChatPage> {
                 print("erroor");
               } else if (state is MessageSent) {
                 setState(() {
-                  print("zeeeeeeeeeeeeeeeeeeeeeeeeeeeeee555555555");
                   if (state.message.chatId == widget.ChatID) {
                     messages.add(state.message);
-                    print("anythingtochechsending");
                   }
                 });
               } else if (state is MessageReceived) {
@@ -240,43 +210,26 @@ class _ChatPageState extends State<ChatPage> {
                   paddingSpaceForReplay = 0;
                 });
                 DateTime receivedTime = state.message.time!.toLocal();
-                print("receivedTime: $receivedTime");
-
-                for (var x in messages) {
-                  print("sentAt: ${x.sentAt}");
-                }
                 int index =
                     messages.indexWhere((msg) => msg.sentAt == receivedTime);
-
-                print({state.message.toString()});
                 if (state.message.chatId == widget.ChatID) {
                   if (index != -1) {
                     setState(() {
-                      print(
-                          "zzzzzzzzzzzzeeeeeeeeeeeeaaaaaaaaaaddddddddd${state.message.content}");
                       messages[index] = state.message; // Update the message
                     });
                   } else {
                     setState(() {
-                      print(
-                          "daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaamn111111111${state.message.content}");
                       messages.add(state.message);
                     });
                   }
                 }
-                print(messages.length);
                 _scrollToBottom(messages.length * 1);
               } else if (state is MessagesDeletedSuccessfully) {
-                print("state.deletIds=${state.deletedIds}");
                 // Remove the message with the given ID from the list
                 setState(() {
                   messages
                       .removeWhere((msg) => state.deletedIds.contains(msg.id));
                 });
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //     // SnackBar(
-                //     //     content: Text('Message deleted: ${state.deletedIds}')),
-                //     );
               } else if (state is MessagesDeleteError) {
                 // Handle deletion error
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -309,17 +262,11 @@ class _ChatPageState extends State<ChatPage> {
                           itemCount: messages.length,
                           itemBuilder: (context, index) {
                             final messageData = messages[index];
-
-                            print(messageData.id);
                             return SwipeTo(
                               key: ValueKey(messageData.id),
                               iconColor: Color(0xff8D6AEE),
                               onRightSwipe: (details) {
-                                print(
-                                    "hhhhhhhhhhhhhhhhhhhhhhzzzzzzzzkkkkkkkkk${messageData.id}");
                                 setState(() {
-                                  print(
-                                      "i will make a reply here ${messageData.toString()}");
                                   _isReplying = true;
                                   _replyingTo = ParentMessage(
                                       id: messageData.id!,
@@ -334,19 +281,19 @@ class _ChatPageState extends State<ChatPage> {
                               child: GestureDetector(
                                   onLongPress: () {
                                     setState(() {
-                                      if (!isSelected
+                                      if (!isSelectedList
                                           .contains(messageData.id!)) {
-                                        isSelected.add(messageData.id!);
+                                        isSelectedList.add(messageData.id!);
                                       } // Add the index to isSelected list
                                     });
                                   },
                                   onTap: () {
                                     setState(() {
                                       // Check if the index exists in the isSelected list
-                                      if (isSelected
+                                      if (isSelectedList
                                           .contains(messageData.id!)) {
                                         // If it exists, remove it
-                                        isSelected.remove(messageData.id!);
+                                        isSelectedList.remove(messageData.id!);
                                       }
                                     });
                                   },
@@ -360,7 +307,7 @@ class _ChatPageState extends State<ChatPage> {
                                                   .sent, // Modify as needed
                                               isSelected:
                                                   messageData.id != null &&
-                                                      isSelected.contains(
+                                                      isSelectedList.contains(
                                                           messageData.id!),
                                               messageSenderName: messageData
                                                   .forwardedFrom!.userName,
@@ -371,10 +318,10 @@ class _ChatPageState extends State<ChatPage> {
                                                   time: messageData.time!,
                                                   status: MessageStatus
                                                       .sent, // Modify as needed
-                                                  isSelected:
-                                                      messageData.id != null &&
-                                                          isSelected.contains(
-                                                              messageData.id!),
+                                                  isSelected: messageData.id !=
+                                                          null &&
+                                                      isSelectedList.contains(
+                                                          messageData.id!),
                                                   repliedContent: messageData
                                                       .parentMessage!.content,
                                                   repliedSenderName: messageData
@@ -386,10 +333,10 @@ class _ChatPageState extends State<ChatPage> {
                                                   time: messageData.time!,
                                                   status: MessageStatus
                                                       .sent, // Modify as needed
-                                                  isSelected:
-                                                      messageData.id != null &&
-                                                          isSelected.contains(
-                                                              messageData.id!),
+                                                  isSelected: messageData.id !=
+                                                          null &&
+                                                      isSelectedList.contains(
+                                                          messageData.id!),
                                                 )
                                       : messageData.forwarded ==
                                               true // Check if the message is forwarded
@@ -400,7 +347,7 @@ class _ChatPageState extends State<ChatPage> {
                                                   .sent, // Modify as needed
                                               isSelected:
                                                   messageData.id != null &&
-                                                      isSelected.contains(
+                                                      isSelectedList.contains(
                                                           messageData.id!),
                                               messageSenderName: messageData
                                                   .forwardedFrom!.userName,
@@ -411,10 +358,10 @@ class _ChatPageState extends State<ChatPage> {
                                                   time: messageData.time!,
                                                   status: MessageStatus
                                                       .sent, // Modify as needed
-                                                  isSelected:
-                                                      messageData.id != null &&
-                                                          isSelected.contains(
-                                                              messageData.id!),
+                                                  isSelected: messageData.id !=
+                                                          null &&
+                                                      isSelectedList.contains(
+                                                          messageData.id!),
                                                   repliedContent: messageData
                                                       .parentMessage!.content,
                                                   repliedSenderName: messageData
@@ -426,10 +373,10 @@ class _ChatPageState extends State<ChatPage> {
                                                   time: messageData.time!,
                                                   status: MessageStatus
                                                       .sent, // Modify as needed
-                                                  isSelected:
-                                                      messageData.id != null &&
-                                                          isSelected.contains(
-                                                              messageData.id!),
+                                                  isSelected: messageData.id !=
+                                                          null &&
+                                                      isSelectedList.contains(
+                                                          messageData.id!),
                                                 )),
                             );
                           },
@@ -494,8 +441,6 @@ class _ChatPageState extends State<ChatPage> {
                                           if (show) {
                                             focusNode.requestFocus();
                                             show != show;
-
-                                            print("daaaaaaaaa");
                                           } else {
                                             showModalBottomSheet(
                                                 backgroundColor:
@@ -568,21 +513,20 @@ class _ChatPageState extends State<ChatPage> {
                                   child: IconButton(
                                     onPressed: () {
                                       if (_isTyping) {
-                                        print("heyd");
-                                        print(_isReplying);
                                         context
                                             .read<MessagesCubit>()
                                             .sendMessage(
-                                                _controller
+                                                content: _controller
                                                     .text, // Message content
-                                                widget.ChatID, // Chat ID
-                                                widget.senderId!, // Sender ID,
-                                                _replyingTo,
-                                                widget.userName,
-                                                _isReplying,
-                                                false,
-                                                0);
-                                        print("heyda");
+                                                chatId:
+                                                    widget.ChatID, // Chat ID
+                                                senderId: widget
+                                                    .senderId!, // Sender ID,
+                                                parentMessage: _replyingTo,
+                                                senderName: widget.userName,
+                                                isReplying: _isReplying,
+                                                isForward: false,
+                                                forwardedFromUserId: 0);
                                         _controller
                                             .clear(); // Clear the text field after sending
                                         setState(() {

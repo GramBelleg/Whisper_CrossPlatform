@@ -10,74 +10,70 @@ import 'package:whisper/services/fetch-messages.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class MessagesCubit extends Cubit<MessagesState> {
-  MessagesCubit(this.chatViewModel, this.chatDeletionService)
-      : super(MessagseInitial());
-
-  final ChatViewModel chatViewModel;
+  final ChatViewModel _chatViewModel;
   final ChatDeletionService chatDeletionService;
   IO.Socket? socket;
+
+  MessagesCubit(this._chatViewModel, this.chatDeletionService)
+      : super(MessagseInitial());
 
   void loadMessages(int chatId) async {
     emit(MessagesLoading());
     try {
-      await chatViewModel.fetchChatMessages(chatId);
-      print("daaaaaaaaaaaaamn");
-      List<ChatMessage> fetchedMessages = [];
-
-      for (var chatMessage in chatViewModel.messages) {
-        chatMessage.time = chatMessage.time?.toLocal();
-        chatMessage.sentAt = chatMessage.sentAt?.toLocal();
-        fetchedMessages.add(chatMessage);
-      }
+      await _chatViewModel.fetchChatMessages(chatId);
+      final fetchedMessages = _processFetchedMessages();
       emit(MessageFetchedSuccessfully(fetchedMessages));
     } catch (e) {
       emit(MessageFetchedWrong());
     }
   }
 
+  List<ChatMessage> _processFetchedMessages() {
+    return _chatViewModel.messages.map((message) {
+      message.time = message.time?.toLocal();
+      message.sentAt = message.sentAt?.toLocal();
+      return message;
+    }).toList();
+  }
+
   void connectSocket(String token) {
-    print("send token: $token");
-    // Disconnect the socket if it's already connected
-    // if (socket != null && socket!.connected) {
-    //   socket?.disconnect();
-    // }
-    //
+    _clearExistingListeners();
+    _initializeSocket(token);
+    _setupSocketListeners();
+  }
 
-    // Remove existing listeners to avoid memory leaks or duplicate calls
+  void _clearExistingListeners() {
     socket?.clearListeners();
+  }
 
+  void _initializeSocket(String token) {
     socket = IO.io("http://localhost:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
     });
-    print("zeyyyyyyyyyyyyyyyyyyyyy");
     socket?.connect();
+  }
 
+  void _setupSocketListeners() {
     socket?.onConnect((_) {
       emit(SocketConnected());
-      print("Connected to server");
     });
 
-    // Listen for messages directly and handle them
     socket?.on('receiveMessage', (data) {
-      receiveMessage(data); // Handle incoming messages directly
+      _handleReceivedMessage(data);
     });
 
     socket?.onConnectError((error) {
       emit(SocketConnectionError(error.toString()));
-      print("Connection error: $error");
     });
 
     socket?.onDisconnect((_) {
       emit(SocketDisconnected());
-      print("Disconnected from server");
     });
 
     socket?.on('deleteMessage', (data) {
-      final ids = List<int>.from(data['Ids']);
-      final chatId = data['chatId'];
-      receiveDeletedMessage(ids, chatId); // Handle deleted messages
+      _handleDeletedMessage(data);
     });
 
     socket?.on('error', (err) {
@@ -87,18 +83,17 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void disconnectSocket() {
     socket?.disconnect();
-    print("Socket disconnected");
   }
 
   void sendMessage(
-      String content,
-      int chatId,
-      int senderId,
+      {required String content,
+      required int chatId,
+      required int senderId,
       ParentMessage? parentMessage,
-      String senderName,
-      bool isReplying,
-      bool isForward,
-      int? forwardedFromUserId) {
+      required String senderName,
+      required bool isReplying,
+      required bool isForward,
+      int? forwardedFromUserId}) {
     int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     print("Current time in milliseconds: $nowMillis");
@@ -126,30 +121,24 @@ class MessagesCubit extends Cubit<MessagesState> {
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       parentMessage: parentMessage,
     );
-    print("0000000000000000000$socket");
     socket?.emit('sendMessage', messageData);
-    print("hallllllllllllozeyad${messageData.toString()}");
     emit(MessageSent(newMessage));
-    print("Message sent: $content");
   }
 
-  void receiveMessage(Map<String, dynamic> data) {
-    print("Receiving message...");
+  void _handleReceivedMessage(Map<String, dynamic> data) {
+    final newMessage = _parseMessage(data);
+    emit(MessageReceived(newMessage));
+  }
 
-    // Parsing the parent message if it exists
-    ParentMessage? parentMessage;
-    if (data['parentMessage'] != null) {
-      print(data['parentMessage'].toString());
-      parentMessage = ParentMessage.fromJson(data['parentMessage']);
-    }
-    ForwardedFrom? forwardedFrom;
-    if (data['forwardedFrom'] != null) {
-      forwardedFrom = ForwardedFrom.fromJson(data['forwardedFrom']);
-      print("dddddddddddddddddddddddd${forwardedFrom.toString()}");
-    }
+  ChatMessage _parseMessage(Map<String, dynamic> data) {
+    final parentMessage = data['parentMessage'] != null
+        ? ParentMessage.fromJson(data['parentMessage'])
+        : null;
+    final forwardedFrom = data['forwardedFrom'] != null
+        ? ForwardedFrom.fromJson(data['forwardedFrom'])
+        : null;
 
-    // Parsing the new message, with null-safety checks on optional fields
-    ChatMessage newMessage = ChatMessage(
+    return ChatMessage(
       id: data['id'],
       chatId: data['chatId'],
       sender: data['sender'] != null ? Sender.fromJson(data['sender']) : null,
@@ -175,23 +164,13 @@ class MessagesCubit extends Cubit<MessagesState> {
       parentMessage: parentMessage,
       forwardedFrom: forwardedFrom,
     );
-
-    print("New message received: ${newMessage.toString()}");
-
-    // Emit a state indicating the message has been received
-    emit(MessageReceived(newMessage));
-    print("Message content: ${data["content"]}");
   }
 
   Future<void> deleteMessage(int chatId, List<int> ids) async {
     emit(MessagesLoading());
     try {
       emit(MessagesDeletedSuccessfully(ids));
-
       await chatDeletionService.deleteMessages(chatId, ids);
-      //chatViewModel.messages.removeWhere((message) => ids.contains(message.id));
-      // Ensure you have this state defined
-      print("hhhhhhhhhhhhhh");
     } catch (e) {
       emit(MessagesDeleteError(e.toString()));
     }
@@ -204,25 +183,16 @@ class MessagesCubit extends Cubit<MessagesState> {
     };
 
     try {
-      // Attempt to emit the delete event to the server
       socket?.emit('deleteMessage', data);
       emit(MessagesDeletedSuccessfully(ids));
-      print(
-          "Broadcast delete message request for chatId: $chatId with ids: $ids");
     } catch (e) {
       emit(MessagesDeleteError(e.toString()));
-      print("Error broadcasting delete message request: $e");
     }
   }
 
-  void receiveDeletedMessage(List<int> ids, int chatId) {
-    try {
-      // Handle incoming delete event and remove messages locally
-      emit(MessagesDeletedSuccessfully(ids));
-      print("Messages deleted from chatId: $chatId with ids: $ids");
-    } catch (e) {
-      emit(MessagesDeleteError(e.toString()));
-      print("Error handling received delete message: $e");
-    }
+  void _handleDeletedMessage(Map<String, dynamic> data) {
+    final ids = List<int>.from(data['Ids']);
+    final chatId = data['chatId'];
+    emit(MessagesDeletedSuccessfully(ids));
   }
 }

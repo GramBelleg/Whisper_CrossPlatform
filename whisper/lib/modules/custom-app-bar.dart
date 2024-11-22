@@ -155,16 +155,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ],
             ),
             actions: [
-              if (widget.isSelected.length == 1) ...[
-                IconButton(
-                  onPressed: () {
-                    // Add reply action here
-                  },
-                  icon: const Icon(
-                    Icons.reply,
-                  ), // Reply icon
-                ),
-              ],
+              if (widget.isSelected.length == 1) ...[],
               IconButton(
                 onPressed: () {
                   // Add favorite action here

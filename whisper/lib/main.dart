@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:whisper/components/custom-access-button.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/components/custom-quick-login.dart';
@@ -29,13 +30,6 @@ void main() {
         BlocProvider(
           create: (context) =>
               MessagesCubit(ChatViewModel(), ChatDeletionService()),
-        ),
-        // Provide the ForwardMenuCubit using the existing MessagesCubit
-        BlocProvider(
-          create: (context) => ForwardMenuCubit(
-            FriendService(),
-            context.read<MessagesCubit>(), // Reuse the MessagesCubit instance
-          ),
         ),
       ],
       child: Whisper(),
