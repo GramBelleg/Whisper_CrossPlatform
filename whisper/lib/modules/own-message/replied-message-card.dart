@@ -3,26 +3,26 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/models/parent-message.dart';
-import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/own-message/own-message.dart';
 
-class RepliedMessageCard extends StatelessWidget {
-  final String message;
-  final DateTime time;
-  final MessageStatus status;
-  final bool isSelected;
-  final ParentMessage repliedMessage;
+class RepliedMessageCard extends OwnMessage {
+  final String repliedContent;
+  final String repliedSenderName;
 
   RepliedMessageCard({
-    required this.message,
-    required this.time,
-    required this.status,
-    required this.isSelected,
-    required this.repliedMessage,
-  });
-
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('hh:mm a').format(dateTime);
-  }
+    required String message,
+    required DateTime time,
+    required bool isSelected,
+    required this.repliedContent,
+    required this.repliedSenderName,
+    required MessageStatus status,
+    Key? key,
+  }) : super(
+            message: message,
+            time: time,
+            isSelected: isSelected,
+            key: key,
+            status: status);
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,8 @@ class RepliedMessageCard extends StatelessWidget {
                     children: [
                       // Display reply bubble
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: const Color(0xffb39ddb),
                           borderRadius: BorderRadius.circular(8),
@@ -67,7 +68,7 @@ class RepliedMessageCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              repliedMessage.senderName ?? "Unknown",
+                              repliedSenderName ?? "Unknown",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -75,8 +76,9 @@ class RepliedMessageCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              repliedMessage.content!,
-                              style: const TextStyle(fontSize: 14, color: Colors.black),
+                              repliedContent,
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.black),
                             ),
                           ],
                         ),
@@ -84,15 +86,17 @@ class RepliedMessageCard extends StatelessWidget {
                       const SizedBox(height: 5),
                       Text(
                         message,
-                        style: const TextStyle(fontSize: 16, color: Colors.white),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       const SizedBox(height: 5),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _formatTime(time),
-                            style: const TextStyle(fontSize: 12, color: Colors.white70),
+                            formatTime(time),
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.white70),
                           ),
                           const SizedBox(width: 4),
                           Icon(

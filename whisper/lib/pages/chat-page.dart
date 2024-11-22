@@ -12,8 +12,14 @@ import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
-import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
+import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
+import 'package:whisper/modules/own-message/forwarded-message-card.dart';
+import 'package:whisper/modules/own-message/normal-message-card.dart';
+import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/recieved-message-card.dart';
+import 'package:whisper/modules/own-message/replied-message-card.dart';
+import 'package:whisper/modules/receive-message/replied-received-message-card.dart';
 import 'package:whisper/services/fetch-messages.dart';
 
 class ChatPage extends StatefulWidget {
@@ -346,33 +352,85 @@ class _ChatPageState extends State<ChatPage> {
                                   },
                                   child: messageData.sender!.id! ==
                                           widget.senderId
-                                      ? OwnMessageCard(
-                                          message: messageData.content,
-                                          time: messageData.time!,
-                                          status: MessageStatus
-                                              .sent, // need modification
-                                          isSelected: messageData.id != null &&
-                                              isSelected
-                                                  .contains(messageData.id!),
-                                          repliedMessage:
-                                              messageData.parentMessage,
-                                          isForwarded:
-                                              messageData.forwarded ?? false,
-                                          messageSenderName:
-                                              messageData.forwarded == true
-                                                  ? messageData
-                                                      .forwardedFrom!.userName
-                                                  : "",
-                                        )
-                                      : ReceivedMessageCard(
-                                          message: messageData.content,
-                                          time: messageData.time!,
-                                          isSelected: messageData.id != null &&
-                                              isSelected
-                                                  .contains(messageData.id!),
-                                          repliedMessage:
-                                              messageData.parentMessage,
-                                        )),
+                                      ? messageData.forwarded == true
+                                          ? ForwardedMessageCard(
+                                              message: messageData.content,
+                                              time: messageData.time!,
+                                              status: MessageStatus
+                                                  .sent, // Modify as needed
+                                              isSelected:
+                                                  messageData.id != null &&
+                                                      isSelected.contains(
+                                                          messageData.id!),
+                                              messageSenderName: messageData
+                                                  .forwardedFrom!.userName,
+                                            )
+                                          : messageData.parentMessage != null
+                                              ? RepliedMessageCard(
+                                                  message: messageData.content,
+                                                  time: messageData.time!,
+                                                  status: MessageStatus
+                                                      .sent, // Modify as needed
+                                                  isSelected:
+                                                      messageData.id != null &&
+                                                          isSelected.contains(
+                                                              messageData.id!),
+                                                  repliedContent: messageData
+                                                      .parentMessage!.content,
+                                                  repliedSenderName: messageData
+                                                      .parentMessage!
+                                                      .senderName,
+                                                )
+                                              : NormalMessageCard(
+                                                  message: messageData.content,
+                                                  time: messageData.time!,
+                                                  status: MessageStatus
+                                                      .sent, // Modify as needed
+                                                  isSelected:
+                                                      messageData.id != null &&
+                                                          isSelected.contains(
+                                                              messageData.id!),
+                                                )
+                                      : messageData.forwarded ==
+                                              true // Check if the message is forwarded
+                                          ? ForwardedReceivedMessageCard(
+                                              message: messageData.content,
+                                              time: messageData.time!,
+                                              status: MessageStatus
+                                                  .sent, // Modify as needed
+                                              isSelected:
+                                                  messageData.id != null &&
+                                                      isSelected.contains(
+                                                          messageData.id!),
+                                              messageSenderName: messageData
+                                                  .forwardedFrom!.userName,
+                                            )
+                                          : messageData.parentMessage != null
+                                              ? RepliedReceivedMessageCard(
+                                                  message: messageData.content,
+                                                  time: messageData.time!,
+                                                  status: MessageStatus
+                                                      .sent, // Modify as needed
+                                                  isSelected:
+                                                      messageData.id != null &&
+                                                          isSelected.contains(
+                                                              messageData.id!),
+                                                  repliedContent: messageData
+                                                      .parentMessage!.content,
+                                                  repliedSenderName: messageData
+                                                      .parentMessage!
+                                                      .senderName,
+                                                )
+                                              : NormalReceivedMessageCard(
+                                                  message: messageData.content,
+                                                  time: messageData.time!,
+                                                  status: MessageStatus
+                                                      .sent, // Modify as needed
+                                                  isSelected:
+                                                      messageData.id != null &&
+                                                          isSelected.contains(
+                                                              messageData.id!),
+                                                )),
                             );
                           },
                         ),

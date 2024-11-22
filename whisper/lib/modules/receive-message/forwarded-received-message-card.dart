@@ -1,68 +1,87 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/own-message/own-message.dart';
+import 'package:whisper/modules/receive-message/received-message.dart';
 
-class NormalMessageCard extends StatelessWidget {
-  final String message;
-  final DateTime time;
-  final MessageStatus status;
-  final bool isSelected;
+class ForwardedReceivedMessageCard extends ReceivedMessage {
+  final String messageSenderName;
 
-  NormalMessageCard({
-    required this.message,
-    required this.time,
-    required this.status,
-    required this.isSelected,
-  });
-
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('hh:mm a').format(dateTime);
-  }
+  ForwardedReceivedMessageCard({
+    required String message,
+    required DateTime time,
+    required bool isSelected,
+    required this.messageSenderName,
+    required MessageStatus status,
+    Key? key,
+  }) : super(
+          message: message,
+          time: time,
+          isSelected: isSelected,
+          status: status,
+          key: key,
+        );
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment:
+          Alignment.centerLeft, // Align to the left like received messages
       child: Container(
         width: MediaQuery.of(context).size.width,
         color: isSelected
-            ? const Color.fromARGB(255, 129, 142, 221)
+            ? const Color.fromARGB(255, 129, 142, 221) // Highlight selected
             : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color: const Color(0xff8D6AEE),
+                color:
+                    const Color(0xff0A122F), // Dark color for received messages
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
                     topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
+                    bottomRight:
+                        Radius.circular(20), // Adjusted for left alignment
                   ),
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 15),
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 8), // Reduced padding
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        message,
+                        'Forwarded from:', // Text indicating the message is forwarded
+                        style: const TextStyle(
+                            fontSize: 12, color: Colors.white70),
+                      ),
+                      Text(
+                        messageSenderName, // Name of the message sender
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 3), // Reduced space
+                      Text(
+                        message, // Forwarded message content
                         style:
                             const TextStyle(fontSize: 16, color: Colors.white),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3), // Reduced space
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _formatTime(time),
+                            formatTime(time), // Format time of the message
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white70),
                           ),

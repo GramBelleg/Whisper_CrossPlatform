@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/own-message/own-message.dart';
 
-class ForwardedMessageCard extends StatelessWidget {
-  final String message;
+class ForwardedMessageCard extends OwnMessageCard {
   final String messageSenderName;
-  final DateTime time;
-  final MessageStatus status;
-  final bool isSelected;
 
   ForwardedMessageCard({
-    required this.message,
-    required this.time,
-    required this.status,
-    required this.isSelected,
+    required String message,
+    required DateTime time,
+    required bool isSelected,
     required this.messageSenderName,
-  });
-
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('hh:mm a').format(dateTime);
-  }
+    required MessageStatus status,
+    Key? key,
+  }) : super(
+          message: message,
+          time: time,
+          isSelected: isSelected,
+          status: status,
+          key: key,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +77,7 @@ class ForwardedMessageCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _formatTime(time),
+                            formatTime(time),
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white70),
                           ),

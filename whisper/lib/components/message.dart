@@ -1,4 +1,4 @@
-import 'package:whisper/modules/own-message-card.dart';
+import 'package:whisper/modules/own-message/own-message.dart';
 
 class Message {
   String data;
