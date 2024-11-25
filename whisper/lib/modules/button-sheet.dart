@@ -1,7 +1,12 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon-creation.dart';
+import 'package:whisper/components/message.dart';
+import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/global-cubit-provider.dart';
+import 'package:whisper/models/parent-message.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -9,11 +14,27 @@ import 'package:whisper/services/upload-file.dart';
 
 class FileButtonSheet extends StatelessWidget {
   final ImagePicker _picker = ImagePicker();
+  final int chatId;
+  final int senderId;
+  final String senderName;
+  final ParentMessage? parentMessage;
+  final bool isReplying;
+  final bool isForward;
+  final int? forwardedFromUserId;
+  BuildContext context;
   FileButtonSheet({
     Key? key,
+    required this.chatId,
+    required this.senderId,
+    required this.senderName,
+    this.parentMessage,
+    this.isReplying = false,
+    this.isForward = false,
+    this.forwardedFromUserId,
+    required this.context,
   }) : super(key: key);
 
-  void _pickAudio() async {
+  void _pickAudio(BuildContext context) async {
     // Use FilePicker to pick an audio file
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.audio,
@@ -36,27 +57,24 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
-  void _pickFile() async {
-    // Use FilePicker to pick a file
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+  void _pickFile(BuildContext context) async {
+    // Use FilePicker to pick multiple files
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
 
     if (result != null) {
-      // Get the selected file
-      String? filePath = result.files.single.path;
-      String? fileName = result.files.single.name;
+      // Iterate through the selected files
+      Navigator.of(context).pop();
+      for (PlatformFile file in result.files) {
+        String? filePath = file.path;
 
-      if (filePath != null) {
-        File selectedFile = File(filePath);
-
-        // Extract file extension
-        String? fileExtension = fileName?.split('.').last;
-        print("File extension: $fileExtension");
-
-        // You can now use fileBytes as a Blob
-        print("File selected: $fileName at $filePath");
-
-        // Example: Call a function to send/display the file
-        _sendFile(fileName, fileExtension!, filePath);
+        if (filePath != null) {
+          print("File selected: ${file.name} at $filePath");
+          // Delegate upload responsibility to the generic _sendFile function
+          await _sendFile(filePath);
+        } else {
+          print("File path is null for ${file.name}");
+        }
       }
     } else {
       // User canceled the picker
@@ -65,13 +83,35 @@ class FileButtonSheet extends StatelessWidget {
   }
 
 // Example function to handle sending the file as a blob
-  void _sendFile(String? fileName, String fileExtension, String filePath) {
-    // Here you would handle the file blob (e.g., send it to a server)
-    print("Sending file: $fileName ");
-    uploadFile(filePath, fileExtension);
+  Future<void> _sendFile(String filePath) async {
+    try {
+      // Call the uploadFile function with the selected file path
+      String uploadResult = await uploadFile(filePath);
+
+      if (uploadResult != 'Failed') {
+        print("File uploaded successfullyy: $uploadResult");
+        // You can trigger additional actions here (e.g., update UI or send metadata)
+        //Todo call socket for send messages
+        GlobalCubitProvider.messagesCubit.sendMessage(
+          content: '', // Empty since it's a file message
+          chatId: chatId,
+          senderId: senderId,
+          senderName: senderName,
+          parentMessage: parentMessage,
+          isReplying: isReplying,
+          isForward: isForward,
+          forwardedFromUserId: forwardedFromUserId,
+          media: uploadResult, // Pass uploaded media result
+        );
+      } else {
+        print("Failed to upload file: $filePath");
+      }
+    } catch (e) {
+      print("Error in _sendFile: $e");
+    }
   }
 
-  void _pickImageFromCamera() async {
+  void _pickImageFromCamera(BuildContext context) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
@@ -85,7 +125,7 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
-  void _pickImageFromGallery() async {
+  void _pickImageFromGallery(BuildContext context) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {

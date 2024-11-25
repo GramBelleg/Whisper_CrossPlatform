@@ -35,8 +35,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   void initState() {
     super.initState();
-    viewModel = CustomAppBarViewModel(
-        messagesCubit: BlocProvider.of<MessagesCubit>(context));
+    viewModel = CustomAppBarViewModel();
   }
 
   void _showDeleteDialog(BuildContext context) {
@@ -74,7 +73,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   void _deleteForMe(BuildContext context) async {
     if (widget.isSelected.isNotEmpty) {
-      final messagesCubit = BlocProvider.of<MessagesCubit>(context);
       try {
         // Call the deleteMessage method from the MessagesCubit
 
@@ -101,7 +99,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   void _deleteForEveryone(BuildContext context) async {
     if (widget.isSelected.isNotEmpty) {
-      final messagesCubit = BlocProvider.of<MessagesCubit>(context);
       try {
         await viewModel.deleteMessagesForEveryone(
             widget.chatId, widget.isSelected);

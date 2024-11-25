@@ -47,7 +47,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   void _initializeSocket(String token) {
-    socket = IO.io("http://localhost:5000", <String, dynamic>{
+    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
@@ -93,11 +93,11 @@ class MessagesCubit extends Cubit<MessagesState> {
       required String senderName,
       required bool isReplying,
       required bool isForward,
-      int? forwardedFromUserId}) {
+      int? forwardedFromUserId,
+      String? media}) {
     int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     print("Current time in milliseconds: $nowMillis");
-    // print("zzzzzzzzzzzzzzzzzzzzzzzz ${parentMessage?.content}");
 
     final messageData = {
       'content': content,
@@ -108,6 +108,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       'parentMessageId': parentMessage == null ? null : parentMessage.id,
       'forwarded': isForward,
       'forwardedFromUserId': isForward == true ? forwardedFromUserId : null,
+      'media': media == null ? null : media,
     };
     final sender = Sender(id: senderId, userName: "zeyad");
     final newMessage = ChatMessage(
@@ -120,6 +121,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       time:
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       parentMessage: parentMessage,
+      media: media,
     );
     socket?.emit('sendMessage', messageData);
     emit(MessageSent(newMessage));
@@ -145,7 +147,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       content: data['content'],
       mentions:
           data['mentions'] != null ? List<int>.from(data['mentions']) : null,
-      media: data['media'] != null ? List<dynamic>.from(data['media']) : null,
+      media: data['media'],
       time:
           data['time'] != null ? DateTime.parse(data['time']).toLocal() : null,
       sentAt: data['sentAt'] != null
@@ -169,6 +171,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   Future<void> deleteMessage(int chatId, List<int> ids) async {
     emit(MessagesLoading());
     try {
+      print("daaaaaaaaaaaaaaaaaaaa");
       emit(MessagesDeletedSuccessfully(ids));
       await chatDeletionService.deleteMessages(chatId, ids);
     } catch (e) {

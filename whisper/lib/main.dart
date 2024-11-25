@@ -23,13 +23,13 @@ import 'package:whisper/services/friend-service.dart';
 import 'package:whisper/view-models/forward-menu-view-model.dart';
 
 void main() {
+  final messagesCubit = MessagesCubit(ChatViewModel(), ChatDeletionService());
   runApp(
     MultiBlocProvider(
       providers: [
         // Provide the MessagesCubit first
-        BlocProvider(
-          create: (context) =>
-              MessagesCubit(ChatViewModel(), ChatDeletionService()),
+        BlocProvider<MessagesCubit>(
+          create: (_) => messagesCubit, // Provide as a singleton
         ),
       ],
       child: Whisper(),

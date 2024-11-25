@@ -6,12 +6,14 @@ import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/components/reply-preview.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/cubit/messages-state.dart';
+import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
+import 'package:whisper/modules/own-message/file-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
 import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
 import 'package:whisper/modules/own-message/forwarded-message-card.dart';
@@ -63,7 +65,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    context.read<MessagesCubit>().loadMessages(widget.ChatID);
+    GlobalCubitProvider.messagesCubit.loadMessages(widget.ChatID);
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -186,395 +188,448 @@ class _ChatPageState extends State<ChatPage> {
           chatId: widget.ChatID,
           chatViewModel: ChatViewModel(),
         ),
-        body: BlocListener<MessagesCubit, MessagesState>(
-            listener: (context, state) {
-              if (state is MessagesLoading) {
-                print("loading");
-              } else if (state is MessageFetchedSuccessfully) {
-                setState(() {
-                  messages = state
-                      .messages; // Assume state.messages is the list of messages
-                  //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
-                });
-                _scrollToBottom(messages.length * 1);
-              } else if (state is MessageFetchedWrong) {
-                print("erroor");
-              } else if (state is MessageSent) {
-                setState(() {
-                  if (state.message.chatId == widget.ChatID) {
-                    messages.add(state.message);
-                  }
-                });
-              } else if (state is MessageReceived) {
-                setState(() {
-                  paddingSpaceForReplay = 0;
-                });
-                DateTime receivedTime = state.message.time!.toLocal();
-                int index =
-                    messages.indexWhere((msg) => msg.sentAt == receivedTime);
-                if (state.message.chatId == widget.ChatID) {
-                  if (index != -1) {
-                    setState(() {
-                      messages[index] = state.message; // Update the message
-                    });
-                  } else {
-                    setState(() {
+        body: BlocProvider<MessagesCubit>.value(
+          value: GlobalCubitProvider.messagesCubit,
+          child: BlocListener<MessagesCubit, MessagesState>(
+              listener: (context, state) {
+                if (state is MessagesLoading) {
+                  print("loading");
+                } else if (state is MessageFetchedSuccessfully) {
+                  setState(() {
+                    messages = state
+                        .messages; // Assume state.messages is the list of messages
+                    //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
+                  });
+                  _scrollToBottom(messages.length * 1);
+                } else if (state is MessageFetchedWrong) {
+                  print("erroor");
+                } else if (state is MessageSent) {
+                  setState(() {
+                    if (state.message.chatId == widget.ChatID) {
                       messages.add(state.message);
-                    });
+                    }
+                  });
+                } else if (state is MessageReceived) {
+                  setState(() {
+                    paddingSpaceForReplay = 0;
+                  });
+                  DateTime receivedTime = state.message.time!.toLocal();
+                  int index =
+                      messages.indexWhere((msg) => msg.sentAt == receivedTime);
+                  if (state.message.chatId == widget.ChatID) {
+                    if (index != -1) {
+                      setState(() {
+                        messages[index] = state.message; // Update the message
+                      });
+                    } else {
+                      setState(() {
+                        messages.add(state.message);
+                      });
+                    }
                   }
+                  _scrollToBottom(messages.length * 1);
+                } else if (state is MessagesDeletedSuccessfully) {
+                  print("y7raq abo da project");
+                  // Remove the message with the given ID from the list
+                  setState(() {
+                    messages.removeWhere(
+                        (msg) => state.deletedIds.contains(msg.id));
+                  });
+                } else if (state is MessagesDeleteError) {
+                  // Handle deletion error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content:
+                            Text('Error deleting message: ${state.error}')),
+                  );
                 }
-                _scrollToBottom(messages.length * 1);
-              } else if (state is MessagesDeletedSuccessfully) {
-                // Remove the message with the given ID from the list
-                setState(() {
-                  messages
-                      .removeWhere((msg) => state.deletedIds.contains(msg.id));
-                });
-              } else if (state is MessagesDeleteError) {
-                // Handle deletion error
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('Error deleting message: ${state.error}')),
-                );
-              }
-            },
-            child: Container(
-              color: const Color(0xff0a254a),
-              child: WillPopScope(
-                child: Stack(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/chat-page-back-ground-image.svg',
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      height: show
-                          ? MediaQuery.of(context).size.height - 400
-                          : MediaQuery.of(context).viewInsets.bottom != 0
-                              ? MediaQuery.of(context).size.height - 450
-                              : MediaQuery.of(context).size.height - 145,
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: paddingSpaceForReplay),
-                        child: ListView.builder(
-                          controller: _scrollController2,
-                          itemCount: messages.length,
-                          itemBuilder: (context, index) {
-                            final messageData = messages[index];
-                            return SwipeTo(
-                              key: ValueKey(messageData.id),
-                              iconColor: Color(0xff8D6AEE),
-                              onRightSwipe: (details) {
-                                setState(() {
-                                  _isReplying = true;
-                                  _replyingTo = ParentMessage(
-                                      id: messageData.id!,
-                                      // senderId: messageData.sender!.id!,
-                                      // type: messageData.type,
-                                      content: messageData.content,
-                                      senderName: messageData.sender!.userName);
-                                  paddingSpaceForReplay = 70;
-                                  _scrollToBottom(messages.length * 1);
-                                });
-                              },
-                              child: GestureDetector(
-                                  onLongPress: () {
-                                    setState(() {
-                                      if (!isSelectedList
-                                          .contains(messageData.id!)) {
-                                        isSelectedList.add(messageData.id!);
-                                      } // Add the index to isSelected list
-                                    });
-                                  },
-                                  onTap: () {
-                                    setState(() {
-                                      // Check if the index exists in the isSelected list
-                                      if (isSelectedList
-                                          .contains(messageData.id!)) {
-                                        // If it exists, remove it
-                                        isSelectedList.remove(messageData.id!);
-                                      }
-                                    });
-                                  },
-                                  child: messageData.sender!.id! ==
-                                          widget.senderId
-                                      ? messageData.forwarded == true
-                                          ? ForwardedMessageCard(
-                                              message: messageData.content,
-                                              time: messageData.time!,
-                                              status: MessageStatus
-                                                  .sent, // Modify as needed
-                                              isSelected:
-                                                  messageData.id != null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                              messageSenderName: messageData
-                                                  .forwardedFrom!.userName,
-                                            )
-                                          : messageData.parentMessage != null
-                                              ? RepliedMessageCard(
-                                                  message: messageData.content,
-                                                  time: messageData.time!,
-                                                  status: MessageStatus
-                                                      .sent, // Modify as needed
-                                                  isSelected: messageData.id !=
-                                                          null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                                  repliedContent: messageData
-                                                      .parentMessage!.content,
-                                                  repliedSenderName: messageData
-                                                      .parentMessage!
-                                                      .senderName,
-                                                )
-                                              : NormalMessageCard(
-                                                  message: messageData.content,
-                                                  time: messageData.time!,
-                                                  status: MessageStatus
-                                                      .sent, // Modify as needed
-                                                  isSelected: messageData.id !=
-                                                          null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                                )
-                                      : messageData.forwarded ==
-                                              true // Check if the message is forwarded
-                                          ? ForwardedReceivedMessageCard(
-                                              message: messageData.content,
-                                              time: messageData.time!,
-                                              status: MessageStatus
-                                                  .sent, // Modify as needed
-                                              isSelected:
-                                                  messageData.id != null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                              messageSenderName: messageData
-                                                  .forwardedFrom!.userName,
-                                            )
-                                          : messageData.parentMessage != null
-                                              ? RepliedReceivedMessageCard(
-                                                  message: messageData.content,
-                                                  time: messageData.time!,
-                                                  status: MessageStatus
-                                                      .sent, // Modify as needed
-                                                  isSelected: messageData.id !=
-                                                          null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                                  repliedContent: messageData
-                                                      .parentMessage!.content,
-                                                  repliedSenderName: messageData
-                                                      .parentMessage!
-                                                      .senderName,
-                                                )
-                                              : NormalReceivedMessageCard(
-                                                  message: messageData.content,
-                                                  time: messageData.time!,
-                                                  status: MessageStatus
-                                                      .sent, // Modify as needed
-                                                  isSelected: messageData.id !=
-                                                          null &&
-                                                      isSelectedList.contains(
-                                                          messageData.id!),
-                                                )),
-                            );
-                          },
-                        ),
+              },
+              child: Container(
+                color: const Color(0xff0a254a),
+                child: WillPopScope(
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/chat-page-back-ground-image.svg',
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.cover,
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ReplyPreview(
-                            isReplying: _isReplying,
-                            senderName: widget.userName,
-                            content: _replyingTo?.content ?? '',
-                            onCancelReply: () {
-                              setState(() {
-                                _isReplying = false;
-                                _replyingTo = null;
-                                paddingSpaceForReplay = 0;
-                              });
+                      Container(
+                        height: show
+                            ? MediaQuery.of(context).size.height - 400
+                            : MediaQuery.of(context).viewInsets.bottom != 0
+                                ? MediaQuery.of(context).size.height - 450
+                                : MediaQuery.of(context).size.height - 145,
+                        child: Padding(
+                          padding:
+                              EdgeInsets.only(bottom: paddingSpaceForReplay),
+                          child: ListView.builder(
+                            controller: _scrollController2,
+                            itemCount: messages.length,
+                            itemBuilder: (context, index) {
+                              final messageData = messages[index];
+                              return SwipeTo(
+                                key: ValueKey(messageData.id),
+                                iconColor: Color(0xff8D6AEE),
+                                onRightSwipe: (details) {
+                                  setState(() {
+                                    _isReplying = true;
+                                    _replyingTo = ParentMessage(
+                                        id: messageData.id!,
+                                        // senderId: messageData.sender!.id!,
+                                        // type: messageData.type,
+                                        content: messageData.content,
+                                        senderName:
+                                            messageData.sender!.userName);
+                                    paddingSpaceForReplay = 70;
+                                    _scrollToBottom(messages.length * 1);
+                                  });
+                                },
+                                child: GestureDetector(
+                                    onLongPress: () {
+                                      setState(() {
+                                        if (!isSelectedList
+                                            .contains(messageData.id!)) {
+                                          isSelectedList.add(messageData.id!);
+                                        } // Add the index to isSelected list
+                                      });
+                                    },
+                                    onTap: () {
+                                      setState(() {
+                                        // Check if the index exists in the isSelected list
+                                        if (isSelectedList
+                                            .contains(messageData.id!)) {
+                                          // If it exists, remove it
+                                          isSelectedList
+                                              .remove(messageData.id!);
+                                        }
+                                      });
+                                    },
+                                    child: messageData.sender!.id! ==
+                                            widget.senderId
+                                        ? messageData.forwarded == true
+                                            ? ForwardedMessageCard(
+                                                message: messageData.content,
+                                                time: messageData.time!,
+                                                status: MessageStatus
+                                                    .sent, // Modify as needed
+                                                isSelected:
+                                                    messageData.id != null &&
+                                                        isSelectedList.contains(
+                                                            messageData.id!),
+                                                messageSenderName: messageData
+                                                    .forwardedFrom!.userName,
+                                              )
+                                            : messageData.parentMessage != null
+                                                ? RepliedMessageCard(
+                                                    message:
+                                                        messageData.content,
+                                                    time: messageData.time!,
+                                                    status: MessageStatus
+                                                        .sent, // Modify as needed
+                                                    isSelected: messageData
+                                                                .id !=
+                                                            null &&
+                                                        isSelectedList.contains(
+                                                            messageData.id!),
+                                                    repliedContent: messageData
+                                                        .parentMessage!.content,
+                                                    repliedSenderName:
+                                                        messageData
+                                                            .parentMessage!
+                                                            .senderName,
+                                                  )
+                                                : messageData.media != null &&
+                                                        messageData
+                                                            .media!.isNotEmpty
+                                                    ? FileMessageCard(
+                                                        message:
+                                                            messageData.content,
+                                                        time: messageData.time!,
+                                                        status: MessageStatus
+                                                            .sent, // Modify as needed
+                                                        isSelected: messageData
+                                                                    .id !=
+                                                                null &&
+                                                            isSelectedList
+                                                                .contains(
+                                                                    messageData
+                                                                        .id!),
+                                                        blobName:
+                                                            messageData.media!,
+                                                      )
+                                                    : NormalMessageCard(
+                                                        message:
+                                                            messageData.content,
+                                                        time: messageData.time!,
+                                                        status: MessageStatus
+                                                            .sent, // Modify as needed
+                                                        isSelected: messageData
+                                                                    .id !=
+                                                                null &&
+                                                            isSelectedList
+                                                                .contains(
+                                                                    messageData
+                                                                        .id!),
+                                                      )
+                                        : messageData.forwarded ==
+                                                true // Check if the message is forwarded
+                                            ? ForwardedReceivedMessageCard(
+                                                message: messageData.content,
+                                                time: messageData.time!,
+                                                status: MessageStatus
+                                                    .sent, // Modify as needed
+                                                isSelected:
+                                                    messageData.id != null &&
+                                                        isSelectedList.contains(
+                                                            messageData.id!),
+                                                messageSenderName: messageData
+                                                    .forwardedFrom!.userName,
+                                              )
+                                            : messageData.parentMessage != null
+                                                ? RepliedReceivedMessageCard(
+                                                    message:
+                                                        messageData.content,
+                                                    time: messageData.time!,
+                                                    status: MessageStatus
+                                                        .sent, // Modify as needed
+                                                    isSelected: messageData
+                                                                .id !=
+                                                            null &&
+                                                        isSelectedList.contains(
+                                                            messageData.id!),
+                                                    repliedContent: messageData
+                                                        .parentMessage!.content,
+                                                    repliedSenderName:
+                                                        messageData
+                                                            .parentMessage!
+                                                            .senderName,
+                                                  )
+                                                : NormalReceivedMessageCard(
+                                                    message:
+                                                        messageData.content,
+                                                    time: messageData.time!,
+                                                    status: MessageStatus
+                                                        .sent, // Modify as needed
+                                                    isSelected: messageData
+                                                                .id !=
+                                                            null &&
+                                                        isSelectedList.contains(
+                                                            messageData.id!),
+                                                  )),
+                              );
                             },
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width - 55,
-                                child: Card(
-                                  margin: const EdgeInsets.only(
-                                      left: 5, right: 5, bottom: 8),
-                                  child: TextFormField(
-                                    onTap: () {
-                                      _scrollToBottom(messages.length * 1);
-                                    },
-                                    scrollController: _scrollController,
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ReplyPreview(
+                              isReplying: _isReplying,
+                              senderName: widget.userName,
+                              content: _replyingTo?.content ?? '',
+                              onCancelReply: () {
+                                setState(() {
+                                  _isReplying = false;
+                                  _replyingTo = null;
+                                  paddingSpaceForReplay = 0;
+                                });
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width - 55,
+                                  child: Card(
+                                    margin: const EdgeInsets.only(
+                                        left: 5, right: 5, bottom: 8),
+                                    child: TextFormField(
+                                      onTap: () {
+                                        _scrollToBottom(messages.length * 1);
+                                      },
+                                      scrollController: _scrollController,
 
-                                    focusNode: focusNode,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    keyboardType: TextInputType.multiline,
-                                    minLines: 1,
-                                    maxLines: 5,
-                                    controller: _controller,
-                                    textAlign: _textAlign, // Set text alignment
-                                    textDirection:
-                                        _textDirection, // Set text direction
-                                    style: const TextStyle(color: Colors.white),
-                                    onChanged:
-                                        _updateTextProperties, // Update text alignment on change
-                                    decoration: InputDecoration(
-                                      fillColor: const Color(
-                                          0xff0A122F), // Background color
-                                      filled:
-                                          true, // Enable filling the background color
-                                      hintText: "Message Here",
-                                      hintStyle: const TextStyle(
-                                          color: Colors.white54),
-                                      contentPadding: const EdgeInsets.all(5),
-                                      prefixIcon: IconButton(
-                                        onPressed: () {
-                                          if (show) {
-                                            focusNode.requestFocus();
-                                            show != show;
-                                          } else {
+                                      focusNode: focusNode,
+                                      textAlignVertical:
+                                          TextAlignVertical.center,
+                                      keyboardType: TextInputType.multiline,
+                                      minLines: 1,
+                                      maxLines: 5,
+                                      controller: _controller,
+                                      textAlign:
+                                          _textAlign, // Set text alignment
+                                      textDirection:
+                                          _textDirection, // Set text direction
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                      onChanged:
+                                          _updateTextProperties, // Update text alignment on change
+                                      decoration: InputDecoration(
+                                        fillColor: const Color(
+                                            0xff0A122F), // Background color
+                                        filled:
+                                            true, // Enable filling the background color
+                                        hintText: "Message Here",
+                                        hintStyle: const TextStyle(
+                                            color: Colors.white54),
+                                        contentPadding: const EdgeInsets.all(5),
+                                        prefixIcon: IconButton(
+                                          onPressed: () {
+                                            if (show) {
+                                              focusNode.requestFocus();
+                                              show != show;
+                                            } else {
+                                              showModalBottomSheet(
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  context: context,
+                                                  builder: (builder) =>
+                                                      EmojiButtonSheet(
+                                                          onEmojiTap: () {
+                                                            // Hide the button sheet
+                                                            Navigator.pop(
+                                                                context);
+                                                            // Show the emoji picker
+
+                                                            _toggleEmojiPicker();
+                                                            _scrollToBottom(
+                                                                170);
+                                                          },
+                                                          onStickerTap: () {},
+                                                          onGifTap: () {}));
+                                            }
+                                          },
+                                          icon: FaIcon(
+                                            show
+                                                ? FontAwesomeIcons.keyboard
+                                                : FontAwesomeIcons.smile,
+                                            color: const Color(
+                                                0xff8D6AEE), // Consistent icon color
+                                          ),
+                                        ),
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
                                             showModalBottomSheet(
                                                 backgroundColor:
                                                     Colors.transparent,
                                                 context: context,
                                                 builder: (builder) =>
-                                                    EmojiButtonSheet(
-                                                        onEmojiTap: () {
-                                                          // Hide the button sheet
-                                                          Navigator.pop(
-                                                              context);
-                                                          // Show the emoji picker
-
-                                                          _toggleEmojiPicker();
-                                                          _scrollToBottom(170);
-                                                        },
-                                                        onStickerTap: () {},
-                                                        onGifTap: () {}));
-                                          }
-                                        },
-                                        icon: FaIcon(
-                                          show
-                                              ? FontAwesomeIcons.keyboard
-                                              : FontAwesomeIcons.smile,
-                                          color: const Color(
-                                              0xff8D6AEE), // Consistent icon color
+                                                    FileButtonSheet(
+                                                      chatId: widget.ChatID,
+                                                      senderId:
+                                                          widget.senderId!,
+                                                      senderName:
+                                                          widget.userName,
+                                                      parentMessage:
+                                                          _replyingTo,
+                                                      isReplying: _isReplying,
+                                                      isForward: false,
+                                                      forwardedFromUserId: null,
+                                                      context: context,
+                                                    ));
+                                          },
+                                          icon: const FaIcon(
+                                            FontAwesomeIcons.paperclip,
+                                            color: Color(0xff8D6AEE),
+                                          ),
                                         ),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          showModalBottomSheet(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              context: context,
-                                              builder: (builder) =>
-                                                  FileButtonSheet());
-                                        },
-                                        icon: const FaIcon(
-                                          FontAwesomeIcons.paperclip,
-                                          color: Color(0xff8D6AEE),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Set border radius to 10
+                                          borderSide: BorderSide
+                                              .none, // Remove the border line
                                         ),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Set border radius to 10
-                                        borderSide: BorderSide
-                                            .none, // Remove the border line
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Set border radius for focused state
-                                        borderSide: BorderSide
-                                            .none, // Remove the border line
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Set border radius for enabled state
-                                        borderSide: BorderSide
-                                            .none, // Remove the border line
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Set border radius for focused state
+                                          borderSide: BorderSide
+                                              .none, // Remove the border line
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10), // Set border radius for enabled state
+                                          borderSide: BorderSide
+                                              .none, // Remove the border line
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 5),
-                                child: CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: Color(0xff0A122F),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (_isTyping) {
-                                        context
-                                            .read<MessagesCubit>()
-                                            .sendMessage(
-                                                content: _controller
-                                                    .text, // Message content
-                                                chatId:
-                                                    widget.ChatID, // Chat ID
-                                                senderId: widget
-                                                    .senderId!, // Sender ID,
-                                                parentMessage: _replyingTo,
-                                                senderName: widget.userName,
-                                                isReplying: _isReplying,
-                                                isForward: false,
-                                                forwardedFromUserId: 0);
-                                        _controller
-                                            .clear(); // Clear the text field after sending
-                                        setState(() {
-                                          _isTyping =
-                                              false; // Reset typing status
-                                          _isReplying = false;
-                                          _replyingTo = null;
-                                        });
-                                      } else {}
-                                    },
-                                    icon: FaIcon(
-                                      _isTyping
-                                          ? FontAwesomeIcons.paperPlane
-                                          : FontAwesomeIcons.microphone,
-                                      color: Color(0xff8D6AEE),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 5),
+                                  child: CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Color(0xff0A122F),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        if (_isTyping) {
+                                          GlobalCubitProvider.messagesCubit
+                                              .sendMessage(
+                                            content: _controller
+                                                .text, // Message content
+                                            chatId: widget.ChatID, // Chat ID
+                                            senderId:
+                                                widget.senderId!, // Sender ID,
+                                            parentMessage: _replyingTo,
+                                            senderName: widget.userName,
+                                            isReplying: _isReplying,
+                                            isForward: false,
+                                          );
+                                          _controller
+                                              .clear(); // Clear the text field after sending
+                                          setState(() {
+                                            _isTyping =
+                                                false; // Reset typing status
+                                            _isReplying = false;
+                                            _replyingTo = null;
+                                          });
+                                        } else {}
+                                      },
+                                      icon: FaIcon(
+                                        _isTyping
+                                            ? FontAwesomeIcons.paperPlane
+                                            : FontAwesomeIcons.microphone,
+                                        color: Color(0xff8D6AEE),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          // Display emoji picker if `show` is true
-                          show
-                              ? EmojiSelect(
-                                  controller: _controller,
-                                  scrollController: _scrollController,
-                                  onTypingStatusChanged: (isTyping) {
-                                    setState(() {
-                                      _isTyping = isTyping;
-                                    });
-                                  })
-                              : Container()
-                        ],
+                              ],
+                            ),
+                            // Display emoji picker if `show` is true
+                            show
+                                ? EmojiSelect(
+                                    controller: _controller,
+                                    scrollController: _scrollController,
+                                    onTypingStatusChanged: (isTyping) {
+                                      setState(() {
+                                        _isTyping = isTyping;
+                                      });
+                                    })
+                                : Container()
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  onWillPop: () {
+                    if (show) {
+                      setState(() {
+                        show = false;
+                      });
+                    } else {
+                      Navigator.pop(context);
+                    }
+                    return Future.value(false);
+                  },
                 ),
-                onWillPop: () {
-                  if (show) {
-                    setState(() {
-                      show = false;
-                    });
-                  } else {
-                    Navigator.pop(context);
-                  }
-                  return Future.value(false);
-                },
-              ),
-            )));
+              )),
+        ));
   }
 }

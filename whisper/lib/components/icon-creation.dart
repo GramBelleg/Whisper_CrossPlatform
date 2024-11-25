@@ -17,7 +17,7 @@ class IconCreationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onTap(),
+      onTap: () => onTap(context),
       child: Column(
         children: [
           CircleAvatar(

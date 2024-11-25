@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/modules/login-credentials.dart';
 import 'package:whisper/pages/mainchats-page.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> login(LoginCredentials loginCred, BuildContext context) async {
-  final url = Uri.parse('http://localhost:5000/api/auth/login');
+  final url = Uri.parse('http://192.168.1.11:5000/api/auth/login');
   try {
     final response = await http.post(
       url,
@@ -31,7 +32,7 @@ Future<void> login(LoginCredentials loginCred, BuildContext context) async {
           await GetToken(); // Make sure GetToken is awaited to fetch the token
       print("dammmmmmmmmn$token");
       // Pass the token to connectSocket
-      context.read<MessagesCubit>().connectSocket(token!);
+      GlobalCubitProvider.messagesCubit.connectSocket(token!);
       Navigator.pushNamed(context, MainChats.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

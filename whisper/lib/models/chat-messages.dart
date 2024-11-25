@@ -8,7 +8,7 @@ class ChatMessage {
   final Sender? sender;
   final List<dynamic>? mentions;
   final String content;
-  final List<dynamic>? media;
+  final String? media;
   DateTime? time;
   DateTime? sentAt;
   final bool? read;
@@ -56,7 +56,7 @@ class ChatMessage {
           ? List<dynamic>.from(json['mentions'])
           : null,
       content: json['content'],
-      media: json['media'] != null ? List<dynamic>.from(json['media']) : null,
+      media: json['media'],
       time: json['time'] != null ? DateTime.parse(json['time']) : null,
       sentAt: json['sentAt'] != null ? DateTime.parse(json['sentAt']) : null,
       read: json['read'],

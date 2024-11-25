@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/pages/chat-page.dart';
 import 'package:whisper/services/fetch-message-by-id.dart';
 import 'package:whisper/services/friend-service.dart';
@@ -101,7 +102,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
       try {
         final message =
             await fetchMessage(messageId); // Fetch the message details
-        context.read<MessagesCubit>().sendMessage(
+        GlobalCubitProvider.messagesCubit.sendMessage(
               content: message.content, // Message content
               chatId: friend.id, // Chat ID of the friend
               senderId: senderId, // Current sender's ID

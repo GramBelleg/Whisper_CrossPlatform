@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:path/path.dart' as p;
 
-Future<void> uploadFile(String filePath, String fileExtension) async {
+Future<String> uploadFile(String filePath) async {
   print("Uploading file: $filePath");
-
-  final String apiUrl = 'http://localhost:5000/api/media/write';
+  String fileExtension = p.extension(filePath);
+  print("File extension: $fileExtension");
+  final String apiUrl = 'http://192.168.1.11:5000/api/media/write';
   String? token = await GetToken();
 
   if (token == null) {
@@ -39,25 +41,26 @@ Future<void> uploadFile(String filePath, String fileExtension) async {
         Uri.parse(presignedUrl),
         headers: {
           'Content-Type': 'application/octet-stream',
-          'x-ms-blob-type':
-              'BlockBlob', // Added header for Azure Blob Storage compatibility
+          'x-ms-blob-type': 'BlockBlob',
         },
         body: fileBytes,
       );
 
-      if (uploadResponse.statusCode == 200) {
-        print('File uploaded successfully. Blob name: $blobName');
+      // Check for a successful upload response
+      if (uploadResponse.statusCode == 201 ||
+          uploadResponse.statusCode == 200) {
+        print("Upload successful!");
+        return blobName;
       } else {
-        print('File upload failed with status: ${uploadResponse.statusCode}');
-        print('Response body: ${uploadResponse.body}');
-        throw Exception(
-            'File upload failed with status: ${uploadResponse.statusCode}');
+        print("Upload failed: ${uploadResponse.statusCode}");
+        return 'Failed';
       }
     } else {
-      throw Exception(
-          'Failed to get presigned URL. Status: ${response.statusCode}');
+      print("Failed to get presigned URL: ${response.statusCode}");
+      return 'Failed';
     }
   } catch (e) {
-    print('Error occurred: $e');
+    print("Error uploading file: $e");
+    return 'Failed';
   }
 }
