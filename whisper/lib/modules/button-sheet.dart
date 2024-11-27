@@ -57,11 +57,38 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
+  Future<FilePickerResult?> filterFilesLessThan50MB(
+      FilePickerResult? result) async {
+    if (result == null) {
+      return null;
+    }
+
+    const int maxSizeInBytes = 50 * 1024 * 1024; // 50 MB
+
+    // Filter files less than 50 MB
+    List<PlatformFile> filteredFiles = result.files.where((file) {
+      if (file.size < maxSizeInBytes) {
+        return true;
+      } else if (file.path != null) {
+        // Check size if the file has a path
+        final fileInfo = File(file.path!);
+        return fileInfo.lengthSync() < maxSizeInBytes;
+      }
+      return false;
+    }).toList();
+
+    if (filteredFiles.isEmpty) {
+      return null; // Return null if no files meet the criteria
+    }
+
+    return FilePickerResult(filteredFiles);
+  }
+
   void _pickFile(BuildContext context) async {
     // Use FilePicker to pick multiple files
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
-
+    result = await filterFilesLessThan50MB(result);
     if (result != null) {
       // Iterate through the selected files
       Navigator.of(context).pop();
@@ -77,7 +104,12 @@ class FileButtonSheet extends StatelessWidget {
         }
       }
     } else {
-      // User canceled the picker
+      // User canceled the picker'
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("File selection canceled"),
+        ),
+      );
       print("File selection canceled");
     }
   }
@@ -90,10 +122,8 @@ class FileButtonSheet extends StatelessWidget {
 
       if (uploadResult != 'Failed') {
         print("File uploaded successfullyy: $uploadResult");
-        // You can trigger additional actions here (e.g., update UI or send metadata)
-        //Todo call socket for send messages
         GlobalCubitProvider.messagesCubit.sendMessage(
-          content: '', // Empty since it's a file message
+          content: "$uploadResult",
           chatId: chatId,
           senderId: senderId,
           senderName: senderName,
@@ -101,7 +131,7 @@ class FileButtonSheet extends StatelessWidget {
           isReplying: isReplying,
           isForward: isForward,
           forwardedFromUserId: forwardedFromUserId,
-          media: uploadResult, // Pass uploaded media result
+          media: uploadResult,
         );
       } else {
         print("Failed to upload file: $filePath");

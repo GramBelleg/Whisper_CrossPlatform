@@ -13,6 +13,7 @@ import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
+import 'package:whisper/modules/message-list.dart';
 import 'package:whisper/modules/own-message/file-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
 import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
@@ -69,97 +70,47 @@ class _ChatPageState extends State<ChatPage> {
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
-          show = false; // Hide emoji picker when the text field is focused
+          show = false;
           isSelectedList.clear();
         });
       }
-    });
-// Listen for incoming messages from the server
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom(0);
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Dispose of the controller
-    focusNode.dispose(); // Dispose of the focusNode
+    _controller.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
   void _updateTextProperties(String text) {
-    // Update text alignment and direction based on the content
     if (text.isNotEmpty && RegExp(r'[\u0600-\u06FF]').hasMatch(text)) {
       setState(() {
-        _textAlign = TextAlign.right; // Right to Left for Arabic
-        _textDirection = TextDirection.rtl; // Set text direction to RTL
+        _textAlign = TextAlign.right;
+        _textDirection = TextDirection.rtl;
       });
     } else {
       setState(() {
-        _textAlign = TextAlign.left; // Left to Right for English
-        _textDirection = TextDirection.ltr; // Set text direction to LTR
+        _textAlign = TextAlign.left;
+        _textDirection = TextDirection.ltr;
       });
     }
-    // Update the typing status based on the text input
     setState(() {
-      _isTyping = text.isNotEmpty; // Check if the text field is not empty
+      _isTyping = text.isNotEmpty;
     });
-    // Calculate the number of lines in the text field
-    int numberOfLines =
-        (text.split('\n').length).clamp(1, 5); // Minimum 1, maximum 5
-    double additionalHeight = numberOfLines * 40; // Height for the lines
-    // Calculate the new scroll position based on the additional height
-    if (_scrollController2.hasClients) {
-      double lastMessagePosition =
-          _scrollController2.position.maxScrollExtent + 100 + additionalHeight;
-      // Animate scroll to the last message considering the additional height
-      _scrollController2.animateTo(
-        lastMessagePosition,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
-  // Toggle emoji picker and keyboard
   void _toggleEmojiPicker() {
     if (show) {
-      focusNode.requestFocus(); // Show the keyboard when hiding emoji picker
+      focusNode.requestFocus();
     } else {
-      focusNode.unfocus(); // Hide the keyboard when showing emoji picker
+      focusNode.unfocus();
     }
     setState(() {
-      show = !show; // Toggle the emoji picker
+      show = !show;
       isSelectedList.clear();
     });
-  }
-
-  void _scrollToBottom(double additional) {
-    additional = additional * 150;
-    // Check if the first scroll controller is attached and has clients
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    }
-    // Check if the second scroll controller is attached and has clients
-    if (_scrollController.hasClients) {
-      // Assuming the last message is stored in a variable called `messages`
-      String lastMessage = messages.isNotEmpty ? messages.last.content : '';
-      // Count the number of lines in the last message
-      int lastMessageLines = lastMessage.split('\n').length;
-      // Calculate additional height based on the number of lines and the passed additional value
-      double additionalHeight = (lastMessageLines * 50) +
-          40 +
-          additional; // Assuming each line takes 50 pixels
-      // Calculate the target scroll position
-      double targetPosition = additionalHeight;
-      // _scrollController2.position.maxScrollExtent +
-      // Scroll to the target position
-      _scrollController2.animateTo(
-        targetPosition,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
   void clearIsSelected() {
@@ -168,13 +119,90 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _getTextFieldPosition() {
-    // Check if the key has a current context
-    if (_textFieldKey.currentContext != null) {
-      final RenderBox renderBox =
-          _textFieldKey.currentContext!.findRenderObject() as RenderBox;
-      final position = renderBox.localToGlobal(Offset.zero); // Get the position
+  void _handleMessagesState(BuildContext context, MessagesState state) {
+    if (state is MessagesLoading) {
+      print("loading");
+    } else if (state is MessageFetchedSuccessfully) {
+      setState(() {
+        messages = state.messages;
+        messages = messages.reversed.toList();
+      });
+    } else if (state is MessageFetchedWrong) {
+      print("erroor");
+    } else if (state is MessageSent) {
+      setState(() {
+        if (state.message.chatId == widget.ChatID) {
+          messages.insert(0, state.message);
+        }
+      });
+    } else if (state is MessageReceived) {
+      print("received");
+      setState(() {
+        paddingSpaceForReplay = 0;
+      });
+      DateTime receivedTime = state.message.time!.toLocal();
+      int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
+      if (state.message.chatId == widget.ChatID) {
+        if (index != -1) {
+          setState(() {
+            messages[index] = state.message;
+          });
+        } else {
+          setState(() {
+            messages.insert(0, state.message);
+          });
+        }
+      }
+    } else if (state is MessagesDeletedSuccessfully) {
+      setState(() {
+        messages.removeWhere((msg) => state.deletedIds.contains(msg.id));
+      });
+    } else if (state is MessagesDeleteError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting message: ${state.error}')),
+      );
     }
+  }
+
+  double getContainerHeight(BuildContext context) {
+    double height;
+    if (show) {
+      height = MediaQuery.of(context).size.height - 400;
+    } else if (MediaQuery.of(context).viewInsets.bottom != 0) {
+      height = MediaQuery.of(context).size.height - 450;
+    } else {
+      height = MediaQuery.of(context).size.height - 145;
+    }
+    return height;
+  }
+
+  void handleLongPressSelection(ChatMessage messageData) {
+    setState(() {
+      if (!isSelectedList.contains(messageData.id!)) {
+        isSelectedList.add(messageData.id!);
+      }
+    });
+  }
+
+  void handleOnTapSelection(ChatMessage messageData) {
+    setState(() {
+      if (isSelectedList.contains(messageData.id!)) {
+        isSelectedList.remove(messageData.id!);
+      } else if (!isSelectedList.isEmpty) {
+        isSelectedList.add(messageData.id!);
+      }
+    });
+  }
+
+  void handleOnRightSwipe(ChatMessage messageData) {
+    setState(() {
+      _isReplying = true;
+      _replyingTo = ParentMessage(
+          id: messageData.id!,
+          content: messageData.content,
+          senderName: messageData.sender!.userName);
+      paddingSpaceForReplay = 70;
+    });
   }
 
   @override
@@ -192,57 +220,7 @@ class _ChatPageState extends State<ChatPage> {
           value: GlobalCubitProvider.messagesCubit,
           child: BlocListener<MessagesCubit, MessagesState>(
               listener: (context, state) {
-                if (state is MessagesLoading) {
-                  print("loading");
-                } else if (state is MessageFetchedSuccessfully) {
-                  setState(() {
-                    messages = state
-                        .messages; // Assume state.messages is the list of messages
-                    //todo for loop 3lehom we lw la2et 7aga pin hat7otaha fel list bta3tak we we ispintrue
-                  });
-                  _scrollToBottom(messages.length * 1);
-                } else if (state is MessageFetchedWrong) {
-                  print("erroor");
-                } else if (state is MessageSent) {
-                  setState(() {
-                    if (state.message.chatId == widget.ChatID) {
-                      messages.add(state.message);
-                    }
-                  });
-                } else if (state is MessageReceived) {
-                  setState(() {
-                    paddingSpaceForReplay = 0;
-                  });
-                  DateTime receivedTime = state.message.time!.toLocal();
-                  int index =
-                      messages.indexWhere((msg) => msg.sentAt == receivedTime);
-                  if (state.message.chatId == widget.ChatID) {
-                    if (index != -1) {
-                      setState(() {
-                        messages[index] = state.message; // Update the message
-                      });
-                    } else {
-                      setState(() {
-                        messages.add(state.message);
-                      });
-                    }
-                  }
-                  _scrollToBottom(messages.length * 1);
-                } else if (state is MessagesDeletedSuccessfully) {
-                  print("y7raq abo da project");
-                  // Remove the message with the given ID from the list
-                  setState(() {
-                    messages.removeWhere(
-                        (msg) => state.deletedIds.contains(msg.id));
-                  });
-                } else if (state is MessagesDeleteError) {
-                  // Handle deletion error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content:
-                            Text('Error deleting message: ${state.error}')),
-                  );
-                }
+                _handleMessagesState(context, state);
               },
               child: Container(
                 color: const Color(0xff0a254a),
@@ -256,172 +234,19 @@ class _ChatPageState extends State<ChatPage> {
                         fit: BoxFit.cover,
                       ),
                       Container(
-                        height: show
-                            ? MediaQuery.of(context).size.height - 400
-                            : MediaQuery.of(context).viewInsets.bottom != 0
-                                ? MediaQuery.of(context).size.height - 450
-                                : MediaQuery.of(context).size.height - 145,
+                        height: getContainerHeight(context),
                         child: Padding(
-                          padding:
-                              EdgeInsets.only(bottom: paddingSpaceForReplay),
-                          child: ListView.builder(
-                            controller: _scrollController2,
-                            itemCount: messages.length,
-                            itemBuilder: (context, index) {
-                              final messageData = messages[index];
-                              return SwipeTo(
-                                key: ValueKey(messageData.id),
-                                iconColor: Color(0xff8D6AEE),
-                                onRightSwipe: (details) {
-                                  setState(() {
-                                    _isReplying = true;
-                                    _replyingTo = ParentMessage(
-                                        id: messageData.id!,
-                                        // senderId: messageData.sender!.id!,
-                                        // type: messageData.type,
-                                        content: messageData.content,
-                                        senderName:
-                                            messageData.sender!.userName);
-                                    paddingSpaceForReplay = 70;
-                                    _scrollToBottom(messages.length * 1);
-                                  });
-                                },
-                                child: GestureDetector(
-                                    onLongPress: () {
-                                      setState(() {
-                                        if (!isSelectedList
-                                            .contains(messageData.id!)) {
-                                          isSelectedList.add(messageData.id!);
-                                        } // Add the index to isSelected list
-                                      });
-                                    },
-                                    onTap: () {
-                                      setState(() {
-                                        // Check if the index exists in the isSelected list
-                                        if (isSelectedList
-                                            .contains(messageData.id!)) {
-                                          // If it exists, remove it
-                                          isSelectedList
-                                              .remove(messageData.id!);
-                                        }
-                                      });
-                                    },
-                                    child: messageData.sender!.id! ==
-                                            widget.senderId
-                                        ? messageData.forwarded == true
-                                            ? ForwardedMessageCard(
-                                                message: messageData.content,
-                                                time: messageData.time!,
-                                                status: MessageStatus
-                                                    .sent, // Modify as needed
-                                                isSelected:
-                                                    messageData.id != null &&
-                                                        isSelectedList.contains(
-                                                            messageData.id!),
-                                                messageSenderName: messageData
-                                                    .forwardedFrom!.userName,
-                                              )
-                                            : messageData.parentMessage != null
-                                                ? RepliedMessageCard(
-                                                    message:
-                                                        messageData.content,
-                                                    time: messageData.time!,
-                                                    status: MessageStatus
-                                                        .sent, // Modify as needed
-                                                    isSelected: messageData
-                                                                .id !=
-                                                            null &&
-                                                        isSelectedList.contains(
-                                                            messageData.id!),
-                                                    repliedContent: messageData
-                                                        .parentMessage!.content,
-                                                    repliedSenderName:
-                                                        messageData
-                                                            .parentMessage!
-                                                            .senderName,
-                                                  )
-                                                : messageData.media != null &&
-                                                        messageData
-                                                            .media!.isNotEmpty
-                                                    ? FileMessageCard(
-                                                        message:
-                                                            messageData.content,
-                                                        time: messageData.time!,
-                                                        status: MessageStatus
-                                                            .sent, // Modify as needed
-                                                        isSelected: messageData
-                                                                    .id !=
-                                                                null &&
-                                                            isSelectedList
-                                                                .contains(
-                                                                    messageData
-                                                                        .id!),
-                                                        blobName:
-                                                            messageData.media!,
-                                                      )
-                                                    : NormalMessageCard(
-                                                        message:
-                                                            messageData.content,
-                                                        time: messageData.time!,
-                                                        status: MessageStatus
-                                                            .sent, // Modify as needed
-                                                        isSelected: messageData
-                                                                    .id !=
-                                                                null &&
-                                                            isSelectedList
-                                                                .contains(
-                                                                    messageData
-                                                                        .id!),
-                                                      )
-                                        : messageData.forwarded ==
-                                                true // Check if the message is forwarded
-                                            ? ForwardedReceivedMessageCard(
-                                                message: messageData.content,
-                                                time: messageData.time!,
-                                                status: MessageStatus
-                                                    .sent, // Modify as needed
-                                                isSelected:
-                                                    messageData.id != null &&
-                                                        isSelectedList.contains(
-                                                            messageData.id!),
-                                                messageSenderName: messageData
-                                                    .forwardedFrom!.userName,
-                                              )
-                                            : messageData.parentMessage != null
-                                                ? RepliedReceivedMessageCard(
-                                                    message:
-                                                        messageData.content,
-                                                    time: messageData.time!,
-                                                    status: MessageStatus
-                                                        .sent, // Modify as needed
-                                                    isSelected: messageData
-                                                                .id !=
-                                                            null &&
-                                                        isSelectedList.contains(
-                                                            messageData.id!),
-                                                    repliedContent: messageData
-                                                        .parentMessage!.content,
-                                                    repliedSenderName:
-                                                        messageData
-                                                            .parentMessage!
-                                                            .senderName,
-                                                  )
-                                                : NormalReceivedMessageCard(
-                                                    message:
-                                                        messageData.content,
-                                                    time: messageData.time!,
-                                                    status: MessageStatus
-                                                        .sent, // Modify as needed
-                                                    isSelected: messageData
-                                                                .id !=
-                                                            null &&
-                                                        isSelectedList.contains(
-                                                            messageData.id!),
-                                                  )),
-                              );
-                            },
-                          ),
-                        ),
+                            padding:
+                                EdgeInsets.only(bottom: paddingSpaceForReplay),
+                            child: MessageList(
+                              scrollController: _scrollController2,
+                              messages: messages,
+                              onLongPress: handleLongPressSelection,
+                              onTap: handleOnTapSelection,
+                              onRightSwipe: handleOnRightSwipe,
+                              isSelectedList: isSelectedList,
+                              senderId: widget.senderId!,
+                            )),
                       ),
                       Align(
                         alignment: Alignment.bottomCenter,
@@ -450,11 +275,7 @@ class _ChatPageState extends State<ChatPage> {
                                     margin: const EdgeInsets.only(
                                         left: 5, right: 5, bottom: 8),
                                     child: TextFormField(
-                                      onTap: () {
-                                        _scrollToBottom(messages.length * 1);
-                                      },
                                       scrollController: _scrollController,
-
                                       focusNode: focusNode,
                                       textAlignVertical:
                                           TextAlignVertical.center,
@@ -462,19 +283,14 @@ class _ChatPageState extends State<ChatPage> {
                                       minLines: 1,
                                       maxLines: 5,
                                       controller: _controller,
-                                      textAlign:
-                                          _textAlign, // Set text alignment
-                                      textDirection:
-                                          _textDirection, // Set text direction
+                                      textAlign: _textAlign,
+                                      textDirection: _textDirection,
                                       style:
                                           const TextStyle(color: Colors.white),
-                                      onChanged:
-                                          _updateTextProperties, // Update text alignment on change
+                                      onChanged: _updateTextProperties,
                                       decoration: InputDecoration(
-                                        fillColor: const Color(
-                                            0xff0A122F), // Background color
-                                        filled:
-                                            true, // Enable filling the background color
+                                        fillColor: const Color(0xff0A122F),
+                                        filled: true,
                                         hintText: "Message Here",
                                         hintStyle: const TextStyle(
                                             color: Colors.white54),
@@ -492,14 +308,9 @@ class _ChatPageState extends State<ChatPage> {
                                                   builder: (builder) =>
                                                       EmojiButtonSheet(
                                                           onEmojiTap: () {
-                                                            // Hide the button sheet
                                                             Navigator.pop(
                                                                 context);
-                                                            // Show the emoji picker
-
                                                             _toggleEmojiPicker();
-                                                            _scrollToBottom(
-                                                                170);
                                                           },
                                                           onStickerTap: () {},
                                                           onGifTap: () {}));
@@ -509,8 +320,7 @@ class _ChatPageState extends State<ChatPage> {
                                             show
                                                 ? FontAwesomeIcons.keyboard
                                                 : FontAwesomeIcons.smile,
-                                            color: const Color(
-                                                0xff8D6AEE), // Consistent icon color
+                                            color: const Color(0xff8D6AEE),
                                           ),
                                         ),
                                         suffixIcon: IconButton(
@@ -540,22 +350,19 @@ class _ChatPageState extends State<ChatPage> {
                                           ),
                                         ),
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10), // Set border radius to 10
-                                          borderSide: BorderSide
-                                              .none, // Remove the border line
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide.none,
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10), // Set border radius for focused state
-                                          borderSide: BorderSide
-                                              .none, // Remove the border line
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide.none,
                                         ),
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10), // Set border radius for enabled state
-                                          borderSide: BorderSide
-                                              .none, // Remove the border line
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide.none,
                                         ),
                                       ),
                                     ),
@@ -571,21 +378,17 @@ class _ChatPageState extends State<ChatPage> {
                                         if (_isTyping) {
                                           GlobalCubitProvider.messagesCubit
                                               .sendMessage(
-                                            content: _controller
-                                                .text, // Message content
-                                            chatId: widget.ChatID, // Chat ID
-                                            senderId:
-                                                widget.senderId!, // Sender ID,
+                                            content: _controller.text,
+                                            chatId: widget.ChatID,
+                                            senderId: widget.senderId!,
                                             parentMessage: _replyingTo,
                                             senderName: widget.userName,
                                             isReplying: _isReplying,
                                             isForward: false,
                                           );
-                                          _controller
-                                              .clear(); // Clear the text field after sending
+                                          _controller.clear();
                                           setState(() {
-                                            _isTyping =
-                                                false; // Reset typing status
+                                            _isTyping = false;
                                             _isReplying = false;
                                             _replyingTo = null;
                                           });
@@ -602,7 +405,6 @@ class _ChatPageState extends State<ChatPage> {
                                 ),
                               ],
                             ),
-                            // Display emoji picker if `show` is true
                             show
                                 ? EmojiSelect(
                                     controller: _controller,

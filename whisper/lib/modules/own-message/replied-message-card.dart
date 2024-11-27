@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
@@ -31,7 +32,7 @@ class RepliedMessageCard extends OwnMessage {
       child: Container(
         width: MediaQuery.of(context).size.width,
         color: isSelected
-            ? const Color.fromARGB(255, 129, 142, 221)
+            ?selectColor
             : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(

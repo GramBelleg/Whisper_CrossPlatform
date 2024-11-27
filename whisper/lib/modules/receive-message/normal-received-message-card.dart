@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/receive-message/received-message.dart';
 
@@ -24,7 +25,7 @@ class NormalReceivedMessageCard extends ReceivedMessage {
       child: Container(
         width: MediaQuery.of(context).size.width,
         color: isSelected
-            ? const Color.fromARGB(255, 129, 142, 221)
+            ? selectColor
             : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Column(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/receive-message/received-message.dart';
@@ -30,9 +31,7 @@ class RepliedReceivedMessageCard extends ReceivedMessage {
       alignment: Alignment.centerLeft,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        color: isSelected
-            ? const Color.fromARGB(255, 129, 142, 221)
-            : Colors.transparent,
+        color: isSelected ? selectColor : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,

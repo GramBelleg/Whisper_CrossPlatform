@@ -110,7 +110,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       'forwardedFromUserId': isForward == true ? forwardedFromUserId : null,
       'media': media == null ? null : media,
     };
-    final sender = Sender(id: senderId, userName: "zeyad");
+    final sender = Sender(id: senderId, userName: senderName);
     final newMessage = ChatMessage(
       content: content,
       chatId: chatId,
@@ -133,9 +133,12 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   ChatMessage _parseMessage(Map<String, dynamic> data) {
+    print("${data['parentMessage']}");
     final parentMessage = data['parentMessage'] != null
         ? ParentMessage.fromJson(data['parentMessage'])
         : null;
+        
+    print("i'm here for recieving${parentMessage.toString()}");
     final forwardedFrom = data['forwardedFrom'] != null
         ? ForwardedFrom.fromJson(data['forwardedFrom'])
         : null;

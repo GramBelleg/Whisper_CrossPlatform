@@ -4,7 +4,7 @@ class ParentMessage {
   final String senderName;
   final String? senderProfilePic;
   final String content;
-  final List? media;
+  final String? media;
 
   ParentMessage({
     required this.id,
@@ -35,5 +35,17 @@ class ParentMessage {
       'content': content,
       'media': media,
     };
+  }
+
+  @override
+  String toString() {
+    return 'ParentMessage('
+        'id: $id, '
+        'senderId: $senderId, '
+        'senderName: $senderName, '
+        'senderProfilePic: $senderProfilePic, '
+        'content: $content, '
+        'media: $media'
+        ')';
   }
 }

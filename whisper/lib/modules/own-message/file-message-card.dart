@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/shared-preferences.dart'; // Import for GetToken
@@ -81,15 +82,25 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
     Directory? baseDir = await getExternalStorageDirectory();
     String filePath = "${baseDir!.path}/$fileName";
     setState(() {
-      fileExists = File(filePath).existsSync();
+      setisexisting(File(filePath).existsSync());
+    });
+  }
+
+  void setisdownloading(bool value) {
+    setState(() {
+      isDownloading = value;
+    });
+  }
+
+  void setisexisting(bool value) {
+    setState(() {
+      fileExists = value;
     });
   }
 
   Future<void> _downloadFile(String fileUrl, String fileName) async {
     print(fileUrl);
-    setState(() {
-      isDownloading = true;
-    });
+    setisdownloading(true);
 
     try {
       Directory? baseDir = await getExternalStorageDirectory();
@@ -122,66 +133,13 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
       } else {
         print("File already exists: $filePath");
       }
-      setState(() {
-        fileExists = true;
-      });
+      setisexisting(true);
     } catch (e) {
-      showErrorDialog("Error downloading file: $e");
+      print("Error downloading file: $e");
     } finally {
-      setState(() {
-        isDownloading = false;
-      });
+      setisdownloading(false);
     }
   }
-
-  // Future<void> _openFile(String fileUrl) async {
-  //   try {
-  //     // Get the application's directory for media files
-  //     Directory? baseDir = await getExternalStorageDirectory();
-
-  //     // Build the Whisper folder path
-  //     String whisperFolderPath = baseDir!.path;
-  //     Directory whisperFolder = Directory(whisperFolderPath);
-
-  //     // Ensure the Whisper folder exists
-  //     if (!await whisperFolder.exists()) {
-  //       await whisperFolder.create(recursive: true);
-  //     }
-
-  //     // Extract the file name and extension from the URL
-  //     String fileNameWithParams =
-  //         fileUrl.split('/').last; // Full name with query params
-  //     String fileName =
-  //         fileNameWithParams.split('?').first; // Remove query params
-  //     if (!fileName.contains('.')) {
-  //       throw Exception("File name does not contain an extension.");
-  //     }
-
-  //     String filePath = "$whisperFolderPath/$fileName";
-
-  //     File file = File(filePath);
-
-  //     // Download the file using Dio
-  //     if (!file.existsSync()) {
-  //       print("Downloading file...");
-  //       await dio.download(fileUrl, filePath);
-  //       print("File downloaded: $filePath");
-  //     } else {
-  //       print("File already exists: $filePath");
-  //     }
-
-  //     // Open the file
-  //     final result = await OpenFile.open(filePath);
-
-  //     // Handle open file result
-  //     if (result.type != ResultType.done) {
-  //       showErrorDialog("Failed to open the file. Error: ${result.message}");
-  //     }
-  //   } catch (e) {
-  //     print("Error downloading or opening file: $e");
-  //     showErrorDialog("Error downloading or opening file: $e");
-  //   }
-  // }
 
   Future<void> _openFile(String fileName) async {
     try {
@@ -191,16 +149,11 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
       final result = await OpenFile.open(filePath);
 
       if (result.type != ResultType.done) {
-        showErrorDialog("Failed to open the file. Error: ${result.message}");
+        print("Failed to open the file. Error: ${result.message}");
       }
     } catch (e) {
-      showErrorDialog("Error opening file: $e");
+      print("Error opening file: $e");
     }
-  }
-
-  void showErrorDialog(String message) {
-    // Use a Snackbar or dialog to show error messages
-    print(message);
   }
 
   @override
@@ -210,8 +163,7 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
-          color:
-              widget.isSelected ? const Color(0xFFDCF8C6) : Colors.transparent,
+          color: widget.isSelected ? selectColor : Colors.transparent,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
