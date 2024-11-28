@@ -139,6 +139,7 @@ class _ChatPageState extends State<ChatPage> {
       print("received");
       setState(() {
         paddingSpaceForReplay = 0;
+        _isReplying = false;
       });
       DateTime receivedTime = state.message.time!.toLocal();
       int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
@@ -233,20 +234,24 @@ class _ChatPageState extends State<ChatPage> {
                         width: MediaQuery.of(context).size.width,
                         fit: BoxFit.cover,
                       ),
-                      Container(
-                        height: getContainerHeight(context),
-                        child: Padding(
-                            padding:
-                                EdgeInsets.only(bottom: paddingSpaceForReplay),
-                            child: MessageList(
-                              scrollController: _scrollController2,
-                              messages: messages,
-                              onLongPress: handleLongPressSelection,
-                              onTap: handleOnTapSelection,
-                              onRightSwipe: handleOnRightSwipe,
-                              isSelectedList: isSelectedList,
-                              senderId: widget.senderId!,
-                            )),
+                      Column(
+                        children: [
+                          Container(
+                            height: getContainerHeight(context),
+                            child: Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: paddingSpaceForReplay),
+                                child: MessageList(
+                                  scrollController: _scrollController2,
+                                  messages: messages,
+                                  onLongPress: handleLongPressSelection,
+                                  onTap: handleOnTapSelection,
+                                  onRightSwipe: handleOnRightSwipe,
+                                  isSelectedList: isSelectedList,
+                                  senderId: widget.senderId!,
+                                )),
+                          ),
+                        ],
                       ),
                       Align(
                         alignment: Alignment.bottomCenter,

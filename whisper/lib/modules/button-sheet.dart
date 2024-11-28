@@ -84,7 +84,7 @@ class FileButtonSheet extends StatelessWidget {
     return FilePickerResult(filteredFiles);
   }
 
-  void _pickFile(BuildContext context) async {
+  void _pickFile() async {
     // Use FilePicker to pick multiple files
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
@@ -141,7 +141,7 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
-  void _pickImageFromCamera(BuildContext context) async {
+  void _pickImageFromCamera() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
@@ -155,7 +155,7 @@ class FileButtonSheet extends StatelessWidget {
     }
   }
 
-  void _pickImageFromGallery(BuildContext context) async {
+  void _pickImageFromGallery() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {

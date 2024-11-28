@@ -100,19 +100,17 @@ class _ForwardMenuState extends State<ForwardMenu> {
   }) async {
     for (final messageId in selectedMessageIds) {
       try {
-        final message =
-            await fetchMessage(messageId); // Fetch the message details
+        final message = await fetchMessage(messageId);
         GlobalCubitProvider.messagesCubit.sendMessage(
-              content: message.content, // Message content
-              chatId: friend.id, // Chat ID of the friend
-              senderId: senderId, // Current sender's ID
-              parentMessage: message.parentMessage, // Parent message (if any)
-              senderName: friend.name, // Friend's name
-              isReplying: false, // Is it a reply?
-              isForward: true, // Is it a forwarded message?
-              forwardedFromUserId:
-                  message.sender?.id, // Original sender's ID (if applicable)
-            );
+            content: message.content,
+            chatId: friend.id,
+            senderId: senderId,
+            parentMessage: message.parentMessage,
+            senderName: friend.name,
+            isReplying: false,
+            isForward: true,
+            forwardedFromUserId: message.sender?.id,
+            media: message.media);
         debugPrint("Message forwarded to: ${friend.name}");
       } catch (e) {
         debugPrint(
@@ -122,9 +120,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
   }
 
   void _navigateAfterForwarding(String? token, int? senderId) {
-    if (_selectedFriendIndexes.length == 1) {
+    if (_selectedFriendIndexes.length == 1&&_friends.length!=1) {
       final friend = _friends[_selectedFriendIndexes.first];
-      Navigator.pop(context); // Close the forward menu
+      Navigator.pop(context); 
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -138,7 +136,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
         ),
       );
     } else {
-      Navigator.pop(context); // Close the forward menu
+      Navigator.pop(context); 
     }
   }
 

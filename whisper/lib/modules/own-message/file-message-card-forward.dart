@@ -13,15 +13,17 @@ import 'package:whisper/modules/own-message/file-message-state-handler.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/services/read-file.dart';
 
-class FileMessageCard extends OwnMessage {
+class ForwardedFileMessageCard extends OwnMessage {
   final String blobName;
+  final String forwardedSenderName;
 
-  FileMessageCard({
+  ForwardedFileMessageCard({
     required this.blobName,
     required String message,
     required DateTime time,
     required bool isSelected,
     required MessageStatus status,
+    required this.forwardedSenderName,
     Key? key,
   }) : super(
           message: message,
@@ -33,42 +35,48 @@ class FileMessageCard extends OwnMessage {
 
   @override
   Widget build(BuildContext context) {
-    return _FileMessageCardStateful(
+    return _ForwardedFileMessageCardStateful(
       blobName: blobName,
       message: message,
       time: formatTime(time),
       isSelected: isSelected,
       status: status,
+      forwardedSenderName: forwardedSenderName,
     );
   }
 }
 
-class _FileMessageCardStateful extends StatefulWidget {
+class _ForwardedFileMessageCardStateful extends StatefulWidget {
   final String blobName;
   final String message;
   final String time;
   final bool isSelected;
   final MessageStatus status;
+  final String forwardedSenderName;
 
-  const _FileMessageCardStateful({
+  const _ForwardedFileMessageCardStateful({
     required this.blobName,
     required this.message,
     required this.time,
     required this.isSelected,
     required this.status,
+    required this.forwardedSenderName,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<_FileMessageCardStateful> createState() => _FileMessageCardState();
+  State<_ForwardedFileMessageCardStateful> createState() =>
+      _ForwardedFileMessageCardState();
 }
 
-class _FileMessageCardState extends State<_FileMessageCardStateful> {
+class _ForwardedFileMessageCardState
+    extends State<_ForwardedFileMessageCardStateful> {
   final Dio dio = Dio();
   bool isDownloading = false;
   bool fileExists = false;
   late FileMessageCubit fileMessageCubit = FileMessageCubit(dio: Dio());
   FileMessageStateHandler fileMessageStateHandler = FileMessageStateHandler();
+
   @override
   void initState() {
     super.initState();
@@ -99,29 +107,48 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
                       context, state, setisdownloading, setisexisting),
               builder: (BuildContext context, FileMessageState state) {
                 return Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: widget.isSelected ? selectColor : Colors.transparent,
-                  ),
+                  width: MediaQuery.of(context).size.width,
+                  color: widget.isSelected ? selectColor : Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ConstrainedBox(
                         constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.75,
+                          maxWidth: MediaQuery.of(context).size.width * 0.8,
                         ),
                         child: Card(
-                          color: const Color(0xFF8D6AEE),
+                          color: const Color(0xff8D6AEE),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                            ),
                           ),
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 15),
                           child: Padding(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Display 'Forwarded from' text
+                                Text(
+                                  'Forwarded from:',
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.white70),
+                                ),
+                                Text(
+                                  widget.forwardedSenderName,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                // Display file information
                                 Row(
                                   children: [
                                     Icon(

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:whisper/components/custom-highlight-text.dart';
 import 'package:whisper/components/custom-quick-login.dart';
 import 'package:whisper/components/custom-text-field.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/cubit/file-message-cubit.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';

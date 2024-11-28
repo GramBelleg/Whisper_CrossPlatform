@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/models/chat-messages.dart';
+import 'package:whisper/modules/own-message/file-message-card-forward.dart';
+import 'package:whisper/modules/own-message/file-message-card-replied.dart';
 import 'package:whisper/modules/own-message/file-message-card.dart';
 import 'package:whisper/modules/own-message/forwarded-message-card.dart';
 import 'package:whisper/modules/own-message/normal-message-card.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/own-message/replied-message-card.dart';
+import 'package:whisper/modules/receive-message/file-received-message-card.dart';
+import 'package:whisper/modules/receive-message/forwarded-received-file-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
 import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
+import 'package:whisper/modules/receive-message/replied-received-file-message.dart';
 import 'package:whisper/modules/receive-message/replied-received-message-card.dart';
 
 class MessageList extends StatelessWidget {
@@ -55,7 +60,7 @@ class MessageList extends StatelessWidget {
   }
 
   Widget _buildSenderMessage(ChatMessage messageData) {
-    if (messageData.forwarded == true) {
+    if (messageData.forwarded == true && messageData.media == null) {
       return ForwardedMessageCard(
         message: messageData.content,
         time: messageData.time!,
@@ -64,7 +69,19 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
       );
-    } else if (messageData.parentMessage != null) {
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty) {
+      return ForwardedFileMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        forwardedSenderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.parentMessage != null && messageData.media == null) {
       print(
           "aaaaaa${messageData.content}, ${messageData.time!},${messageData.id != null && isSelectedList.contains(messageData.id!)},${messageData.parentMessage!.content},${messageData.parentMessage!.senderName}");
       return RepliedMessageCard(
@@ -75,6 +92,19 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         repliedContent: messageData.parentMessage!.content,
         repliedSenderName: messageData.parentMessage!.senderName,
+      );
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty) {
+      return RepliedFileMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+        status: MessageStatus.sent,
       );
     } else if (messageData.media != null && messageData.media!.isNotEmpty) {
       return FileMessageCard(
@@ -97,7 +127,7 @@ class MessageList extends StatelessWidget {
   }
 
   Widget _buildReceiverMessage(ChatMessage messageData) {
-    if (messageData.forwarded == true) {
+    if (messageData.forwarded == true && messageData.media == null) {
       return ForwardedReceivedMessageCard(
         message: messageData.content,
         time: messageData.time!,
@@ -106,7 +136,19 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
       );
-    } else if (messageData.parentMessage != null) {
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty) {
+      return ForwardedFileReceivedMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        messageSenderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
         message: messageData.content,
         time: messageData.time!,
@@ -115,6 +157,28 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         repliedContent: messageData.parentMessage!.content,
         repliedSenderName: messageData.parentMessage!.senderName,
+      );
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty) {
+      return FileRepliedReceivedMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.media != null && messageData.media!.isNotEmpty) {
+      return FileReceivedMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
       );
     } else {
       return NormalReceivedMessageCard(
