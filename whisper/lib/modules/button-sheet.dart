@@ -22,6 +22,7 @@ class FileButtonSheet extends StatelessWidget {
   final bool isForward;
   final int? forwardedFromUserId;
   BuildContext context;
+
   FileButtonSheet({
     Key? key,
     required this.chatId,
@@ -58,27 +59,27 @@ class FileButtonSheet extends StatelessWidget {
   }
 
   Future<FilePickerResult?> filterFilesLessThan50MB(
-      FilePickerResult? result) async {
+      FilePickerResult? result, List<String> rejectedFiles) async {
     if (result == null) {
       return null;
     }
 
-    const int maxSizeInBytes = 50 * 1024 * 1024; // 50 MB
-
-    // Filter files less than 50 MB
+    const int maxSizeInBytes = 10 * 1024 * 1024;
     List<PlatformFile> filteredFiles = result.files.where((file) {
       if (file.size < maxSizeInBytes) {
         return true;
       } else if (file.path != null) {
-        // Check size if the file has a path
         final fileInfo = File(file.path!);
-        return fileInfo.lengthSync() < maxSizeInBytes;
+        if (fileInfo.lengthSync() < maxSizeInBytes) {
+          return true;
+        }
       }
+      rejectedFiles.add(file.name); // Add rejected file names
       return false;
     }).toList();
 
     if (filteredFiles.isEmpty) {
-      return null; // Return null if no files meet the criteria
+      return null;
     }
 
     return FilePickerResult(filteredFiles);
@@ -88,28 +89,46 @@ class FileButtonSheet extends StatelessWidget {
     // Use FilePicker to pick multiple files
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
-    result = await filterFilesLessThan50MB(result);
+
+    List<String> rejectedFiles = [];
+    result = await filterFilesLessThan50MB(result, rejectedFiles);
     if (result != null) {
-      // Iterate through the selected files
+      if (rejectedFiles.isNotEmpty) {
+        print(
+            "The following files were too large and skipped: ${rejectedFiles.join(', ')}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                "The following files were too large and skipped: ${rejectedFiles.join(', ')}"),
+          ),
+        );
+      }
       Navigator.of(context).pop();
       for (PlatformFile file in result.files) {
         String? filePath = file.path;
 
         if (filePath != null) {
           print("File selected: ${file.name} at $filePath");
-          // Delegate upload responsibility to the generic _sendFile function
           await _sendFile(filePath);
         } else {
           print("File path is null for ${file.name}");
         }
       }
+    } else if (result == null && rejectedFiles.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "The following files were too large and skipped: ${rejectedFiles.join(', ')}"),
+        ),
+      );
+      Navigator.of(context).pop();
     } else {
-      // User canceled the picker'
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("File selection canceled"),
         ),
       );
+      Navigator.of(context).pop();
       print("File selection canceled");
     }
   }
