@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:whisper/components/custom-chat-text-field.dart';
 import 'package:whisper/components/reply-preview.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/cubit/messages-state.dart';
@@ -232,7 +233,7 @@ class _ChatPageState extends State<ChatPage> {
                         'assets/images/chat-page-back-ground-image.svg',
                         height: MediaQuery.of(context).size.height,
                         width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill, //Todo check in disktop
                       ),
                       Column(
                         children: [
@@ -277,101 +278,22 @@ class _ChatPageState extends State<ChatPage> {
                                 Container(
                                   width: MediaQuery.of(context).size.width - 55,
                                   child: Card(
-                                    margin: const EdgeInsets.only(
-                                        left: 5, right: 5, bottom: 8),
-                                    child: TextFormField(
-                                      scrollController: _scrollController,
-                                      focusNode: focusNode,
-                                      textAlignVertical:
-                                          TextAlignVertical.center,
-                                      keyboardType: TextInputType.multiline,
-                                      minLines: 1,
-                                      maxLines: 5,
-                                      controller: _controller,
-                                      textAlign: _textAlign,
-                                      textDirection: _textDirection,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      onChanged: _updateTextProperties,
-                                      decoration: InputDecoration(
-                                        fillColor: const Color(0xff0A122F),
-                                        filled: true,
-                                        hintText: "Message Here",
-                                        hintStyle: const TextStyle(
-                                            color: Colors.white54),
-                                        contentPadding: const EdgeInsets.all(5),
-                                        prefixIcon: IconButton(
-                                          onPressed: () {
-                                            if (show) {
-                                              focusNode.requestFocus();
-                                              show != show;
-                                            } else {
-                                              showModalBottomSheet(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  context: context,
-                                                  builder: (builder) =>
-                                                      EmojiButtonSheet(
-                                                          onEmojiTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            _toggleEmojiPicker();
-                                                          },
-                                                          onStickerTap: () {},
-                                                          onGifTap: () {}));
-                                            }
-                                          },
-                                          icon: FaIcon(
-                                            show
-                                                ? FontAwesomeIcons.keyboard
-                                                : FontAwesomeIcons.smile,
-                                            color: const Color(0xff8D6AEE),
-                                          ),
-                                        ),
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            showModalBottomSheet(
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                context: context,
-                                                builder: (builder) =>
-                                                    FileButtonSheet(
-                                                      chatId: widget.ChatID,
-                                                      senderId:
-                                                          widget.senderId!,
-                                                      senderName:
-                                                          widget.userName,
-                                                      parentMessage:
-                                                          _replyingTo,
-                                                      isReplying: _isReplying,
-                                                      isForward: false,
-                                                      forwardedFromUserId: null,
-                                                      context: context,
-                                                    ));
-                                          },
-                                          icon: const FaIcon(
-                                            FontAwesomeIcons.paperclip,
-                                            color: Color(0xff8D6AEE),
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                      margin: const EdgeInsets.only(
+                                          left: 5, right: 5, bottom: 8),
+                                      child: CustomChatTextField(
+                                        scrollController: _scrollController,
+                                        focusNode: focusNode,
+                                        controller: _controller,
+                                        onChanged: _updateTextProperties,
+                                        textAlign: _textAlign,
+                                        textDirection: _textDirection,
+                                        toggleEmojiPicker: _toggleEmojiPicker,
+                                        chatId: widget.ChatID,
+                                        senderId: widget.senderId!,
+                                        userName: widget.userName,
+                                        parentMessage: _replyingTo,
+                                        isReplying: _isReplying,
+                                      )),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(bottom: 5),
