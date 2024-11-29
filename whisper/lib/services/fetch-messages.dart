@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:whisper/models/chat-messages.dart'; 
+import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 class ChatViewModel {

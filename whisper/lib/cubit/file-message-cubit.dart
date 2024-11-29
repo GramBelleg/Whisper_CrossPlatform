@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper/cubit/file-message-states.dart';
+import 'package:whisper/services/read-file.dart';
 
 class FileMessageCubit extends Cubit<FileMessageState> {
   final Dio dio;
@@ -19,10 +20,43 @@ class FileMessageCubit extends Cubit<FileMessageState> {
         Directory? baseDir = await getExternalStorageDirectory();
         String filePath = "${baseDir!.path}/$fileName";
         fileExists = File(filePath).existsSync();
-        emit(FileMessageChecked(fileExists: fileExists));
+        if (fileExists) {
+          emit(FileMessageChecked(fileExists: fileExists));
+        } else {
+          // After checking file existence, calculate the size and decide if we need to download
+          String fileUrl = await generatePresignedUrl(
+              fileName); // Assuming you have this function.
+          await checkAndDownloadFile(fileUrl, fileName);
+        }
       }
     } catch (e) {
       emit(FileMessageError(message: "Failed to check file existence: $e"));
+    }
+  }
+
+  Future<void> checkAndDownloadFile(String fileUrl, String fileName) async {
+    try {
+      int fileSize = await calculateFileSize(fileUrl);
+
+      if (fileSize < 10 * 1024 * 1024) {
+        // Size less than 10 MB
+        await downloadFile(fileUrl, fileName);
+      } else {
+        emit(FileMessageError(message: "File is too large to download."));
+      }
+    } catch (e) {
+      emit(FileMessageError(message: "Failed to check and download file: $e"));
+    }
+  }
+
+  Future<int> calculateFileSize(String fileUrl) async {
+    try {
+      Response response = await dio.head(fileUrl);
+      int contentLength =
+          int.parse(response.headers.value('content-length') ?? '0');
+      return contentLength;
+    } catch (e) {
+      throw Exception("Failed to calculate file size: $e");
     }
   }
 

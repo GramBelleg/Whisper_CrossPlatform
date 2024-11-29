@@ -64,7 +64,7 @@ class FileButtonSheet extends StatelessWidget {
       return null;
     }
 
-    const int maxSizeInBytes = 10 * 1024 * 1024;
+    const int maxSizeInBytes = 20 * 1024 * 1024;
     List<PlatformFile> filteredFiles = result.files.where((file) {
       if (file.size < maxSizeInBytes) {
         return true;
@@ -74,7 +74,7 @@ class FileButtonSheet extends StatelessWidget {
           return true;
         }
       }
-      rejectedFiles.add(file.name); // Add rejected file names
+      rejectedFiles.add(file.name); 
       return false;
     }).toList();
 
@@ -86,7 +86,6 @@ class FileButtonSheet extends StatelessWidget {
   }
 
   void _pickFile() async {
-    // Use FilePicker to pick multiple files
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
 
@@ -132,11 +131,8 @@ class FileButtonSheet extends StatelessWidget {
       print("File selection canceled");
     }
   }
-
-// Example function to handle sending the file as a blob
   Future<void> _sendFile(String filePath) async {
     try {
-      // Call the uploadFile function with the selected file path
       String uploadResult = await uploadFile(filePath);
 
       if (uploadResult != 'Failed') {
@@ -164,7 +160,6 @@ class FileButtonSheet extends StatelessWidget {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
 
     if (image != null) {
-      // You can now send the captured image or show a message with the file name
       print("Image captured: ${image.name} at ${image.path}");
 
       // For example, you can send the image in the chat

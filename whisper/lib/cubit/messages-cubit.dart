@@ -137,7 +137,7 @@ class MessagesCubit extends Cubit<MessagesState> {
     final parentMessage = data['parentMessage'] != null
         ? ParentMessage.fromJson(data['parentMessage'])
         : null;
-        
+
     print("i'm here for recieving${parentMessage.toString()}");
     final forwardedFrom = data['forwardedFrom'] != null
         ? ForwardedFrom.fromJson(data['forwardedFrom'])
