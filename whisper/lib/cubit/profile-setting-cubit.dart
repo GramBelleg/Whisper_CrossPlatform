@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:whisper/components/user-state.dart'; 
-import 'package:whisper/services/confirm-code-email-update.dart'; 
+import 'package:whisper/components/user-state.dart';
+import 'package:whisper/services/confirm-code-email-update.dart';
 import 'package:whisper/services/email-code-update.dart';
 import 'package:whisper/services/read-file.dart';
-import 'package:whisper/services/shared-preferences.dart'; 
-import 'package:whisper/services/update-user-field.dart'; 
-import 'package:whisper/socket.dart'; 
+import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/services/update-user-field.dart';
+import 'package:whisper/socket.dart';
 
-part 'profile-setting-state.dart'; 
+part 'profile-setting-state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   bool isEditing = false;
@@ -60,6 +60,9 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   void removeProfilePic() {
     sendProfilePhoto('');
+    final userState = (state as SettingsLoaded).userState;
+    userState?.copyWith(profilePic: '');
+    _emitUpdatedState();
   }
 
   Future<void> loadUserState() async {
