@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/blob-url-manager.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/receive-message/received-message.dart';
@@ -76,7 +77,13 @@ class _VideoReceivedMessageCardState
   Future<void> _initializeVideo() async {
     if (mounted) {
       try {
-        videoUrl = await generatePresignedUrl(widget.blobName);
+        if (BlobUrlManager.isExist(widget.blobName)) {
+          videoUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
+          print("zzzzzzzzzzzzz");
+        } else {
+          videoUrl = await generatePresignedUrl(widget.blobName);
+          BlobUrlManager.addBlobUrl(widget.blobName, videoUrl);
+        }
         _videoController = VideoPlayerController.network(videoUrl)
           ..setVolume(0) // Mute the audio
           ..initialize().then((_) {

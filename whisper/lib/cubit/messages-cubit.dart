@@ -8,12 +8,12 @@ import 'package:whisper/services/chat-deletion-service.dart';
 
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:whisper/socket.dart';
 
 class MessagesCubit extends Cubit<MessagesState> {
   final ChatViewModel _chatViewModel;
   final ChatDeletionService chatDeletionService;
-  IO.Socket? socket;
-
+  final socket = SocketService.instance.socket;
   MessagesCubit(this._chatViewModel, this.chatDeletionService)
       : super(MessagseInitial());
 
@@ -36,26 +36,7 @@ class MessagesCubit extends Cubit<MessagesState> {
     }).toList();
   }
 
-  void connectSocket(String token) {
-    _clearExistingListeners();
-    _initializeSocket(token);
-    _setupSocketListeners();
-  }
-
-  void _clearExistingListeners() {
-    socket?.clearListeners();
-  }
-
-  void _initializeSocket(String token) {
-    socket = IO.io("http://192.168.1.11:5000", <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": false,
-      'query': {'token': "Bearer $token"}
-    });
-    socket?.connect();
-  }
-
-  void _setupSocketListeners() {
+  void setupSocketListeners() {
     socket?.onConnect((_) {
       emit(SocketConnected());
     });
@@ -127,7 +108,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       media: media,
       extension: extension,
     );
-    print("damdddn");
+    print("damdddn$socket");
     socket?.emit('message', messageData);
     print("damdddn");
     emit(MessageSent(newMessage));

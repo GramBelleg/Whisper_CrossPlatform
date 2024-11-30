@@ -8,6 +8,7 @@ import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/modules/login-credentials.dart';
 import 'package:whisper/pages/mainchats-page.dart';
 import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/socket.dart';
 
 Future<void> login(LoginCredentials loginCred, BuildContext context) async {
   final url = Uri.parse('http://192.168.1.11:5000/api/auth/login');
@@ -28,11 +29,9 @@ Future<void> login(LoginCredentials loginCred, BuildContext context) async {
       await SaveEmail(loginCred.email!);
       await SaveId(data['user']['id']);
       ////////
-      var token =
-          await GetToken(); // Make sure GetToken is awaited to fetch the token
-      print("dammmmmmmmmn$token");
+
       // Pass the token to connectSocket
-      GlobalCubitProvider.messagesCubit.connectSocket(token!);
+      SocketService.instance.connectSocket();
       Navigator.pushNamed(context, MainChats.id);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/blob-url-manager.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/receive-message/received-message.dart';
@@ -77,7 +78,11 @@ class _RepliedImageReceivedMessageCardState
   @override
   void initState() {
     super.initState();
-    _generateImageUrl(widget.blobName);
+    if (BlobUrlManager.isExist(widget.blobName)) {
+      imageUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
+    } else {
+      _generateImageUrl(widget.blobName);
+    }
   }
 
   Future<void> _generateImageUrl(String blobName) async {
@@ -85,6 +90,7 @@ class _RepliedImageReceivedMessageCardState
       String url = await generatePresignedUrl(blobName);
       setState(() {
         imageUrl = url;
+        BlobUrlManager.addBlobUrl(widget.blobName, url);
       });
     } catch (e) {
       print('Error generating image URL: $e');
