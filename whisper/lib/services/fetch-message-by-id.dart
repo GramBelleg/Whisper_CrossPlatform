@@ -24,7 +24,7 @@ Future<ChatMessage> fetchMessage(int messageId) async {
   if (response.statusCode == 200) {
     Map<String, dynamic> jsonData = json.decode(response.body);
     ChatMessage message = ChatMessage.fromJson(jsonData);
-    return message; // Return the fetched message
+    return message; 
   } else {
     throw Exception('Failed to load message: ${response.statusCode}');
   }

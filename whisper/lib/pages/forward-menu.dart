@@ -110,7 +110,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
             isReplying: false,
             isForward: true,
             forwardedFromUserId: message.sender?.id,
-            media: message.media);
+            media: message.media,
+            type: message.type,
+            extension: message.extension);
         debugPrint("Message forwarded to: ${friend.name}");
       } catch (e) {
         debugPrint(
@@ -120,9 +122,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
   }
 
   void _navigateAfterForwarding(String? token, int? senderId) {
-    if (_selectedFriendIndexes.length == 1&&_friends.length!=1) {
+    if (_selectedFriendIndexes.length == 1 && _friends.length != 1) {
       final friend = _friends[_selectedFriendIndexes.first];
-      Navigator.pop(context); 
+      Navigator.pop(context);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -136,7 +138,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
         ),
       );
     } else {
-      Navigator.pop(context); 
+      Navigator.pop(context);
     }
   }
 

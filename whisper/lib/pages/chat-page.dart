@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/components/custom-chat-text-field.dart';
 import 'package:whisper/components/reply-preview.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
@@ -10,19 +9,9 @@ import 'package:whisper/cubit/messages-state.dart';
 import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/models/parent-message.dart';
-import 'package:whisper/modules/button-sheet.dart';
 import 'package:whisper/modules/custom-app-bar.dart';
-import 'package:whisper/modules/emoji-button-sheet.dart';
 import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/message-list.dart';
-import 'package:whisper/modules/own-message/file-message-card.dart';
-import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
-import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
-import 'package:whisper/modules/own-message/forwarded-message-card.dart';
-import 'package:whisper/modules/own-message/normal-message-card.dart';
-import 'package:whisper/modules/own-message/own-message.dart';
-import 'package:whisper/modules/own-message/replied-message-card.dart';
-import 'package:whisper/modules/receive-message/replied-received-message-card.dart';
 import 'package:whisper/services/fetch-messages.dart';
 
 class ChatPage extends StatefulWidget {
@@ -138,10 +127,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     } else if (state is MessageReceived) {
       print("received");
-      setState(() {
-        paddingSpaceForReplay = 0;
-        _isReplying = false;
-      });
+      handleOncancelReply();
       DateTime receivedTime = state.message.time!.toLocal();
       int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
       if (state.message.chatId == widget.ChatID) {
@@ -156,6 +142,7 @@ class _ChatPageState extends State<ChatPage> {
         }
       }
     } else if (state is MessagesDeletedSuccessfully) {
+      print("deletedk${state.deletedIds}");
       setState(() {
         messages.removeWhere((msg) => state.deletedIds.contains(msg.id));
       });
@@ -205,6 +192,32 @@ class _ChatPageState extends State<ChatPage> {
           senderName: messageData.sender!.userName);
       paddingSpaceForReplay = 70;
     });
+  }
+
+  void handleOncancelReply() {
+    print("cancel reply");
+    setState(() {
+      _isReplying = false;
+      _replyingTo = null;
+      paddingSpaceForReplay = 0;
+    });
+  }
+
+  void handleSendMessage() {
+    if (_isTyping) {
+      GlobalCubitProvider.messagesCubit.sendMessage(
+        content: _controller.text,
+        chatId: widget.ChatID,
+        senderId: widget.senderId!,
+        parentMessage: _replyingTo,
+        senderName: widget.userName,
+        isReplying: _isReplying,
+        isForward: false,
+        type: "TEXT",
+      );
+      _controller.clear();
+      handleOncancelReply();
+    } else {}
   }
 
   @override
@@ -264,11 +277,7 @@ class _ChatPageState extends State<ChatPage> {
                               senderName: widget.userName,
                               content: _replyingTo?.content ?? '',
                               onCancelReply: () {
-                                setState(() {
-                                  _isReplying = false;
-                                  _replyingTo = null;
-                                  paddingSpaceForReplay = 0;
-                                });
+                                handleOncancelReply();
                               },
                             ),
                             Row(
@@ -293,6 +302,8 @@ class _ChatPageState extends State<ChatPage> {
                                         userName: widget.userName,
                                         parentMessage: _replyingTo,
                                         isReplying: _isReplying,
+                                        handleOncancelReply:
+                                            handleOncancelReply,
                                       )),
                                 ),
                                 Padding(
@@ -302,24 +313,7 @@ class _ChatPageState extends State<ChatPage> {
                                     backgroundColor: Color(0xff0A122F),
                                     child: IconButton(
                                       onPressed: () {
-                                        if (_isTyping) {
-                                          GlobalCubitProvider.messagesCubit
-                                              .sendMessage(
-                                            content: _controller.text,
-                                            chatId: widget.ChatID,
-                                            senderId: widget.senderId!,
-                                            parentMessage: _replyingTo,
-                                            senderName: widget.userName,
-                                            isReplying: _isReplying,
-                                            isForward: false,
-                                          );
-                                          _controller.clear();
-                                          setState(() {
-                                            _isTyping = false;
-                                            _isReplying = false;
-                                            _replyingTo = null;
-                                          });
-                                        } else {}
+                                        handleSendMessage();
                                       },
                                       icon: FaIcon(
                                         _isTyping

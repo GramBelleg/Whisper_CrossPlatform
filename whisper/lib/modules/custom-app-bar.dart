@@ -102,14 +102,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
       try {
         await viewModel.deleteMessagesForEveryone(
             widget.chatId, widget.isSelected);
-        // Clear the selection after deletion
         if (widget.clearSelection != null) {
           widget.clearSelection!();
         }
 
-        Navigator.of(context).pop(); // Close the dialog
+        Navigator.of(context).pop(); 
       } catch (e) {
-        // Handle any errors that occur during deletion
         print('Error deleting messages for everyone: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error deleting messages for everyone: $e')),
@@ -117,7 +115,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       }
     } else {
       Navigator.of(context)
-          .pop(); // Close the dialog if no messages are selected
+          .pop(); 
     }
   }
 

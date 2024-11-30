@@ -49,9 +49,8 @@ dependencies:
   dio: ^5.7.0
   open_file: ^3.5.10
   flutter_cached_pdfview: ^0.4.3
-  # audioplayers: ^6.1.0
-  # path_provider: ^2.0.11
-
+  video_player: ^2.9.2
+  visibility_detector: ^0.4.0+2
   flutter:
     sdk: flutter
 

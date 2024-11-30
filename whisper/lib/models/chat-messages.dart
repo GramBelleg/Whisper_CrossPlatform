@@ -23,6 +23,7 @@ class ChatMessage {
   final String type;
   final ParentMessage? parentMessage;
   final ForwardedFrom? forwardedFrom;
+  final String? extension;
 
   ChatMessage({
     this.id,
@@ -45,6 +46,7 @@ class ChatMessage {
     required this.type,
     this.parentMessage,
     this.forwardedFrom,
+    this.extension,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,7 @@ class ChatMessage {
       forwardedFrom: json['forwardedFrom'] != null
           ? ForwardedFrom.fromJson(json['forwardedFrom'])
           : null,
+      extension: json['extension'],
     );
   }
 
@@ -100,6 +103,7 @@ class ChatMessage {
       'type': type,
       'parentMessage': parentMessage?.toJson(),
       'forwardedFrom': forwardedFrom?.toJson(),
+      'extension': extension
     };
   }
 

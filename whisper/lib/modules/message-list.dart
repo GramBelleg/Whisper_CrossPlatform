@@ -4,16 +4,28 @@ import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/modules/own-message/file-message-card-forward.dart';
 import 'package:whisper/modules/own-message/file-message-card-replied.dart';
 import 'package:whisper/modules/own-message/file-message-card.dart';
+import 'package:whisper/modules/own-message/forward-image-message-card.dart';
+import 'package:whisper/modules/own-message/forward-vedio-message-card.dart';
 import 'package:whisper/modules/own-message/forwarded-message-card.dart';
+import 'package:whisper/modules/own-message/image-message-card-replied.dart';
+import 'package:whisper/modules/own-message/image-message-card.dart';
 import 'package:whisper/modules/own-message/normal-message-card.dart';
 import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/own-message/replied-message-card.dart';
+import 'package:whisper/modules/own-message/replied-video-message-card.dart';
+import 'package:whisper/modules/own-message/video-message-card.dart';
 import 'package:whisper/modules/receive-message/file-received-message-card.dart';
+import 'package:whisper/modules/receive-message/forwarded-receive-vedio-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-file-message-card.dart';
+import 'package:whisper/modules/receive-message/forwarded-received-image-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-message-card.dart';
+import 'package:whisper/modules/receive-message/image-received-message-card.dart';
 import 'package:whisper/modules/receive-message/normal-received-message-card.dart';
+import 'package:whisper/modules/receive-message/replied-image-receieved-message-card.dart';
+import 'package:whisper/modules/receive-message/replied-receive-vedio-message-card.dart';
 import 'package:whisper/modules/receive-message/replied-received-file-message.dart';
 import 'package:whisper/modules/receive-message/replied-received-message-card.dart';
+import 'package:whisper/modules/receive-message/vedio-receive-message-card.dart';
 
 class MessageList extends StatelessWidget {
   final ScrollController scrollController;
@@ -71,8 +83,35 @@ class MessageList extends StatelessWidget {
       );
     } else if (messageData.forwarded == true &&
         messageData.media != null &&
-        messageData.media!.isNotEmpty) {
+        messageData.media!.isNotEmpty &&
+        messageData.type == "DOC") {
       return ForwardedFileMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        forwardedSenderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "IMAGE") {
+      return ForwardedImageMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        forwardedSenderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VIDEO") {
+      return ForwardedVideoMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -95,7 +134,8 @@ class MessageList extends StatelessWidget {
       );
     } else if (messageData.parentMessage != null &&
         messageData.media != null &&
-        messageData.media!.isNotEmpty) {
+        messageData.media!.isNotEmpty &&
+        messageData.type == "DOC") {
       return RepliedFileMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
@@ -106,8 +146,60 @@ class MessageList extends StatelessWidget {
         repliedSenderName: messageData.parentMessage!.senderName,
         status: MessageStatus.sent,
       );
-    } else if (messageData.media != null && messageData.media!.isNotEmpty) {
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "IMAGE") {
+      return RepliedImageMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VIDEO") {
+      return RepliedVideoMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "DOC") {
       return FileMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "IMAGE")) {
+      return ImageMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VIDEO")) {
+      return VideoMessageCard(
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -138,7 +230,8 @@ class MessageList extends StatelessWidget {
       );
     } else if (messageData.forwarded == true &&
         messageData.media != null &&
-        messageData.media!.isNotEmpty) {
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "DOC")) {
       return ForwardedFileReceivedMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
@@ -147,6 +240,32 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "IMAGE")) {
+      return ForwardedReceivedImageMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        messageSenderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VIDEO")) {
+      return ForwardedReceivedVideoMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        messageSenderName: messageData.forwardedFrom!.userName,
       );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
@@ -160,7 +279,8 @@ class MessageList extends StatelessWidget {
       );
     } else if (messageData.parentMessage != null &&
         messageData.media != null &&
-        messageData.media!.isNotEmpty) {
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "DOC")) {
       return FileRepliedReceivedMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
@@ -171,8 +291,60 @@ class MessageList extends StatelessWidget {
         repliedSenderName: messageData.parentMessage!.senderName,
         status: MessageStatus.sent,
       );
-    } else if (messageData.media != null && messageData.media!.isNotEmpty) {
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "IMAGE")) {
+      return RepliedImageReceivedMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+      );
+    } else if (messageData.parentMessage != null &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VIDEO")) {
+      return RepliedReceivedVideoMessageCard(
+        blobName: messageData.parentMessage!.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        repliedContent: messageData.parentMessage!.content,
+        repliedSenderName: messageData.parentMessage!.senderName,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "DOC")) {
       return FileReceivedMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "IMAGE")) {
+      return ImageReceivedMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VIDEO")) {
+      return VideoReceivedMessageCard(
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,

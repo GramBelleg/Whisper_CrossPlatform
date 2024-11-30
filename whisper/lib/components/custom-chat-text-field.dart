@@ -14,9 +14,10 @@ class CustomChatTextField extends StatefulWidget {
   final int chatId;
   final int senderId;
   final String userName;
-  ParentMessage? parentMessage;
+  final ParentMessage? parentMessage;
   final bool isReplying;
   final VoidCallback toggleEmojiPicker;
+  final VoidCallback handleOncancelReply;
 
   CustomChatTextField({
     required this.scrollController,
@@ -29,8 +30,9 @@ class CustomChatTextField extends StatefulWidget {
     required this.chatId,
     required this.senderId,
     required this.userName,
-    this.parentMessage,
+    required this.parentMessage,
     required this.isReplying,
+    required this.handleOncancelReply,
     Key? key,
   }) : super(key: key);
 
@@ -135,6 +137,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
         isForward: false,
         forwardedFromUserId: null,
         context: context,
+        handleOncancelReply: widget.handleOncancelReply,
       ),
     );
   }

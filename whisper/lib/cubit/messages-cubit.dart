@@ -60,7 +60,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       emit(SocketConnected());
     });
 
-    socket?.on('receiveMessage', (data) {
+    socket?.on('message', (data) {
       _handleReceivedMessage(data);
     });
 
@@ -94,21 +94,24 @@ class MessagesCubit extends Cubit<MessagesState> {
       required bool isReplying,
       required bool isForward,
       int? forwardedFromUserId,
-      String? media}) {
+      String? media,
+      String? extension,
+      required String type}) {
     int nowMillis = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     print("Current time in milliseconds: $nowMillis");
-
+    print("extension: $extension  type: $type");
     final messageData = {
       'content': content,
       'chatId': chatId,
-      'type': 'TEXT',
+      'type': type,
       'sentAt': DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true)
           .toIso8601String(),
       'parentMessageId': parentMessage == null ? null : parentMessage.id,
       'forwarded': isForward,
       'forwardedFromUserId': isForward == true ? forwardedFromUserId : null,
       'media': media == null ? null : media,
+      'extension': extension,
     };
     final sender = Sender(id: senderId, userName: senderName);
     final newMessage = ChatMessage(
@@ -117,13 +120,16 @@ class MessagesCubit extends Cubit<MessagesState> {
       sender: sender,
       sentAt:
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
-      type: 'TEXT',
+      type: type,
       time:
           DateTime.fromMillisecondsSinceEpoch(nowMillis, isUtc: true).toLocal(),
       parentMessage: parentMessage,
       media: media,
+      extension: extension,
     );
-    socket?.emit('sendMessage', messageData);
+    print("damdddn");
+    socket?.emit('message', messageData);
+    print("damdddn");
     emit(MessageSent(newMessage));
   }
 
@@ -133,7 +139,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   ChatMessage _parseMessage(Map<String, dynamic> data) {
-    print("${data['parentMessage']}");
+    print("aazazaza${data['parentMessage']}");
     final parentMessage = data['parentMessage'] != null
         ? ParentMessage.fromJson(data['parentMessage'])
         : null;
@@ -142,7 +148,7 @@ class MessagesCubit extends Cubit<MessagesState> {
     final forwardedFrom = data['forwardedFrom'] != null
         ? ForwardedFrom.fromJson(data['forwardedFrom'])
         : null;
-
+    print("i'm here for recievinggggg${data['type']}");
     return ChatMessage(
       id: data['id'],
       chatId: data['chatId'],
@@ -168,6 +174,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       type: data['type'],
       parentMessage: parentMessage,
       forwardedFrom: forwardedFrom,
+      extension: data['extension'],
     );
   }
 
@@ -184,21 +191,23 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void emitDeleteMessageForEveryone(List<int> ids, int chatId) {
     final data = {
-      'Ids': ids,
+      'messages': ids,
       'chatId': chatId,
     };
 
     try {
-      socket?.emit('deleteMessage', data);
       emit(MessagesDeletedSuccessfully(ids));
+      socket?.emit('deleteMessage', data);
+      print("i'm her for deleting ${data}");
     } catch (e) {
       emit(MessagesDeleteError(e.toString()));
     }
   }
 
   void _handleDeletedMessage(Map<String, dynamic> data) {
-    final ids = List<int>.from(data['Ids']);
+    final ids = List<int>.from(data['messages']);
     final chatId = data['chatId'];
+    print("daaaaaaaaaaaaaaaaaaaa");
     emit(MessagesDeletedSuccessfully(ids));
   }
 }
