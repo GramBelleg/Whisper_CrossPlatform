@@ -7,10 +7,10 @@ class VisibilityCubit extends Cubit<Map<String, dynamic>> {
   final VisibilityService _visibilityService;
 
   VisibilityCubit(this._visibilityService) : super({}) {
-    _loadVisibilitySettings();
+    loadVisibilitySettings();
   }
 
-  Future<void> _loadVisibilitySettings() async {
+  Future<void> loadVisibilitySettings() async {
     try {
       final settings = await _visibilityService.getVisibilitySettings();
       emit(settings);
@@ -19,27 +19,27 @@ class VisibilityCubit extends Cubit<Map<String, dynamic>> {
     }
   }
 
-  void updateProfilePictureVisibility(String visibility) {
-    _updateVisibilitySetting('pfp', visibility);
+  Future<void> updateProfilePictureVisibility(String visibility) async {
+    await updateVisibilitySetting('pfp', visibility);
   }
 
-  void updateLastSeenVisibility(String visibility) {
-    _updateVisibilitySetting('lastSeen', visibility);
+  Future<void> updateLastSeenVisibility(String visibility) async {
+    await updateVisibilitySetting('lastSeen', visibility);
   }
 
-  void updateStoriesVisibility(String visibility) {
-    _updateVisibilitySetting('story', visibility);
+  Future<void> updateStoriesVisibility(String visibility) async {
+    await updateVisibilitySetting('story', visibility);
   }
 
-  void updateReadReceipts(bool value) {
-    _updateVisibilitySetting('readReceipts', value);
+  Future<void> updateReadReceipts(bool value) async {
+    await updateVisibilitySetting('readReceipts', value);
   }
 
-  void updateAddMeToGroupsVisibility(String visibility) {
-    _updateVisibilitySetting('addMeToGroups', visibility);
+  Future<void> updateAddMeToGroupsVisibility(String visibility) async {
+    await updateVisibilitySetting('addMeToGroups', visibility);
   }
 
-  Future<void> _updateVisibilitySetting(String key, dynamic value) async {
+  Future<void> updateVisibilitySetting(String key, dynamic value) async {
     try {
       await _visibilityService.updateVisibilitySetting(key, value);
       final updatedSettings = await _visibilityService.getVisibilitySettings();
