@@ -15,6 +15,12 @@ class VisibilitySettingsPage extends StatefulWidget {
 
 class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
   @override
+  void initState() {
+    super.initState();
+    context.read<VisibilityCubit>().loadVisibilitySettings();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: firstNeutralColor,
@@ -28,6 +34,13 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
       ),
       body: BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
         builder: (context, privacyState) {
+          final profilePictureVisibility =
+              privacyState['pfpPrivacy'] ?? 'Unknown';
+          final storiesVisibility = privacyState['storyPrivacy'] ?? 'Unknown';
+          final lastSeenVisibility =
+              privacyState['lastSeenPrivacy'] ?? 'Unknown';
+          final readReceipts = privacyState['readReceipts'] ?? false;
+
           return ListView(
             children: [
               ListTile(
@@ -40,7 +53,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      privacyState['pfpPrivacy'],
+                      profilePictureVisibility,
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -50,7 +63,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   showVisibilityOptions(
                     context,
                     "Who can see my profile picture?",
-                    privacyState['pfpPrivacy'],
+                    profilePictureVisibility,
                     (value) {
                       context
                           .read<VisibilityCubit>()
@@ -69,7 +82,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      privacyState['storyPrivacy'],
+                      storiesVisibility,
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -79,7 +92,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                   showVisibilityOptions(
                     context,
                     "Who can see my stories?",
-                    privacyState['storyPrivacy'],
+                    storiesVisibility,
                     (value) {
                       context
                           .read<VisibilityCubit>()
@@ -98,7 +111,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Text(
-                      privacyState['lastSeenPrivacy'],
+                      lastSeenVisibility,
                       style: TextStyle(color: primaryColor.withOpacity(0.6)),
                     )
                   ],
@@ -106,7 +119,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 onTap: () {
                   if (kDebugMode) print("last seen visibility");
                   showVisibilityOptions(context, "Who can see my last seen?",
-                      privacyState['lastSeenPrivacy'], (value) {
+                      lastSeenVisibility, (value) {
                     context
                         .read<VisibilityCubit>()
                         .updateLastSeenVisibility(value);
@@ -123,7 +136,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                     ),
                     Switch(
                       key: VisibilitySettingsKeys.readReceiptsSwitch,
-                      value: privacyState['readReceipts'],
+                      value: readReceipts,
                       onChanged: (bool value) {
                         if (kDebugMode) print("read receipts");
                         context

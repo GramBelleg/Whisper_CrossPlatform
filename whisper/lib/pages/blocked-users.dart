@@ -11,6 +11,14 @@ class BlockedUsersPage extends StatefulWidget {
 }
 
 class _BlockedUsersPageState extends State<BlockedUsersPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch blocked users when the page is initialized
+    context.read<BlockedUsersCubit>().fetchBlockedUsers();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
