@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,6 +14,7 @@ import 'package:whisper/modules/custom-app-bar.dart';
 import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/message-list.dart';
 import 'package:whisper/services/fetch-messages.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -53,6 +55,11 @@ class _ChatPageState extends State<ChatPage> {
   bool _isReplying = false; // Tracks if in reply mode
   double paddingSpaceForReplay = 0;
 
+  // Voice Recording Utilities
+  bool _isRecording = false;
+  bool _isPlaying = false;
+  RecorderController recorderController = RecorderController();
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +78,7 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     _controller.dispose();
     focusNode.dispose();
+    recorderController.dispose();
     super.dispose();
   }
 
@@ -220,6 +228,21 @@ class _ChatPageState extends State<ChatPage> {
     } else {}
   }
 
+  void startRecording() async {
+    try {
+      bool permission = await recorderController.checkPermission();
+      if (permission) await recorderController.record();
+    } catch (e) {
+      if (kDebugMode) print("Failed to start recording: $e");
+    }
+  }
+
+  void stopRecording() async {
+    final path = await recorderController.stop();
+    if (kDebugMode) print("Recording saved at: $path");
+    // Send the audio file or save it in the chat
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -287,41 +310,88 @@ class _ChatPageState extends State<ChatPage> {
                                 Container(
                                   width: MediaQuery.of(context).size.width - 55,
                                   child: Card(
-                                      margin: const EdgeInsets.only(
-                                          left: 5, right: 5, bottom: 8),
-                                      child: CustomChatTextField(
-                                        scrollController: _scrollController,
-                                        focusNode: focusNode,
-                                        controller: _controller,
-                                        onChanged: _updateTextProperties,
-                                        textAlign: _textAlign,
-                                        textDirection: _textDirection,
-                                        toggleEmojiPicker: _toggleEmojiPicker,
-                                        chatId: widget.ChatID,
-                                        senderId: widget.senderId!,
-                                        userName: widget.userName,
-                                        parentMessage: _replyingTo,
-                                        isReplying: _isReplying,
-                                        handleOncancelReply:
-                                            handleOncancelReply,
-                                      )),
+                                    margin: const EdgeInsets.only(
+                                        left: 5, right: 5, bottom: 8),
+                                    child: _isRecording
+                                        ? AudioWaveforms(
+                                            recorderController:
+                                                recorderController,
+                                            size: Size(
+                                                MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                50.0),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xff0A122F),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            waveStyle: const WaveStyle(
+                                              waveColor: Color(0xff8D6AEE),
+                                              extendWaveform: true,
+                                              showMiddleLine: false,
+                                            ),
+                                          )
+                                        : CustomChatTextField(
+                                            scrollController: _scrollController,
+                                            focusNode: focusNode,
+                                            controller: _controller,
+                                            onChanged: _updateTextProperties,
+                                            textAlign: _textAlign,
+                                            textDirection: _textDirection,
+                                            toggleEmojiPicker:
+                                                _toggleEmojiPicker,
+                                            chatId: widget.ChatID,
+                                            senderId: widget.senderId!,
+                                            userName: widget.userName,
+                                            parentMessage: _replyingTo,
+                                            isReplying: _isReplying,
+                                            handleOncancelReply:
+                                                handleOncancelReply,
+                                          ),
+                                  ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(bottom: 5),
                                   child: CircleAvatar(
                                     radius: 24,
                                     backgroundColor: Color(0xff0A122F),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        handleSendMessage();
-                                      },
-                                      icon: FaIcon(
-                                        _isTyping
-                                            ? FontAwesomeIcons.paperPlane
-                                            : FontAwesomeIcons.microphone,
-                                        color: Color(0xff8D6AEE),
-                                      ),
-                                    ),
+                                    child: _isRecording && !_isTyping
+                                        ? IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                stopRecording();
+                                                _isRecording = false;
+                                              });
+                                            },
+                                            icon: FaIcon(
+                                              FontAwesomeIcons.stop,
+                                              color: Color(0xff8D6AEE),
+                                            ),
+                                          )
+                                        : _isTyping
+                                            ? IconButton(
+                                                onPressed: () {
+                                                  handleSendMessage();
+                                                },
+                                                icon: FaIcon(
+                                                  FontAwesomeIcons.paperPlane,
+                                                  color: Color(0xff8D6AEE),
+                                                ),
+                                              )
+                                            : IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    startRecording();
+                                                    _isRecording = true;
+                                                    _isTyping = false;
+                                                  });
+                                                },
+                                                icon: FaIcon(
+                                                  FontAwesomeIcons.microphone,
+                                                  color: Color(0xff8D6AEE),
+                                                ),
+                                              ),
                                   ),
                                 ),
                               ],
