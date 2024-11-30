@@ -174,7 +174,7 @@ class _SettingsContentState extends State<SettingsContent> {
           return;
         }
         //verify my code
-        print("the code is:           " + message);
+        print("the code:           " + message);
         final response = await context
             .read<SettingsCubit>()
             .verifyCode(message, email, context);
@@ -336,39 +336,6 @@ class _SettingsContentState extends State<SettingsContent> {
                     VisibilitySettingsKeys.blockedUsersTile),
                 SizedBox(
                   height: 6,
-                ),
-                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
-                  builder: (context, privacyState) {
-                    return ListTile(
-                      key: VisibilitySettingsKeys.addMeToGroupsTile,
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Who can add me to groups?",
-                              style: TextStyle(color: secondNeutralColor)),
-                          Text(
-                            privacyState['addMeToGroups'] ??
-                                "No Backend Endpoint",
-                            style:
-                                TextStyle(color: primaryColor.withOpacity(0.6)),
-                          )
-                        ],
-                      ),
-                      onTap: () {
-                        if (kDebugMode) print("add me to groups");
-                        showVisibilityOptions(
-                          context,
-                          "Who can add me to groups?",
-                          privacyState['addMeToGroups'],
-                          (value) {
-                            context
-                                .read<VisibilityCubit>()
-                                .updateAddMeToGroupsVisibility(value);
-                          },
-                        );
-                      },
-                    );
-                  },
                 ),
                 CustomAccessButton(
                   key: Key(HomeKeys.logoutFromOneButtonKey),

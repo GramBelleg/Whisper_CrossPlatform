@@ -89,6 +89,9 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   font_awesome_flutter: ^10.7.0
   test: ^1.25.7
+  bloc_test: ^9.1.1
+  build_runner: ^2.4.6
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
