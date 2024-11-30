@@ -4,10 +4,10 @@ import 'package:whisper/services/blocked_users_service.dart';
 class BlockedUsersCubit extends Cubit<List<Map<String, dynamic>>> {
   final BlockedUsersService _blockedUsersService;
   BlockedUsersCubit(this._blockedUsersService) : super([]) {
-    _fetchBlockedUsers();
+    fetchBlockedUsers();
   }
 
-  Future<void> _fetchBlockedUsers() async {
+  Future<void> fetchBlockedUsers() async {
     try {
       final blockedUsers = await _blockedUsersService.fetchBlockedUsers();
       emit(blockedUsers);

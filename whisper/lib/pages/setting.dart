@@ -337,39 +337,6 @@ class _SettingsContentState extends State<SettingsContent> {
                 SizedBox(
                   height: 6,
                 ),
-                BlocBuilder<VisibilityCubit, Map<String, dynamic>>(
-                  builder: (context, privacyState) {
-                    return ListTile(
-                      key: VisibilitySettingsKeys.addMeToGroupsTile,
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Who can add me to groups?",
-                              style: TextStyle(color: secondNeutralColor)),
-                          Text(
-                            privacyState['addMeToGroups'] ??
-                                "No Backend Endpoint",
-                            style:
-                                TextStyle(color: primaryColor.withOpacity(0.6)),
-                          )
-                        ],
-                      ),
-                      onTap: () {
-                        if (kDebugMode) print("add me to groups");
-                        showVisibilityOptions(
-                          context,
-                          "Who can add me to groups?",
-                          privacyState['addMeToGroups'],
-                          (value) {
-                            context
-                                .read<VisibilityCubit>()
-                                .updateAddMeToGroupsVisibility(value);
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
                 CustomAccessButton(
                   key: Key(HomeKeys.logoutFromOneButtonKey),
                   label: "Logout From This Device",

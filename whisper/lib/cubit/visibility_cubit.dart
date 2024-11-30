@@ -35,10 +35,6 @@ class VisibilityCubit extends Cubit<Map<String, dynamic>> {
     await updateVisibilitySetting('readReceipts', value);
   }
 
-  Future<void> updateAddMeToGroupsVisibility(String visibility) async {
-    await updateVisibilitySetting('addMeToGroups', visibility);
-  }
-
   Future<void> updateVisibilitySetting(String key, dynamic value) async {
     try {
       await _visibilityService.updateVisibilitySetting(key, value);
