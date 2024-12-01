@@ -8,7 +8,7 @@ Future<String> uploadFile(String filePath) async {
   print("Uploading file: $filePath");
   String fileExtension = p.extension(filePath);
   print("File extension: $fileExtension");
-  final String apiUrl = 'http://192.168.1.110:5000/api/media/write';
+  final String apiUrl = 'http://192.168.2.100:5000/api/media/write';
   String? token = await GetToken();
 
   if (token == null) {

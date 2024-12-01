@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<String> generatePresignedUrl(String blobName) async {
-  final String apiUrl = 'http://192.168.1.110:5000/api/media/read';
+  final String apiUrl = 'http://192.168.2.100:5000/api/media/read';
   String? token = await GetToken();
 
   final response = await http.post(

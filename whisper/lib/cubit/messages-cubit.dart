@@ -47,7 +47,7 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   void _initializeSocket(String token) {
-    socket = IO.io("http://192.168.1.110:5000", <String, dynamic>{
+    socket = IO.io("http://192.168.2.100:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}

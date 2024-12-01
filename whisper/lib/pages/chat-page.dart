@@ -15,6 +15,8 @@ import 'package:whisper/modules/emoji-select.dart';
 import 'package:whisper/modules/message-list.dart';
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:whisper/services/upload-file.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -231,7 +233,15 @@ class _ChatPageState extends State<ChatPage> {
   void startRecording() async {
     try {
       bool permission = await recorderController.checkPermission();
-      if (permission) await recorderController.record();
+      final downloadsDirectory = await getExternalStorageDirectory();
+      if (permission) {
+        await recorderController.record(
+          path:
+              '${downloadsDirectory!.path}/whisper_record_${DateTime.now().millisecondsSinceEpoch}.m4a',
+          bitRate: 128000,
+          sampleRate: 44100,
+        );
+      }
     } catch (e) {
       if (kDebugMode) print("Failed to start recording: $e");
     }
@@ -241,6 +251,24 @@ class _ChatPageState extends State<ChatPage> {
     final path = await recorderController.stop();
     if (kDebugMode) print("Recording saved at: $path");
     // Send the audio file or save it in the chat
+    if (path != null) {
+      final blobName = await uploadFile(path);
+      if (kDebugMode) print("UPLOADED FILE NOW WITH BLOBNAME = $blobName");
+      if (blobName != 'Failed') {
+        GlobalCubitProvider.messagesCubit.sendMessage(
+          extension: path.split('.').last,
+          content: blobName,
+          chatId: widget.ChatID,
+          senderId: widget.senderId!,
+          parentMessage: _replyingTo,
+          senderName: widget.userName,
+          isReplying: _isReplying,
+          isForward: false,
+          type: "VM",
+          media: blobName,
+        );
+      }
+    }
   }
 
   @override
