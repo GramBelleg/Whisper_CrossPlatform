@@ -66,6 +66,7 @@ dependencies:
   shared_preferences: ^2.3.2
   http: ^1.2.2
   webview_flutter: ^4.10.0
+  audio_waveforms: ^1.1.1
 
 dev_dependencies:
   flutter_test:

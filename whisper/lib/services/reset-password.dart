@@ -8,7 +8,7 @@ import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> resetPassword(
     ResetPasswordCredentials resetPassCred, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/resetPassword');
+  final url = Uri.parse('http://192.168.2.100:5000/api/auth/resetPassword');
   resetPassCred.email = await GetEmail();
   try {
     final response = await http.post(

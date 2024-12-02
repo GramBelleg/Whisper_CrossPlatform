@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/models/chat-messages.dart';
@@ -14,6 +15,7 @@ import 'package:whisper/modules/own-message/own-message.dart';
 import 'package:whisper/modules/own-message/replied-message-card.dart';
 import 'package:whisper/modules/own-message/replied-video-message-card.dart';
 import 'package:whisper/modules/own-message/video-message-card.dart';
+import 'package:whisper/modules/own-message/voice_message_card.dart';
 import 'package:whisper/modules/receive-message/file-received-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-receive-vedio-message-card.dart';
 import 'package:whisper/modules/receive-message/forwarded-received-file-message-card.dart';
@@ -207,7 +209,22 @@ class MessageList extends StatelessWidget {
             messageData.id != null && isSelectedList.contains(messageData.id!),
         blobName: messageData.media!,
       );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VM") {
+      if (kDebugMode) print("RECEIVED VOICE MESSAGE HERE");
+      if (kDebugMode) print("media=${messageData.media}, type=${messageData.type}");
+      return VoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected:
+            messageData.id != null && isSelectedList.contains(messageData.id!),
+      );
     } else {
+      if (kDebugMode) print("RECEIVED NORMAL MESSAGE HERE");
+      if (kDebugMode) print("media=${messageData.media}, type=${messageData.type}");
       return NormalMessageCard(
         message: messageData.content,
         time: messageData.time!,

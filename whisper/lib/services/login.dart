@@ -11,7 +11,7 @@ import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/socket.dart';
 
 Future<void> login(LoginCredentials loginCred, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/login');
+  final url = Uri.parse('http://192.168.2.100:5000/api/auth/login');
   try {
     final response = await http.post(
       url,

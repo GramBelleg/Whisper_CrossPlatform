@@ -127,7 +127,6 @@ class _SelectedImageCaptioningState extends State<SelectedImageCaptioning> {
                         onPressed: () {
                           setState(() {
                             currentIndex--;
-                            _controller.clear();
                             _initializeMedia();
                           });
                         },
@@ -139,7 +138,6 @@ class _SelectedImageCaptioningState extends State<SelectedImageCaptioning> {
                         onPressed: () {
                           setState(() {
                             currentIndex++;
-                            _controller.clear();
                             _initializeMedia();
                           });
                         },

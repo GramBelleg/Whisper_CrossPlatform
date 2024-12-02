@@ -6,7 +6,7 @@ import 'package:whisper/pages/reset-password.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<void> sendResetCode(String email, BuildContext context) async {
-  final url = Uri.parse('http://192.168.1.11:5000/api/auth/sendResetCode');
+  final url = Uri.parse('http://192.168.2.100:5000/api/auth/sendResetCode');
   try {
     final response = await http.post(
       url,

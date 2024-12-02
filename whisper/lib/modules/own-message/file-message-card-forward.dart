@@ -152,7 +152,7 @@ class _ForwardedFileMessageCardState
                                 Row(
                                   children: [
                                     Icon(
-                                      FontAwesomeIcons.filePdf,
+                                      FontAwesomeIcons.file,
                                       color: Colors.white,
                                       size: 18,
                                     ),
