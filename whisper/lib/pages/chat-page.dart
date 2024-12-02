@@ -190,7 +190,7 @@ class _ChatPageState extends State<ChatPage> {
           id: messageData.id!,
           content: messageData.content,
           senderName: messageData.sender!.userName);
-      paddingSpaceForReplay = 70;
+      // paddingSpaceForReplay = 70;
     });
   }
 
@@ -240,107 +240,106 @@ class _ChatPageState extends State<ChatPage> {
               child: Container(
                 color: const Color(0xff0a254a),
                 child: WillPopScope(
-                  child: Stack(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/chat-page-back-ground-image.svg',
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.fill, //Todo check in disktop
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            height: getContainerHeight(context),
-                            child: Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: paddingSpaceForReplay),
-                                child: MessageList(
-                                  scrollController: _scrollController2,
-                                  messages: messages,
-                                  onLongPress: handleLongPressSelection,
-                                  onTap: handleOnTapSelection,
-                                  onRightSwipe: handleOnRightSwipe,
-                                  isSelectedList: isSelectedList,
-                                  senderId: widget.senderId!,
-                                )),
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ReplyPreview(
-                              isReplying: _isReplying,
-                              senderName: widget.userName,
-                              content: _replyingTo?.content ?? '',
-                              onCancelReply: () {
-                                handleOncancelReply();
-                              },
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 55,
-                                  child: Card(
-                                      margin: const EdgeInsets.only(
-                                          left: 5, right: 5, bottom: 8),
-                                      child: CustomChatTextField(
-                                        scrollController: _scrollController,
-                                        focusNode: focusNode,
-                                        controller: _controller,
-                                        onChanged: _updateTextProperties,
-                                        textAlign: _textAlign,
-                                        textDirection: _textDirection,
-                                        toggleEmojiPicker: _toggleEmojiPicker,
-                                        chatId: widget.ChatID,
-                                        senderId: widget.senderId!,
-                                        userName: widget.userName,
-                                        parentMessage: _replyingTo,
-                                        isReplying: _isReplying,
-                                        handleOncancelReply:
-                                            handleOncancelReply,
-                                      )),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 5),
-                                  child: CircleAvatar(
-                                    radius: 24,
-                                    backgroundColor: Color(0xff0A122F),
-                                    child: IconButton(
-                                      onPressed: () {
-                                        handleSendMessage();
-                                      },
-                                      icon: FaIcon(
-                                        _isTyping
-                                            ? FontAwesomeIcons.paperPlane
-                                            : FontAwesomeIcons.microphone,
-                                        color: Color(0xff8D6AEE),
+                  child: Stack(children: [
+                    SvgPicture.asset(
+                      'assets/images/chat-page-back-ground-image.svg',
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.fill, //Todo check in disktop
+                    ),
+                    Column(
+                      children: [
+                        Expanded(
+                          // height: getContainerHeight(context),
+                          child: Padding(
+                              padding: EdgeInsets.only(
+                                  bottom: paddingSpaceForReplay),
+                              child: MessageList(
+                                scrollController: _scrollController2,
+                                messages: messages,
+                                onLongPress: handleLongPressSelection,
+                                onTap: handleOnTapSelection,
+                                onRightSwipe: handleOnRightSwipe,
+                                isSelectedList: isSelectedList,
+                                senderId: widget.senderId!,
+                              )),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ReplyPreview(
+                                isReplying: _isReplying,
+                                senderName: widget.userName,
+                                content: _replyingTo?.content ?? '',
+                                onCancelReply: () {
+                                  handleOncancelReply();
+                                },
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width - 55,
+                                    child: Card(
+                                        margin: const EdgeInsets.only(
+                                            left: 5, right: 5, bottom: 8),
+                                        child: CustomChatTextField(
+                                          scrollController: _scrollController,
+                                          focusNode: focusNode,
+                                          controller: _controller,
+                                          onChanged: _updateTextProperties,
+                                          textAlign: _textAlign,
+                                          textDirection: _textDirection,
+                                          toggleEmojiPicker: _toggleEmojiPicker,
+                                          chatId: widget.ChatID,
+                                          senderId: widget.senderId!,
+                                          userName: widget.userName,
+                                          parentMessage: _replyingTo,
+                                          isReplying: _isReplying,
+                                          handleOncancelReply:
+                                              handleOncancelReply,
+                                        )),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: 5),
+                                    child: CircleAvatar(
+                                      radius: 24,
+                                      backgroundColor: Color(0xff0A122F),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          handleSendMessage();
+                                        },
+                                        icon: FaIcon(
+                                          _isTyping
+                                              ? FontAwesomeIcons.paperPlane
+                                              : FontAwesomeIcons.microphone,
+                                          color: Color(0xff8D6AEE),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            show
-                                ? EmojiSelect(
-                                    controller: _controller,
-                                    scrollController: _scrollController,
-                                    onTypingStatusChanged: (isTyping) {
-                                      setState(() {
-                                        _isTyping = isTyping;
-                                      });
-                                    })
-                                : Container()
-                          ],
+                                ],
+                              ),
+                              show
+                                  ? EmojiSelect(
+                                      controller: _controller,
+                                      scrollController: _scrollController,
+                                      onTypingStatusChanged: (isTyping) {
+                                        setState(() {
+                                          _isTyping = isTyping;
+                                        });
+                                      })
+                                  : Container()
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ]),
                   onWillPop: () {
                     if (show) {
                       setState(() {

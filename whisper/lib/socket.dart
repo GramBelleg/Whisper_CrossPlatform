@@ -20,7 +20,6 @@ class SocketService {
   // Initialize and connect the socket
 
   Future<void> connectSocket() async {
-    print("hhhhhhhhhhhhhhh");
     _clearExistingListeners();
     String? token = await GetToken();
     _initializeSocket(token);
@@ -35,10 +34,10 @@ class SocketService {
       'query': {'token': "Bearer $token"}
     });
     socket?.connect();
-    
   }
 
   void _clearExistingListeners() {
+    socket?.disconnect(); //da lesa maktob we matgarab4
     socket?.clearListeners();
   }
 
@@ -48,13 +47,12 @@ class SocketService {
   }
 }
 
-
-    // socket?.on('pfp', (data) async {
-    //   print("changed Profile Pic: $data");
-    //   final UserState? userState = await getUserState();
-    //   print("this is userid from socket: ${data['userId']} ");
-    //   if (data['userId'] == await GetId()) {
-    //     String response = await generatePresignedUrl(data['profilePic']);
-    //     userState?.copyWith(profilePic: response);
-    //   }
-    // });
+// socket?.on('pfp', (data) async {
+//   print("changed Profile Pic: $data");
+//   final UserState? userState = await getUserState();
+//   print("this is userid from socket: ${data['userId']} ");
+//   if (data['userId'] == await GetId()) {
+//     String response = await generatePresignedUrl(data['profilePic']);
+//     userState?.copyWith(profilePic: response);
+//   }
+// });
