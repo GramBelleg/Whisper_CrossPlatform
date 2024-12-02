@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/components/custom_highlight_text.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/services/log-out-services.dart';
+import 'package:whisper/services/log_out_service.dart';
 
 void showLogoutConfirmationDialog(BuildContext context, bool fromAllDevices) {
   showDialog(

@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-
-import '../constants/ip-for-services.dart';
-import 'shared-preferences.dart';
+import '../constants/ip_for_services.dart';
+import 'shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class VisibilityService {
   String? _token;
 
   Future<Map<String, dynamic>> getVisibilitySettings() async {
-    _token = await GetToken();
+    _token = await getToken();
 
     try {
       // final response = await _dio.get("http://$ip:5000/api/user/info");

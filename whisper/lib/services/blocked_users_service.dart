@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:whisper/services/shared-preferences.dart';
-import '../constants/ip-for-services.dart';
+import 'package:whisper/services/shared_preferences.dart';
+import '../constants/ip_for_services.dart';
 
 class BlockedUsersService {
   final String baseURL = "http://$ip:5000/api/user/blocked";
   String? _token;
 
   Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
-    _token = await GetToken();
+    _token = await getToken();
 
     final response = await http.get(
       Uri.parse(baseURL),

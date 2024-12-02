@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:whisper/components/user-state.dart';
-import 'package:whisper/constants/ip-for-services.dart';
-import 'package:whisper/global-cubit-provider.dart';
-import 'package:whisper/services/read-file.dart';
-import 'package:whisper/services/shared-preferences.dart';
+import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/models/user_state.dart';
+import 'package:whisper/services/read_file.dart';
+import 'package:whisper/services/shared_preferences.dart';
 
 class SocketService {
   // Private constructor
@@ -23,7 +22,7 @@ class SocketService {
 
   Future<void> connectSocket() async {
     _clearExistingListeners();
-    String? token = await GetToken();
+    String? token = await getToken();
     _initializeSocket(token);
     print(socket);
     GlobalCubitProvider.messagesCubit.setupSocketListeners();
@@ -31,7 +30,7 @@ class SocketService {
       print("changed Profile Pic: $data");
       final UserState? userState = await getUserState();
       print("this is userid from socket: ${data['userId']} ");
-      if (data['userId'] == await GetId()) {
+      if (data['userId'] == await getId()) {
         String response = await generatePresignedUrl(data['profilePic']);
         userState?.copyWith(profilePic: response);
       }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:whisper/keys/login-keys.dart';
+import 'package:whisper/keys/login_keys.dart';
 import 'package:whisper/pages/login.dart';
 
 void main() {

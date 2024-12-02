@@ -1,4 +1,3 @@
-import 'package:whisper/models/chat-messages.dart';
 import 'package:whisper/models/sender.dart';
 
 class Comment {

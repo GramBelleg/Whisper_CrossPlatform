@@ -20,13 +20,12 @@ void showVisibilityOptions(
               ListTile(
                 title: Text(
                   title,
-                  style: TextStyle(color:secondNeutralColor),
+                  style: TextStyle(color: secondNeutralColor),
                 ),
               ),
               RadioListTile<String>(
                 key: VisibilitySettingsKeys.everyoneRadio,
-                title: Text("Everyone",
-                    style: TextStyle(color: primaryColor)),
+                title: Text("Everyone", style: TextStyle(color: primaryColor)),
                 value: "Everyone",
                 groupValue: currentValue,
                 onChanged: (String? value) {
@@ -36,8 +35,7 @@ void showVisibilityOptions(
               ),
               RadioListTile<String>(
                 key: VisibilitySettingsKeys.contactsRadio,
-                title: Text("Contacts",
-                    style: TextStyle(color: primaryColor)),
+                title: Text("Contacts", style: TextStyle(color: primaryColor)),
                 value: "Contacts",
                 groupValue: currentValue,
                 onChanged: (String? value) {
@@ -47,8 +45,7 @@ void showVisibilityOptions(
               ),
               RadioListTile<String>(
                 key: VisibilitySettingsKeys.nobodyRadio,
-                title:
-                    Text("Nobody", style: TextStyle(color: primaryColor)),
+                title: Text("Nobody", style: TextStyle(color: primaryColor)),
                 value: "Nobody",
                 groupValue: currentValue,
                 onChanged: (String? value) {

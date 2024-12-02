@@ -1,28 +1,27 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:whisper/components/custom-access-button.dart';
+import 'package:whisper/components/custom_access_button.dart';
 import 'package:whisper/components/helpers.dart';
-import 'package:whisper/components/users-stories.dart';
+import 'package:whisper/models/story.dart';
+import 'package:whisper/models/user_state.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/keys/home-keys.dart';
-import 'package:whisper/keys/profile-keys.dart';
+import 'package:whisper/keys/home_keys.dart';
+import 'package:whisper/keys/settings_page_keys.dart';
 import 'package:whisper/keys/visibility_settings_keys.dart';
-import 'package:whisper/components/user-state.dart';
-import 'package:whisper/cubit/profile-setting-cubit.dart';
-import 'package:whisper/pages/blocked-users.dart';
-import 'package:whisper/pages/story-creation.dart';
-import 'package:whisper/pages/user-story.dart';
-import 'package:whisper/pages/view-profile-photo.dart';
-import 'package:whisper/pages/visibilitySettings.dart';
+import 'package:whisper/cubit/settings_cubit.dart';
+import 'package:whisper/pages/blocked_users_page.dart';
+import 'package:whisper/pages/story_creation_screen.dart';
+import 'package:whisper/pages/user_stories_screen.dart';
+import 'package:whisper/pages/view_profile_image.dart';
+import 'package:whisper/pages/visibility_settings_page.dart';
 import 'package:whisper/services/logout_confirmation_dialog.dart';
-import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/upload-file.dart';
+import 'package:whisper/services/shared_preferences.dart';
+import 'package:whisper/services/upload_file.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
+import 'package:whisper/validators/reset-password-validation/validate_confirmation_code.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -341,7 +340,7 @@ class _SettingsContentState extends State<SettingsContent> {
         if (message.length < 6) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(ValidateConfirmationCode(message) as String),
+              content: Text(validateConfirmationCode(message) as String),
             ),
           );
           return;
@@ -622,7 +621,8 @@ class _SettingsContentState extends State<SettingsContent> {
                   style: TextStyle(color: secondNeutralColor),
                 ),
                 onTap: () {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context);
+                  // Close the dialog
                   _viewProfilePhoto(
                       context,
                       widget.userState!
@@ -636,8 +636,9 @@ class _SettingsContentState extends State<SettingsContent> {
                   style: TextStyle(color: secondNeutralColor),
                 ),
                 onTap: () async {
-                  Navigator.pop(context); // Close the dialog
-                  final id = await GetId();
+                  Navigator.pop(context);
+                  // Close the dialog
+                  final id = await getId();
                   _viewStatus(context, id!);
                 },
               ),
@@ -699,6 +700,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
+
                   _pickImageFromCamera();
                 },
               ),
@@ -712,6 +714,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
+
                   _pickImageFromGallery();
                 },
               ),
@@ -726,6 +729,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
+
                   _removeImage();
                 },
               ),
@@ -775,31 +779,31 @@ class _SettingsContentState extends State<SettingsContent> {
         _buildTextField(
           widget.bioController,
           'Bio',
-          StateText: widget.bioState,
+          stateText: widget.bioState,
         ),
         _buildTextField(
           widget.nameController,
           'Name',
-          StateText: widget.nameState,
+          stateText: widget.nameState,
         ),
         _buildTextField(
           widget.usernameController,
           'Username',
-          StateText: widget.usernameState,
+          stateText: widget.usernameState,
         ),
         _buildTextField(
           widget.phoneController,
           'Phone Number',
-          StateText: widget.phoneNumberState,
+          stateText: widget.phoneNumberState,
         ),
         _buildTextField(widget.emailController, 'Email',
-            StateText: widget.emailState, needCode: true),
+            stateText: widget.emailState, needCode: true),
       ],
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String labelText,
-      {String? StateText, bool needCode = false}) {
+      {String? stateText, bool needCode = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -812,24 +816,24 @@ class _SettingsContentState extends State<SettingsContent> {
                 fontSize: 15,
               ),
             ),
-            if (StateText != null &&
-                StateText.isNotEmpty &&
-                StateText ==
+            if (stateText != null &&
+                stateText.isNotEmpty &&
+                stateText ==
                     "Updated") // Show green circle if field is successfully updated
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  StateText,
+                  stateText,
                   style: TextStyle(color: highlightColor, fontSize: 14),
                 ),
               ),
-            if (StateText != null &&
-                StateText.isNotEmpty &&
-                StateText != "Updated")
+            if (stateText != null &&
+                stateText.isNotEmpty &&
+                stateText != "Updated")
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  StateText,
+                  stateText,
                   style: const TextStyle(color: Colors.red, fontSize: 14),
                 ),
               ),

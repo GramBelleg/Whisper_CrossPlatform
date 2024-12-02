@@ -1,0 +1,96 @@
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whisper/models/user_state.dart';
+
+final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
+Future<void> saveEmail(String email) async {
+  await _secureStorage.write(key: 'user_email', value: email);
+  print('Email saved: $email');
+}
+
+Future<void> saveRobotToken(String robotToken) async {
+  await _secureStorage.write(key: 'robotToken', value: robotToken);
+  print('robotToken saved: $robotToken');
+}
+
+Future<String?> getEmail() async {
+  String? email = await _secureStorage.read(key: 'user_email');
+  print('Loaded email: $email');
+  return email;
+}
+
+Future<String?> getRobotToken() async {
+  String? robotToken = await _secureStorage.read(key: 'robotToken');
+  print('Loaded robotToken: $robotToken');
+  return robotToken;
+}
+
+Future<void> saveToken(String token) async {
+  await _secureStorage.write(key: 'token', value: token);
+  print('Token saved: $token');
+}
+
+Future<String?> getToken() async {
+  String? token = await _secureStorage.read(key: 'token');
+  print('Loaded token: $token');
+  return token;
+}
+
+Future<void> saveId(int id) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('id', id);
+  print('Id saved: $id');
+}
+
+Future<int?> getId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int? id = prefs.getInt('id');
+  print('Loaded Id: $id');
+  return id;
+}
+
+Future<void> saveUserState(UserState userState) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String userStateJson = jsonEncode(userState.toJson());
+  await prefs.setString('user_state', userStateJson);
+  print('UserState saved: $userStateJson');
+}
+
+Future<UserState?> getUserState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userStateJson = prefs.getString('user_state');
+
+  if (userStateJson == null) {
+    print('No UserState found');
+    return null;
+  }
+
+  Map<String, dynamic> userStateMap = jsonDecode(userStateJson);
+  UserState userState = UserState.fromJson(userStateMap);
+  print('Loaded UserState: $userState');
+  return userState;
+}
+
+// Future<void> saveUser(User user) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String userJson = jsonEncode(user.toJson());
+//   await prefs.setString('user', userJson);
+//   print('User saved: $userJson');
+// }
+
+// Future<User?> getUser() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String? userJson = prefs.getString('user');
+
+//   if (userJson == null) {
+//     print('No User found');
+//     return null;
+//   }
+
+//   Map<String, dynamic> userMap = jsonDecode(userJson);
+//   User user = User.fromJson(userMap);
+//   print('Loaded User: $user');
+//   return user;
+// }

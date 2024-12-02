@@ -1,19 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/components/page-state.dart';
-import 'package:whisper/keys/login-keys.dart';
-import 'package:whisper/modules/login-credentials.dart';
-import 'package:whisper/pages/forgot-password-email.dart';
-import 'package:whisper/pages/signup.dart';
-import 'package:whisper/validators/form-validation/email-field-validation.dart';
-import '../components/custom-access-button.dart';
-import '../components/custom-highlight-text.dart';
-import '../components/custom-quick-login.dart';
-import '../components/custom-text-field.dart';
+import 'package:whisper/components/page_state.dart';
+import 'package:whisper/keys/login_keys.dart';
+import 'package:whisper/models/login_credentials.dart';
+import 'package:whisper/pages/forget_password_email.dart';
+import 'package:whisper/pages/sign_up.dart';
+import 'package:whisper/validators/form-validation/validate_email_field.dart';
+import '../components/custom_access_button.dart';
+import '../components/custom_highlight_text.dart';
+import '../components/custom_quick_login.dart';
+import '../components/custom_text_field.dart';
 import '../constants/colors.dart';
-import '../services/log-in-services.dart';
-import '../validators/form-validation/password-field-validation.dart';
+import '../services/login_service.dart';
+import '../validators/form-validation/validate_passward_field.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -52,7 +51,7 @@ class _LoginState extends State<Login> {
   }
 
   Future<bool?> _checkLoginStatus() async {
-    return await LoginService.CheckAlreadyLoggedIn(context);
+    return await LoginService.checkAlreadyLoggedIn(context);
   }
 
   @override
@@ -70,7 +69,7 @@ class _LoginState extends State<Login> {
                   vertical: 32.0,
                 ),
                 child: Form(
-                  key: this.formKey,
+                  key: formKey,
                   child: ListView(
                     children: [
                       Image.asset(
@@ -86,19 +85,19 @@ class _LoginState extends State<Login> {
                         prefixIcon: FontAwesomeIcons.envelope,
                         isObscure: false,
                         isPassword: false,
-                        validate: ValidateEmailField,
+                        validate: validateEmailField,
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       CustomTextField(
                         key: const ValueKey(LoginKeys.passwordTextFieldKey),
-                        controller: this.passwordController,
+                        controller: passwordController,
                         label: "Password",
                         prefixIcon: FontAwesomeIcons.lock,
                         isObscure: true,
                         isPassword: true,
-                        validate: ValidatePasswordField,
+                        validate: validatePasswordField,
                       ),
                       SizedBox(
                         height: 10,

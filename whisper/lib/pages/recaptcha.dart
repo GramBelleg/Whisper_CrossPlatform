@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/components/custom_highlight_text.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/keys/signup-keys.dart';
-import 'package:whisper/modules/signup-credentials.dart';
-import 'package:whisper/services/shared-preferences.dart';
-import 'package:whisper/services/sign-up-services.dart';
+import 'package:whisper/keys/sign_up_keys.dart';
+import 'package:whisper/models/sign_up_credentials.dart';
+import 'package:whisper/services/shared_preferences.dart';
+import 'package:whisper/services/sign_up_services.dart';
 
 class Recaptcha extends StatefulWidget {
   final String apiKey;
@@ -42,7 +42,7 @@ class _RecaptchaState extends State<Recaptcha> {
   late final WebViewController _controller;
 
   void verifyToken(String token, SignupCredentials? user) async {
-    await SaveRobotToken(token);
+    await saveRobotToken(token);
     await SignupService.signup(context, user);
   }
 
