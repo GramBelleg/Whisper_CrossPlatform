@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,18 +5,22 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/custom-access-button.dart';
+import 'package:whisper/components/helpers.dart';
+import 'package:whisper/components/users-stories.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/keys/home-keys.dart';
 import 'package:whisper/keys/profile-keys.dart';
 import 'package:whisper/keys/visibility_settings_keys.dart';
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/cubit/profile-setting-cubit.dart';
 import 'package:whisper/pages/blocked-users.dart';
+import 'package:whisper/pages/story-creation.dart';
+import 'package:whisper/pages/user-story.dart';
+import 'package:whisper/pages/view-profile-photo.dart';
 import 'package:whisper/pages/visibilitySettings.dart';
 import 'package:whisper/services/logout_confirmation_dialog.dart';
+import 'package:whisper/services/shared-preferences.dart';
 import 'package:whisper/services/upload-file.dart';
-import 'package:whisper/utils/visibility_utils.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:whisper/validators/reset-password-validation/confirmation-code-validation.dart';
 
@@ -98,8 +101,144 @@ class SettingsContent extends StatefulWidget {
 
 class _SettingsContentState extends State<SettingsContent> {
   final ImagePicker _picker = ImagePicker(); // ImagePicker instance
-// Save changes method with success indicators
-  File? _image; // Variable to hold the picked image
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: firstNeutralColor,
+      appBar: AppBar(
+        backgroundColor: firstNeutralColor,
+        actions: widget.isEditing
+            ? [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TextButton(
+                    key: SettingsPageKeys.doneButton,
+                    onPressed: () {
+                      _saveChanges(context);
+                    },
+                    child: Text(
+                      "Done",
+                      style: TextStyle(
+                        color: secondNeutralColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )
+              ]
+            : [
+                TextButton(
+                  onPressed: () {
+                    context.read<SettingsCubit>().toggleEditing();
+                  },
+                  child: Text(
+                    'Edit',
+                    style: TextStyle(
+                      color: secondNeutralColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ],
+        title: widget.isEditing
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    key: SettingsPageKeys.cancelButton,
+                    onPressed: () {
+                      context.read<SettingsCubit>().toggleEditing();
+                      context.read<SettingsCubit>().resetStateMessages();
+                    },
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(
+                        color: secondNeutralColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 60), // Placeholder for alignment
+                ],
+              )
+            : null,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 15),
+              _buildProfileSection(),
+              if (widget.isEditing)
+                _buildEditFields(), // Show edit fields if in editing mode
+              if (!widget.isEditing) ...[
+                SizedBox(height: 30),
+                _buildInfoRow(
+                    widget.userState!.phoneNumber, 'Phone', Icons.phone),
+                _buildInfoRow(
+                    widget.userState!.username, 'Username', Icons.person),
+                _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
+              ],
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing)
+                const Divider(
+                  color: Color(0xFF0A254A),
+                  thickness: 4.0,
+                ),
+              if (!widget.isEditing) SizedBox(height: 8),
+              if (!widget.isEditing) ...[
+                Text(
+                  "Privacy Settings",
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 20,
+                  ),
+                ),
+                SizedBox(
+                    height: 16), // Add vertical space between title and buttons
+                // Privacy Settings buttons
+                _buildPrivacyCard(
+                    'Visibility Settings',
+                    FontAwesomeIcons.eye,
+                    const VisibilitySettingsPage(),
+                    VisibilitySettingsKeys.visibilitySettingsTile),
+                _buildPrivacyCard(
+                    'Blocked Users',
+                    FontAwesomeIcons.userSlash,
+                    const BlockedUsersPage(),
+                    VisibilitySettingsKeys.blockedUsersTile),
+                SizedBox(
+                  height: 6,
+                ),
+                CustomAccessButton(
+                  key: Key(HomeKeys.logoutFromOneButtonKey),
+                  label: "Logout From This Device",
+                  onPressed: () {
+                    showLogoutConfirmationDialog(context, false);
+                  },
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                CustomAccessButton(
+                  key: Key(HomeKeys.logoutFromAllButtonKey),
+                  label: "Logout From All Devices",
+                  onPressed: () {
+                    showLogoutConfirmationDialog(context, true);
+                  },
+                )
+              ]
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Future<bool> _confirmCode(String email) async {
     if (email != widget.userState?.email) {
@@ -109,6 +248,8 @@ class _SettingsContentState extends State<SettingsContent> {
       // Check if response was successful
       if (response['success'] == true) {
         _showCustomAlertDialogCode(email, context);
+      } else {
+        context.read<SettingsCubit>().setEmailState(response['message']);
       }
     } else {
       // Set state if email is the same as the current one
@@ -237,131 +378,6 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: firstNeutralColor,
-      appBar: AppBar(
-        backgroundColor: firstNeutralColor,
-        actions: widget.isEditing
-            ? [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: TextButton(
-                    key: SettingsPageKeys.doneButton,
-                    onPressed: () {
-                      _saveChanges(context);
-                    },
-                    child: Text(
-                      "Done",
-                      style: TextStyle(color: secondNeutralColor, fontSize: 18),
-                    ),
-                  ),
-                )
-              ]
-            : [
-                IconButton(
-                  key: SettingsPageKeys.editButton,
-                  icon: Icon(Icons.edit, color: secondNeutralColor),
-                  onPressed: () {
-                    context.read<SettingsCubit>().toggleEditing();
-                  },
-                )
-              ],
-        title: widget.isEditing
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    key: SettingsPageKeys.cancelButton,
-                    onPressed: () {
-                      context.read<SettingsCubit>().toggleEditing();
-                      context.read<SettingsCubit>().resetStateMessages();
-                    },
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(color: secondNeutralColor, fontSize: 18),
-                    ),
-                  ),
-                  SizedBox(width: 60), // Placeholder for alignment
-                ],
-              )
-            : null,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 15),
-              _buildProfileSection(),
-              if (widget.isEditing)
-                _buildEditFields(), // Show edit fields if in editing mode
-              if (!widget.isEditing) ...[
-                SizedBox(height: 30),
-                _buildInfoRow(
-                    widget.userState!.phoneNumber, 'Phone', Icons.phone),
-                _buildInfoRow(
-                    widget.userState!.username, 'Username', Icons.person),
-                _buildInfoRow(widget.userState!.email, 'Email', Icons.email),
-              ],
-              if (!widget.isEditing) SizedBox(height: 8),
-              if (!widget.isEditing)
-                const Divider(
-                  color: Color(0xFF0A254A),
-                  thickness: 4.0,
-                ),
-              if (!widget.isEditing) SizedBox(height: 8),
-              if (!widget.isEditing) ...[
-                Text(
-                  "Privacy Settings",
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(
-                    height: 16), // Add vertical space between title and buttons
-                // Privacy Settings buttons
-                _buildPrivacyCard(
-                    'Visibility Settings',
-                    FontAwesomeIcons.eye,
-                    const VisibilitySettingsPage(),
-                    VisibilitySettingsKeys.visibilitySettingsTile),
-                _buildPrivacyCard(
-                    'Blocked Users',
-                    FontAwesomeIcons.userSlash,
-                    const BlockedUsersPage(),
-                    VisibilitySettingsKeys.blockedUsersTile),
-                SizedBox(
-                  height: 6,
-                ),
-                CustomAccessButton(
-                  key: Key(HomeKeys.logoutFromOneButtonKey),
-                  label: "Logout From This Device",
-                  onPressed: () {
-                    showLogoutConfirmationDialog(context, false);
-                  },
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-                CustomAccessButton(
-                  key: Key(HomeKeys.logoutFromAllButtonKey),
-                  label: "Logout From All Devices",
-                  onPressed: () {
-                    showLogoutConfirmationDialog(context, true);
-                  },
-                )
-              ]
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildInfoRow(String value, String label, IconData icon) {
     return InkWell(
       key: Key(label + SettingsPageKeys.row),
@@ -393,50 +409,77 @@ class _SettingsContentState extends State<SettingsContent> {
           Stack(
             alignment: Alignment.center,
             children: [
-              // Gray scale photo
-              InkWell(
-                key: SettingsPageKeys.picUpdatePicInkWell,
-                onTap: () {
-                  if (widget.isEditing) {
-                    // Show options to pick an image
-                    _showImageSourceDialog();
-                  }
-                },
-                splashColor: Colors.transparent, // Remove splash color
-                highlightColor: Colors.transparent, // Remove highlight color
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundColor: Colors.grey,
-                  child: ClipOval(
-                    child: ColorFiltered(
-                      colorFilter: widget.isEditing
-                          ? ColorFilter.mode(
-                              Colors.grey, // Apply gray filter when editing
-                              BlendMode.saturation, // Desaturate the color
-                            )
-                          : ColorFilter.mode(
-                              Colors.transparent, // No filter when not editing
-                              BlendMode.saturation,
-                            ),
-                      child: widget.userState!.profilePic == ''
-                          ? Image.network(
-                              'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(widget.userState!.name)}', // Default online avatar URL
-                              fit: BoxFit.cover,
-                              width: 140,
-                              height: 140,
-                            )
-                          : Image.network(
-                              widget.userState!
-                                  .profilePic, // Display the picked image
-                              fit: BoxFit.cover,
-                              width: 140,
-                              height: 140,
-                            ),
+              // Circle with border if a story exists
+              Container(
+                padding: const EdgeInsets.all(3), // Border thickness
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  // && widget.userState?.hasStory
+                  gradient: !widget.isEditing && widget.userState!.hasStory
+                      ? const LinearGradient(
+                          colors: [
+                            Colors.purple,
+                            Colors.orange
+                          ], // Border gradient colors
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null, // No border if no story
+                ),
+                child: InkWell(
+                  key: SettingsPageKeys.picUpdatePicInkWell,
+                  onTap: () {
+                    if (widget.isEditing) {
+                      // Show options to pick an image
+                      _showImageSourceDialog();
+                    } else {
+                      if (widget.userState!.hasStory) {
+                        _showProfileOrStatusOptions(); // Show dialog to select action if not editing
+                      } else {
+                        _viewProfilePhoto(
+                            context,
+                            widget.userState!
+                                .profilePic); // Navigate to view profile photo
+                      }
+                    }
+                  },
+                  splashColor: Colors.transparent, // Remove splash color
+                  highlightColor: Colors.transparent, // Remove highlight color
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.grey,
+                    child: ClipOval(
+                      child: ColorFiltered(
+                        colorFilter: widget.isEditing
+                            ? ColorFilter.mode(
+                                Colors.grey, // Apply gray filter when editing
+                                BlendMode.saturation, // Desaturate the color
+                              )
+                            : ColorFilter.mode(
+                                Colors
+                                    .transparent, // No filter when not editing
+                                BlendMode.saturation,
+                              ),
+                        child: widget.userState!.profilePic == ''
+                            ? Image.network(
+                                'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(widget.userState!.name)}', // Default avatar URL
+                                fit: BoxFit.cover,
+                                width: 140,
+                                height: 140,
+                              )
+                            : Image.network(
+                                widget.userState!
+                                    .profilePic, // Display the user's profile picture
+                                fit: BoxFit.cover,
+                                width: 140,
+                                height: 140,
+                              ),
+                      ),
                     ),
                   ),
                 ),
               ),
-              // Camera icon overlay with action
+              // Camera icon overlay with action when in editing mode
               if (widget.isEditing) ...[
                 Positioned(
                   child: InkWell(
@@ -452,6 +495,35 @@ class _SettingsContentState extends State<SettingsContent> {
                       Icons.camera_alt, // Camera icon
                       color: secondNeutralColor,
                       size: 40,
+                    ),
+                  ),
+                ),
+              ],
+              // Add story "+" button (if not editing, or based on some condition)
+              if (!widget.isEditing) ...[
+                Positioned(
+                  bottom: 10, // Position below the image
+                  right: 20, // Align to the bottom-right
+                  child: InkWell(
+                    onTap: () {
+                      // Action to add a story
+                      _navigateToStoryCreationScreen(context);
+                    },
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Color(
+                            0xff4cb9cf), // Background color of the "+" button
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.add, // "+" icon
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -479,16 +551,123 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
-  String formatName(String fullName) {
-    List<String> names = fullName.split(" ");
+  // Navigate to Story Creation Screen
+  void _navigateToStoryCreationScreen(BuildContext context) async {
+    final newStory = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StoryCreationScreen(
+          onStoryCreated: (Story story) {
+            context.read<SettingsCubit>().updateHasStoryUserState();
 
-    if (names.length > 1) {
-      // Get the first and last name
-      return "${names[0]}+${names[names.length - 1]}";
-    } else {
-      // If only one name is present, return as is
-      return fullName;
+            context
+                .read<SettingsCubit>()
+                .sendMyStory(story.media, story.content, story.type);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showProfileOrStatusOptions() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      backgroundColor: firstSecondaryColor,
+      builder: (BuildContext context) {
+        return SafeArea(
+          key: SettingsPageKeys.showPhotoOrStory,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Stack to hold both the cancel icon and the header text
+              Stack(
+                children: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Text(
+                        'Select an action',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: secondNeutralColor),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 10,
+                    top: 4,
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: secondNeutralColor),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(), // Divider for separation
+              // Options
+              ListTile(
+                leading: Icon(Icons.photo, color: secondNeutralColor),
+                title: Text(
+                  'View Profile Photo',
+                  style: TextStyle(color: secondNeutralColor),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close the dialog
+                  _viewProfilePhoto(
+                      context,
+                      widget.userState!
+                          .profilePic); // Navigate to view profile photo
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.visibility, color: secondNeutralColor),
+                title: Text(
+                  'View Status',
+                  style: TextStyle(color: secondNeutralColor),
+                ),
+                onTap: () async {
+                  Navigator.pop(context); // Close the dialog
+                  final id = await GetId();
+                  _viewStatus(context, id!);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _viewProfilePhoto(BuildContext context, String photoUrl) {
+    if (widget.userState!.profilePic != '') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FullScreenPhotoScreen(photoUrl: photoUrl),
+        ),
+      );
     }
+  }
+
+  void _viewStatus(BuildContext context, int userId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserStoriesScreen(
+            userId: userId,
+            profilePic: widget.userState!.profilePic,
+            userName: widget.userState!.name,
+            isMyStory: true),
+      ),
+    );
   }
 
 // Function to show dialog for image source
@@ -497,12 +676,11 @@ class _SettingsContentState extends State<SettingsContent> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color(0xFF0A254A), // Set dialog background color
+          backgroundColor: Color(0xFF0A254A),
           title: Center(
             child: Text(
               'Choose an Option',
-              style: TextStyle(
-                  color: secondNeutralColor), // Set title text color to white
+              style: TextStyle(color: secondNeutralColor),
             ),
           ),
           content: Column(
@@ -513,8 +691,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   key: SettingsPageKeys.takePhotoListTile,
                   child: Text(
                     'Take Photo',
-                    style: TextStyle(
-                        color: secondNeutralColor), // Set text color to white
+                    style: TextStyle(color: secondNeutralColor),
                   ),
                 ),
                 onTap: () {
@@ -527,8 +704,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 title: Center(
                   child: Text(
                     'Select from Gallery',
-                    style: TextStyle(
-                        color: secondNeutralColor), // Set text color to white
+                    style: TextStyle(color: secondNeutralColor),
                   ),
                 ),
                 onTap: () {

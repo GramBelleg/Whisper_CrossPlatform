@@ -1,12 +1,14 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:whisper/components/story.dart';
+import 'package:whisper/components/users-stories.dart';
+import 'package:whisper/services/read-file.dart';
 
 class StoryViewer extends StatefulWidget {
   final List<Story> stories;
+  final String profilePic;
 
-  const StoryViewer({super.key, required this.stories});
+  const StoryViewer({Key? key, required this.stories, required this.profilePic})
+      : super(key: key);
 
   @override
   _StoryViewerState createState() => _StoryViewerState();
@@ -17,65 +19,58 @@ class _StoryViewerState extends State<StoryViewer> {
   late VideoPlayerController _videoPlayerController;
   late PageController _pageController;
   bool _isLoading = true;
-  Timer? _autoSwipeTimer;
+  List<String> _mediaUrls = []; // Store media URLs here
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    _startAutoSwipeTimer();
+    if (widget.stories.isNotEmpty) {
+      // Initialize media URLs list with a default value (empty or null)
+      _mediaUrls = List.generate(widget.stories.length, (index) => '');
+      _loadMedia(widget.stories[_currentStoryIndex].media, _currentStoryIndex);
+    }
   }
 
   @override
   void dispose() {
     _videoPlayerController.dispose();
-    _autoSwipeTimer?.cancel();
     super.dispose();
   }
 
-  // Start auto swipe timer
-  void _startAutoSwipeTimer() {
-    _autoSwipeTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-      if (_currentStoryIndex < widget.stories.length - 1) {
-        _nextStory();
-      } else {
-        timer.cancel();
-      }
+  void _loadMedia(String media, int index) async {
+    setState(() {
+      _isLoading = true;
     });
+
+    // Check if the media URL is already loaded for the current story
+    if (_mediaUrls[index].isEmpty) {
+      if (media.endsWith('.mp4')) {
+        // For videos, generate the URL and initialize the video controller
+        String mediaUrl = await generatePresignedUrl(media);
+        setState(() {
+          _mediaUrls[index] = mediaUrl; // Store the generated URL
+        });
+        _initializeVideo(mediaUrl);
+      } else {
+        setState(() {
+          _isLoading = false;
+          _mediaUrls[index] = media; // Directly use the image URL
+        });
+      }
+    }
   }
 
-  // Load the media (image/video)
-  void _loadMedia(String url) {
-    // Use post-frame callback to delay setState() calls
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        _isLoading = true;
-      });
-    });
-    Future.delayed(Duration(seconds: 2), () {
-      // Simulate loading delay
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+  void _initializeVideo(String url) {
+    _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url))
+      ..initialize().then((_) {
         setState(() {
           _isLoading = false;
         });
-      });
-    });
-  }
-
-  // Initialize the video player if it's a video
-  void _initializeVideo(String url) {
-    _videoPlayerController = VideoPlayerController.network(url)
-      ..initialize().then((_) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          setState(() {
-            _isLoading = false;
-          });
-          _videoPlayerController.play();
-        });
+        _videoPlayerController.play();
       });
   }
 
-  // Navigate to the next story
   void _nextStory() {
     if (_currentStoryIndex < widget.stories.length - 1) {
       setState(() {
@@ -86,10 +81,10 @@ class _StoryViewerState extends State<StoryViewer> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+      _loadMedia(widget.stories[_currentStoryIndex].media, _currentStoryIndex);
     }
   }
 
-  // Navigate to the previous story
   void _previousStory() {
     if (_currentStoryIndex > 0) {
       setState(() {
@@ -100,114 +95,51 @@ class _StoryViewerState extends State<StoryViewer> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+      _loadMedia(widget.stories[_currentStoryIndex].media, _currentStoryIndex);
     }
-  }
-
-  // Dynamically add a story
-  void _addStory(Story story) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        widget.stories.add(story); // Add new story to the list
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Story Viewer'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // Dynamically add a story (Example: Adding a text story)
-              _addStory(Story(
-                mediaUrl: 'https://example.com/image.jpg',
-                userName: 'New User',
-                userProfilePic: 'https://example.com/user.jpg',
-                text: 'New Dynamic Story Text', // You can add a text here
-              ));
-            },
-          ),
-        ],
-      ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: widget.stories.length,
-        itemBuilder: (context, index) {
-          Story story = widget.stories[index];
-
-          // Load media (image/video) when a new story is displayed
-          _loadMedia(story.mediaUrl);
-
-          // Initialize video if it's a video story
-          if (story.isVideo) {
-            _initializeVideo(story.mediaUrl);
-          }
-
-          return GestureDetector(
-            onTap: _nextStory,
-            onHorizontalDragUpdate: (details) {
-              if (details.primaryDelta! > 0) {
-                _previousStory();
-              } else if (details.primaryDelta! < 0) {
-                _nextStory();
-              }
-            },
-            child: Stack(
-              children: [
-                // Display image/video/text
-                story.isVideo
-                    ? _isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : VideoPlayer(_videoPlayerController)
-                    : story.text != null
-                        ? _isLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Text(
-                                    story.text!,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              )
-                        : _isLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : Image.network(
-                                story.mediaUrl,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
-                // Profile Picture and User Name
-                Positioned(
-                  top: 40,
-                  left: 20,
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(story.userProfilePic),
-                  ),
-                ),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Text(
-                    story.userName,
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ),
-              ],
-            ),
-          );
+      body: GestureDetector(
+        onTap: _nextStory,
+        onHorizontalDragUpdate: (details) {
+          if (details.primaryDelta! > 0) _previousStory();
+          if (details.primaryDelta! < 0) _nextStory();
         },
+        child: Stack(
+          children: [
+            PageView.builder(
+              controller: _pageController,
+              itemCount: widget.stories.length,
+              itemBuilder: (context, index) {
+                final story = widget.stories[index];
+
+                // Show loading indicator until media URL is ready
+                if (_mediaUrls[index].isEmpty || _isLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                // Display media once the URL is available
+                return story.media.endsWith('.mp4')
+                    ? VideoPlayer(_videoPlayerController)
+                    : Image.network(
+                        _mediaUrls[index], // Use the media URL stored
+                        fit: BoxFit.cover,
+                      );
+              },
+            ),
+            Positioned(
+              top: 40,
+              left: 20,
+              child: CircleAvatar(
+                backgroundImage:
+                    NetworkImage(widget.profilePic), // Use profile picture
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -39,11 +39,11 @@ Future<Map<String, dynamic>> sendConfirmationCodeEmail(
       };
     } else {
       print('Responseddddddddddddddddddddddddddddddddddddddd: $responseData');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Something went wrong : ${responseData['message']}"),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Something went wrong : ${responseData['message']}"),
+      //   ),
+      // );
 
       return {
         'success': false,

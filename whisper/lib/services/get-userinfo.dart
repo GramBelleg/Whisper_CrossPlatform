@@ -5,8 +5,7 @@ import 'package:whisper/services/shared-preferences.dart';
 import '../constants/ip-for-services.dart';
 
 Future<UserState?> fetchUserInfo() async {
-  final url =
-      Uri.parse('http://$ip:5000/api/user/info'); // API endpoint
+  final url = Uri.parse('http://$ip:5000/api/user/info'); // API endpoint
   String? token = await GetToken(); // Retrieve token
 
   if (token == null) {
@@ -42,6 +41,7 @@ Future<UserState?> fetchUserInfo() async {
         lastSeenPrivacy: data['lastSeenPrivacy'] ?? 'default',
         pfpPrivacy: data['pfpPrivacy'] ?? 'default',
         readReceipts: data['readReceipts'] ?? false,
+        hasStory: data['hasStory'] ?? false,
       );
     } else {
       print('Error: ${response.statusCode}, ${response.body}');

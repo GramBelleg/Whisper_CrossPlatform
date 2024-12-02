@@ -14,6 +14,7 @@ class UserState extends Equatable {
   final String lastSeenPrivacy;
   final String pfpPrivacy;
   final bool readReceipts;
+  final bool hasStory;
 
   const UserState({
     required this.name,
@@ -28,6 +29,7 @@ class UserState extends Equatable {
     required this.lastSeenPrivacy,
     required this.pfpPrivacy,
     required this.readReceipts,
+    required this.hasStory,
   });
 
 // CopyWith method
@@ -44,6 +46,7 @@ class UserState extends Equatable {
     String? lastSeenPrivacy,
     String? pfpPrivacy,
     bool? readReceipts,
+    bool? hasStory,
   }) async {
     // Create a new instance with the updated values or existing values if none are provided
     UserState updatedUserState = UserState(
@@ -59,6 +62,7 @@ class UserState extends Equatable {
       lastSeenPrivacy: lastSeenPrivacy ?? this.lastSeenPrivacy,
       pfpPrivacy: pfpPrivacy ?? this.pfpPrivacy,
       readReceipts: readReceipts ?? this.readReceipts,
+      hasStory: hasStory ?? this.hasStory,
     );
 
     // Save the updated state after any changes
@@ -82,6 +86,7 @@ class UserState extends Equatable {
       lastSeenPrivacy: json['lastSeenPrivacy'] as String,
       pfpPrivacy: json['pfpPrivacy'] as String,
       readReceipts: json['readReceipts'] as bool,
+      hasStory: json['hasStory'] as bool,
     );
   }
 
@@ -100,6 +105,7 @@ class UserState extends Equatable {
       'lastSeenPrivacy': lastSeenPrivacy,
       'pfpPrivacy': pfpPrivacy,
       'readReceipts': readReceipts,
+      'hasStory': hasStory,
     };
   }
 
@@ -117,5 +123,6 @@ class UserState extends Equatable {
         lastSeenPrivacy,
         pfpPrivacy,
         readReceipts,
+        hasStory,
       ];
 }

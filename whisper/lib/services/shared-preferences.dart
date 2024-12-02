@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whisper/components/user-state.dart';
+import 'package:whisper/components/users-stories.dart';
 
 final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
@@ -73,3 +74,25 @@ Future<UserState?> getUserState() async {
   print('Loaded UserState: $userState');
   return userState;
 }
+
+// Future<void> saveUser(User user) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String userJson = jsonEncode(user.toJson());
+//   await prefs.setString('user', userJson);
+//   print('User saved: $userJson');
+// }
+
+// Future<User?> getUser() async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   String? userJson = prefs.getString('user');
+
+//   if (userJson == null) {
+//     print('No User found');
+//     return null;
+//   }
+
+//   Map<String, dynamic> userMap = jsonDecode(userJson);
+//   User user = User.fromJson(userMap);
+//   print('Loaded User: $user');
+//   return user;
+// }

@@ -12,6 +12,8 @@ import 'package:whisper/socket.dart';
 part 'profile-setting-state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
+  final socket = SocketService.instance.socket;
+
   bool isEditing = false;
 
   late TextEditingController nameController;
@@ -53,8 +55,16 @@ class SettingsCubit extends Cubit<SettingsState> {
     ));
   }
 
+  void sendMyStory(String blobName, String content, String type) {
+    SocketService.instance.sendStory(blobName, content, type);
+  }
+
+  void deleteMyStory(int storyId) {
+    print("delete my storyyy");
+    SocketService.instance.deleteStory(storyId);
+  }
+
   void sendProfilePhoto(String blobName) {
-    final socket = SocketService.instance.socket;
     socket?.emit('pfp', {'profilePic': blobName});
   }
 
@@ -102,6 +112,13 @@ class SettingsCubit extends Cubit<SettingsState> {
     _emitUpdatedState();
   }
 
+  Future<void> updateHasStoryUserState() async {
+    final userState = await getUserState();
+    userState?.copyWith(hasStory: !userState.hasStory);
+    print("update hasStory");
+    _emitUpdatedState();
+  }
+
   // Setter functions for States
   Future<void> setNameState(String state) async {
     nameState = state;
@@ -139,7 +156,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       final userState = (state as SettingsLoaded).userState;
       if (field == 'name') {
         userState?.copyWith(name: newValue);
-      } else if (field == 'username') {
+      } else if (field == 'userName') {
         userState?.copyWith(username: newValue);
       } else if (field == 'phoneNumber') {
         userState?.copyWith(phoneNumber: newValue);

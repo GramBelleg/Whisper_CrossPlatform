@@ -1,218 +1,298 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:story/story_page_view.dart';
+import 'package:story/story_image.dart';
+import 'package:whisper/components/helpers.dart';
+import 'package:whisper/components/users-stories.dart';
+import 'package:whisper/socket.dart';
+import 'package:whisper/keys/story-keys.dart';
 
-class Story {
-  final String mediaUrl; // Media URL for image/video/text
-  final bool isVideo; // Flag to check if it's a video
-  final String userName; // User's name for the story
-  final String userProfilePic; // User profile picture
-  final String? text; // Text for text-based stories (nullable)
+class StoryPage extends StatefulWidget {
+  const StoryPage({
+    Key? key,
+    required this.userIndex,
+    required this.isMyStory,
+    required this.sampleUsers,
+    this.withCloseIcon = true,
+  }) : super(key: key);
 
-  Story({
-    required this.mediaUrl,
-    this.isVideo = false,
-    required this.userName,
-    required this.userProfilePic,
-    this.text, // Can be null if it's not a text story
-  });
-}
-
-class StoryViewer extends StatefulWidget {
-  final List<Story> stories;
-
-  StoryViewer({required this.stories});
+  final int userIndex;
+  final List<User> sampleUsers;
+  final bool withCloseIcon;
+  final bool isMyStory;
 
   @override
-  _StoryViewerState createState() => _StoryViewerState();
+  _StoryPageState createState() => _StoryPageState();
 }
 
-class _StoryViewerState extends State<StoryViewer> {
-  int _currentStoryIndex = 0;
-  late VideoPlayerController _videoPlayerController;
-  late PageController _pageController;
-  bool _isLoading = true;
-  Timer? _autoSwipeTimer;
+class _StoryPageState extends State<StoryPage> {
+  late ValueNotifier<IndicatorAnimationCommand> indicatorAnimationController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _startAutoSwipeTimer();
+    indicatorAnimationController = ValueNotifier<IndicatorAnimationCommand>(
+        IndicatorAnimationCommand.resume); // Assuming resume is a valid command
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _autoSwipeTimer?.cancel();
+    // Correcting the animation state to a valid constant
+    indicatorAnimationController.value = IndicatorAnimationCommand.pause;
+    indicatorAnimationController.dispose();
     super.dispose();
-  }
-
-  // Start auto swipe timer
-  void _startAutoSwipeTimer() {
-    _autoSwipeTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-      if (_currentStoryIndex < widget.stories.length - 1) {
-        _nextStory();
-      } else {
-        timer.cancel();
-      }
-    });
-  }
-
-  // Load the media (image/video)
-  void _loadMedia(String url) async {
-    setState(() {
-      _isLoading = true;
-    });
-    await Future.delayed(Duration(seconds: 2)); // Simulate loading delay
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  // Initialize the video player if it's a video
-  void _initializeVideo(String url) {
-    _videoPlayerController = VideoPlayerController.network(url)
-      ..initialize().then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-        _videoPlayerController.play();
-      });
-  }
-
-  // Navigate to the next story
-  void _nextStory() {
-    if (_currentStoryIndex < widget.stories.length - 1) {
-      setState(() {
-        _currentStoryIndex++;
-      });
-      _pageController.animateToPage(
-        _currentStoryIndex,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  // Navigate to the previous story
-  void _previousStory() {
-    if (_currentStoryIndex > 0) {
-      setState(() {
-        _currentStoryIndex--;
-      });
-      _pageController.animateToPage(
-        _currentStoryIndex,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  // Dynamically add a story
-  void _addStory(Story story) {
-    setState(() {
-      widget.stories.add(story); // Add new story to the list
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Story Viewer'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // Dynamically add a story (Example: Adding a text story)
-              _addStory(Story(
-                mediaUrl: 'https://example.com/image.jpg',
-                userName: 'New User',
-                userProfilePic: 'https://example.com/user.jpg',
-                text: 'New Dynamic Story Text', // You can add a text here
-              ));
-            },
-          ),
-        ],
-      ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: widget.stories.length,
-        itemBuilder: (context, index) {
-          Story story = widget.stories[index];
+      body: widget.sampleUsers.isEmpty
+          ? Center(child: Text("No users available"))
+          : StoryPageView(
+              itemBuilder: (context, pageIndex, storyIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
 
-          // Load media (image/video) when a new story is displayed
-          _loadMedia(story.mediaUrl);
+                // Ensure the current user index is within bounds
+                if (currentUserIndex >= widget.sampleUsers.length) {
+                  return Container(); // End the page list if user index exceeds length
+                }
 
-          // Initialize video if it's a video story
-          if (story.isVideo) {
-            _initializeVideo(story.mediaUrl);
-          }
+                final user = widget.sampleUsers[currentUserIndex];
+                if (storyIndex >= 0 && storyIndex < user.stories.length) {
+                  final story = user.stories[storyIndex];
 
-          return GestureDetector(
-            onTap: _nextStory,
-            onHorizontalDragUpdate: (details) {
-              if (details.primaryDelta! > 0) {
-                _previousStory();
-              } else if (details.primaryDelta! < 0) {
-                _nextStory();
-              }
-            },
-            child: Stack(
-              children: [
-                // Display image/video/text
-                story.isVideo
-                    ? _isLoading
-                        ? Center(child: CircularProgressIndicator())
-                        : VideoPlayer(_videoPlayerController)
-                    : story.text != null
-                        ? _isLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Text(
-                                    story.text!,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(color: Colors.black),
+                      ),
+                      Column(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                // Story Image
+                                Positioned.fill(
+                                  child: StoryImage(
+                                    key: ValueKey(story.media),
+                                    imageProvider: NetworkImage(
+                                      story.media,
                                     ),
-                                    textAlign: TextAlign.center,
+                                    fit: BoxFit.fitWidth,
                                   ),
                                 ),
-                              )
-                        : _isLoading
-                            ? Center(child: CircularProgressIndicator())
-                            : Image.network(
-                                story.mediaUrl,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
+                                // Centered Content
+                                Positioned(
+                                  bottom:
+                                      100, // Adjust this value for placement above the image
+                                  left: 16,
+                                  right: 16,
+                                  child: Text(
+                                    story.content,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Header with User Info
+                      Padding(
+                        padding: const EdgeInsets.only(top: 44, left: 8),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 32,
+                              width: 32,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(user.profilePic == ''
+                                      ? 'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(user.userName)}' // Default avatar URL
+
+                                      : user.profilePic),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: BoxShape.circle,
                               ),
-                // Profile Picture and User Name
-                Positioned(
-                  top: 40,
-                  left: 20,
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(story.userProfilePic),
-                  ),
-                ),
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Text(
-                    story.userName,
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ),
-              ],
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              user.userName,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Container(); // Handle the error when storyIndex is out of bounds
+                }
+              },
+              gestureItemBuilder: (context, pageIndex, storyIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
+
+                // Ensure the current user index is within bounds
+                if (currentUserIndex >= widget.sampleUsers.length) {
+                  return Container(); // Return an empty container if out of bounds
+                }
+
+                final user = widget.sampleUsers[currentUserIndex];
+                if (storyIndex >= 0 && storyIndex < user.stories.length) {
+                  final story = user.stories[storyIndex];
+
+                  return Stack(
+                    children: [
+                      if (widget.withCloseIcon)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 32),
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              color: Colors.white,
+                              icon: const Icon(Icons.close),
+                              key: storyPageKeys.closeButton,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        ),
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              if (widget.isMyStory) ...[
+                                // Heart Icon and Count
+                                Icon(
+                                  Icons.favorite,
+                                  color: story.likes > 0
+                                      ? Colors.red
+                                      : Colors.white70,
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                    width: 4), // Space between icon and number
+                                Text(
+                                  '${story.likes}', // Display the number of likes
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 16), // Adjust spacing
+
+                                // Views Icon and Count
+                                Icon(
+                                  Icons.visibility,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${story.views} views',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+
+                                const Spacer(), // Push delete icon to the other side
+
+                                // Delete Icon
+                                IconButton(
+                                  key: storyPageKeys.deleteStoryButton,
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      // Remove the story from the user's stories list
+                                      widget
+                                          .sampleUsers[widget.userIndex].stories
+                                          .removeAt(storyIndex);
+                                      Navigator.pop(context);
+                                      storyIndex--;
+                                    });
+
+                                    // Call the delete story API
+                                    SocketService.instance
+                                        .deleteStory(story.id);
+
+                                    // Check if there are no more stories left
+                                    if (widget.sampleUsers[widget.userIndex]
+                                        .stories.isEmpty) {
+                                      // If no stories remain, navigate back
+                                      Navigator.pop(context);
+                                    }
+
+                                    print("Story deleted");
+                                  },
+                                ),
+                              ] else ...[
+                                const Spacer(), // Push heart icon to the right
+
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: story.liked
+                                        ? Colors.red
+                                        : Colors
+                                            .grey, // Change color based on state
+                                    size: 32, // Larger size for the icon
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      // Handle like functionality
+                                      // story.liked = !story.liked; // Toggle like state
+                                    });
+
+                                    if (story.liked) {
+                                      print("Liked!");
+                                    } else {
+                                      print("Unliked!");
+                                    }
+                                  },
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Container(); // Handle the error when storyIndex is out of bounds
+                }
+              },
+              indicatorAnimationController: indicatorAnimationController,
+              initialStoryIndex: (pageIndex) => 0,
+              pageLength: widget.sampleUsers.length - widget.userIndex,
+              storyLength: (int pageIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
+                if (currentUserIndex < widget.sampleUsers.length) {
+                  return widget.sampleUsers[currentUserIndex].stories.length;
+                }
+                return 0;
+              },
+              onPageLimitReached: () {
+                Navigator.pop(context);
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page-state.dart';
 import 'package:whisper/cubit/messages-cubit.dart';
+import 'package:whisper/cubit/profile-setting-cubit.dart';
+import 'package:whisper/cubit/stories-cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/pages/confirmation-code.dart';
 import 'package:whisper/pages/forgot-password-email.dart';
@@ -18,18 +20,24 @@ import 'package:whisper/pages/signup.dart';
 import 'package:whisper/services/blocked_users_service.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
 import 'package:whisper/services/fetch-messages.dart';
+import 'package:whisper/services/user-stories-service.dart';
 import 'package:whisper/services/visibility_service.dart';
 
 void main() {
-  runApp(MultiBlocProvider(providers: [
+  runApp(MultiBlocProvider(child: Whisper(), providers: [
+    BlocProvider(create: (context) => SettingsCubit()),
+
     BlocProvider(
         create: (context) =>
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
     // BlocProvider(create: (context) => UserCubit()),
     BlocProvider(create: (context) => VisibilityCubit(VisibilityService())),
     BlocProvider(create: (context) => BlockedUsersCubit(BlockedUsersService())),
-  ], child: Whisper()));
+    BlocProvider(create: (context) => UserStoryCubit(UserStoriesService())),
+  ]));
 }
+
+class UserStoryService {}
 
 class Whisper extends StatefulWidget {
   @override

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisper/components/user-state.dart';
 import 'package:whisper/constants/ip-for-services.dart';
@@ -16,36 +15,28 @@ class SocketService {
   // Socket instance
   IO.Socket? socket;
 
-  // Define separate StreamControllers for different events
-  // final StreamController<dynamic> _messageStreamController =
-  //     StreamController.broadcast();
-  // final StreamController<dynamic> _profilePicStreamController =
-  //     StreamController.broadcast();
-
-  // // Stream<dynamic> get messageStream => _messageStreamController.stream;
-  // Stream<dynamic> get profilePicStream => _profilePicStreamController.stream;
-  // Stream<dynamic> get statusStream => _profilePicStreamController.stream;
-
   // Getter to access the instance
   static SocketService get instance => _instance;
 
   // Initialize and connect the socket
   Future<void> initSocket() async {
+    _clearExistingListeners();
     String? token = await GetToken();
+    _initializeSocket(token!);
+
+    socket?.connect();
+    socket?.onConnect((_) => print('Connected to socket server'));
+  }
+
+  void _initializeSocket(String token) {
     socket = IO.io("http://$ip:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
-      'query': {'token': "Bearer ${token as String}"}
+      'query': {'token': "Bearer $token"}
     });
+  }
 
-    // Connect to the socket server
-    socket?.connect();
-
-    // Listen for messages directly and handle them
-    // socket?.on('receiveMessage', (data) {
-    //   _messageStreamController.add(data); // Handle incoming messages directly
-    // });
-
+  void _setupSocketListeners() {
     socket?.on('pfp', (data) async {
       print("changed Profile Pic: $data");
       final UserState? userState = await getUserState();
@@ -56,15 +47,43 @@ class SocketService {
       }
     });
 
-    // Optional: Listen for connection events
-    socket?.onConnect((_) => print('Connected to socket server'));
+    socket?.onConnectError((error) {
+      print("Error in connect");
+    });
+
     socket?.onDisconnect((_) => print('Disconnected from socket server'));
+    socket?.on('message', (data) {});
+
+    socket?.on('error', (err) {
+      print(err);
+    });
+  }
+
+  void sendStory(String blobName, String content, String type) {
+    print("send my story");
+    socket
+        ?.emit('story', {"content": content, "media": blobName, "type": type});
+  }
+
+  void deleteStory(int storyId) {
+    print("send storyyy");
+    socket?.emit('deleteStory', {"storyId": storyId});
+  }
+
+  void _clearExistingListeners() {
+    socket?.clearListeners();
+  }
+
+  // Ensure that the socket is initialized before you try to use it
+  IO.Socket? getSocket() {
+    if (socket == null || !socket!.connected) {
+      return null;
+    }
+    return socket;
   }
 
   // Disconnect the socket
   void dispose() {
-    //_messageStreamController.close();
-    // _profilePicStreamController.close();
     socket?.disconnect();
     socket = null;
   }

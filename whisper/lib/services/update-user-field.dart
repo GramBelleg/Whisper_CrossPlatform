@@ -6,8 +6,8 @@ import '../constants/ip-for-services.dart';
 // Private method to handle the update API request
 Future<Map<String, dynamic>> updateUserField(String field, String value) async {
   String? token = await GetToken();
-  final url = Uri.parse(
-      'http://$ip:5000/api/user/$field'); // Your update API endpoint
+  final url =
+      Uri.parse('http://$ip:5000/api/user/$field'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   if (token == null) {
@@ -30,7 +30,6 @@ Future<Map<String, dynamic>> updateUserField(String field, String value) async {
       }),
     );
     final responseData = jsonDecode(response.body);
-    print("here in the respoooncccce     " + response.body);
     if (response.statusCode == 200) {
       // Assuming the response contains a 'data' field with the updated value
       return {

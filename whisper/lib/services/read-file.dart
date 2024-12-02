@@ -19,7 +19,7 @@ Future<String> generatePresignedUrl(String blobName) async {
   if (response.statusCode == 200) {
     // Parse the response to extract the presigned URL
     final data = jsonDecode(response.body);
-    print("retrieve url photo successfly");
+    print("retrieve url photo successfly  ${data['presignedUrl']}");
     return data[
         'presignedUrl']; // Ensure this matches the response from your backend
   } else {

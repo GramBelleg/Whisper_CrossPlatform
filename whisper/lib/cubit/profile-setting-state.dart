@@ -5,6 +5,8 @@ abstract class SettingsState {}
 
 class SettingsInitial extends SettingsState {}
 
+class SettingsLoading extends SettingsState {}
+
 class SettingsLoaded extends SettingsState {
   final UserState? userState;
   bool isEditing;
@@ -37,8 +39,38 @@ class SettingsLoaded extends SettingsState {
   });
 }
 
+class SettingsSaved extends SettingsState {
+  final String message;
+
+  SettingsSaved(this.message);
+}
+
 class SettingsLoadError extends SettingsState {
   final String message;
 
   SettingsLoadError(this.message);
+}
+
+class SettingsUpdated extends SettingsState {
+  final UserState userState;
+
+  SettingsUpdated(this.userState);
+}
+
+class SettingsEditing extends SettingsState {
+  final bool isEditing;
+
+  SettingsEditing(this.isEditing);
+}
+
+class SettingsReset extends SettingsState {
+  final String message;
+
+  SettingsReset(this.message);
+}
+
+class SettingsInvalid extends SettingsState {
+  final String message;
+
+  SettingsInvalid(this.message);
 }

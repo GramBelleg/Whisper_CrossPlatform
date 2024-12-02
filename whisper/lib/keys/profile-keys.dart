@@ -13,4 +13,6 @@ class SettingsPageKeys {
   static const removePhotoListTile = Key('removePhotoListTile');
   static const selectPhotoListTile = Key('selectPhotoListTile');
   static const String row = 'Row';
+  static const showPhotoOrStory = Key('showPhotoOrStory');
+  static const backFromViewProfilePicture = Key('backFromViewProfilePicture');
 }
