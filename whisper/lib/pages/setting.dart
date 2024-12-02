@@ -520,6 +520,7 @@ class _SettingsContentState extends State<SettingsContent> {
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
+                        key: SettingsPageKeys.addStory,
                         Icons.add, // "+" icon
                         color: Colors.white,
                         size: 20,
