@@ -8,18 +8,24 @@ class CustomAccessButton extends StatelessWidget {
   final VoidCallback onPressed; // Accept an onPressed callback
 
   // Remove formKey from constructor parameters
-  CustomAccessButton({required this.label, required this.onPressed});
+  CustomAccessButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints(
-        maxWidth: 50,
-      ),
+      // constraints: BoxConstraints(
+      //   maxWidth: 400,
+      // ),
       child: ElevatedButton(
         onPressed: onPressed, // Use the passed onPressed function
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(primaryColor), // Correctly set the background color
+          fixedSize: MaterialStateProperty.all(Size(MediaQuery.of(context).size.width, 50)),
+          backgroundColor: MaterialStateProperty.all(
+              primaryColor), // Correctly set the background color
         ),
         child: Text(
           label,

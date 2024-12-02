@@ -32,7 +32,7 @@ class ChatCard extends StatelessWidget {
   final bool isMuted;
 
   const ChatCard({
-    Key? key,
+    super.key,
     required this.ChatId,
     required this.userName,
     required this.lastMessage,
@@ -45,7 +45,7 @@ class ChatCard extends StatelessWidget {
     this.messageType = MessageType.TEXT, // Updated default value
     this.unreadCount = 0,
     this.isMuted = false,
-  }) : super(key: key);
+  });
 
   // Define the custom color
   final Color customColor = const Color(0xFF4CB9CF);

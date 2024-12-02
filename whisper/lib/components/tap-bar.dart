@@ -1,14 +1,13 @@
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 
-// Function to build the bottom navigation bar
 FlashyTabBar buildBottomNavigationBar(
-    int selectedIndex, Function(int) onItemSelected) {
+    int selectedIndex, Function(int) onTabSelected) {
   return FlashyTabBar(
     backgroundColor: const Color(0xFF0A122F),
     selectedIndex: selectedIndex,
     showElevation: true,
-    onItemSelected: onItemSelected,
+    onItemSelected: onTabSelected,
     items: [
       FlashyTabBarItem(
         icon: const Icon(
@@ -17,9 +16,7 @@ FlashyTabBar buildBottomNavigationBar(
         ),
         title: const Text(
           'Contacts',
-          style: TextStyle(
-            color: Color(0xff8D6AEE),
-          ),
+          style: TextStyle(color: Color(0xff8D6AEE)),
         ),
       ),
       FlashyTabBarItem(
@@ -29,9 +26,7 @@ FlashyTabBar buildBottomNavigationBar(
         ),
         title: const Text(
           'Chats',
-          style: TextStyle(
-            color: Color(0xff8D6AEE),
-          ),
+          style: TextStyle(color: Color(0xff8D6AEE)),
         ),
       ),
       FlashyTabBarItem(
@@ -41,9 +36,7 @@ FlashyTabBar buildBottomNavigationBar(
         ),
         title: const Text(
           'Settings',
-          style: TextStyle(
-            color: Color(0xff8D6AEE),
-          ),
+          style: TextStyle(color: Color(0xff8D6AEE)),
         ),
       ),
     ],

@@ -2,11 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
+import 'package:whisper/keys/forgot-password-keys.dart';
 import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../components/custom-access-button.dart';
 import '../components/custom-text-field.dart';
 import '../constants/colors.dart';
-import '../services/send-reset-code.dart';
+import '../services/reset-password-services.dart';
 
 class ForgotPasswordEmail extends StatelessWidget {
   ForgotPasswordEmail({super.key});
@@ -17,7 +18,7 @@ class ForgotPasswordEmail extends StatelessWidget {
 
   void _submitForm(context) async {
     if (formKey.currentState!.validate()) {
-      await sendResetCode(
+       ResetPasswordService.sendResetCode(
         _emailController.text,
         context,
       );
@@ -37,7 +38,7 @@ class ForgotPasswordEmail extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -47,6 +48,7 @@ class ForgotPasswordEmail extends StatelessWidget {
                 height: 50,
               ),
               CustomTextField(
+                key: ValueKey(ForgotPasswordKeys.emailTextFieldKey),
                 controller: this._emailController,
                 label: "Email",
                 prefixIcon: FontAwesomeIcons.envelope,
@@ -58,6 +60,7 @@ class ForgotPasswordEmail extends StatelessWidget {
                 height: 50,
               ),
               CustomAccessButton(
+                key: ValueKey(ForgotPasswordKeys.sendCodeButtonKey),
                 label: "Send Confirmation Code",
                 onPressed: () {
                   _submitForm(context);
@@ -67,6 +70,8 @@ class ForgotPasswordEmail extends StatelessWidget {
                 height: 20,
               ),
               Center(
+                key: ValueKey(ForgotPasswordKeys
+                    .goBackFromForgotPasswordHighlightTextKey),
                 child: CustomHighlightText(
                   callToActionText: "Go Back",
                   onTap: () {

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/custom-highlight-text.dart';
-import 'package:whisper/pages/login.dart';
-import 'package:whisper/services/logout-all-devices.dart';
+import 'package:whisper/components/page-state.dart';
+import 'package:whisper/services/log-out-services.dart';
 import '../constants/colors.dart';
 
 class LogoutAfterResetPassword extends StatelessWidget {
@@ -18,7 +18,7 @@ class LogoutAfterResetPassword extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 64.0, vertical: 32.0),
         child: Form(
-          key: this.formKey,
+          key: formKey,
           child: ListView(
             children: [
               Image.asset(
@@ -45,13 +45,17 @@ class LogoutAfterResetPassword extends StatelessWidget {
                   CustomHighlightText(
                     callToActionText: "No",
                     onTap: () async {
-                      Navigator.pushNamed(context, Login.id);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        PageState.id,
+                        (Route<dynamic> route) => false,
+                      );
                     },
                   ),
                   CustomHighlightText(
                     callToActionText: "Yes",
                     onTap: () async {
-                      await logoutFromAllDevices(context);
+                      await LogoutService.logoutFromAllDevices(context);
                     },
                   ),
                 ],

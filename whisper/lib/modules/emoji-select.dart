@@ -6,7 +6,8 @@ class EmojiSelect extends StatelessWidget {
   final ScrollController scrollController;
   final ValueSetter<bool> onTypingStatusChanged;
 
-  EmojiSelect({
+  const EmojiSelect({
+    super.key,
     required this.controller,
     required this.scrollController,
     required this.onTypingStatusChanged,

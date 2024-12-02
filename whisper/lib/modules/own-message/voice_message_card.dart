@@ -121,7 +121,7 @@ class _VoiceMessageState extends State<_StatefulVoiceMessage> {
           debugPrint("File downloaded successfully at $filePath");
         }
       }
-
+      // playerController.setFinishMode(finishMode: FinishMode.pause);
       await playerController.preparePlayer(
         path: filePath,
         shouldExtractWaveform: true,
@@ -171,7 +171,8 @@ class _VoiceMessageState extends State<_StatefulVoiceMessage> {
                       if (playerController.playerState.isPlaying) {
                         await playerController.pausePlayer();
                       } else {
-                        await playerController.startPlayer(
+                        await playerController.startPlayer(forceRefresh: true);
+                        await playerController.setFinishMode(
                             finishMode: FinishMode.pause);
                       }
                       setState(() {});

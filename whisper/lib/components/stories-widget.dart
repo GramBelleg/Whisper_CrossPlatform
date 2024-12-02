@@ -1,91 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:story/story_page_view.dart';
 import 'package:story/story_image.dart';
-
-// Model classes
-class UserModel {
-  UserModel(this.stories, this.userName, this.imageUrl);
-
-  final List<StoryModel> stories;
-  final String userName;
-  final String imageUrl;
-}
-
-class StoryModel {
-  StoryModel(this.imageUrl);
-
-  final String imageUrl;
-}
-
-// Sample user and story data
-final sampleUsers = [
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixid=MXwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxN3x8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609418426663-8b5c127691f9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyNXx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User1",
-      "https://images.unsplash.com/photo-1609262772830-0decc49ec18c?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzMDF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609439547168-c973842210e1?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw4Nnx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User2",
-      "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?ixid=MXwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwzMjN8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User3",
-      "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User4",
-      "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User5",
-      "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User6",
-      "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  UserModel([
-    StoryModel(
-        "https://images.unsplash.com/photo-1609421139394-8def18a165df?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMDl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1609377375732-7abb74e435d9?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxODJ8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-    StoryModel(
-        "https://images.unsplash.com/photo-1560925978-3169a42619b2?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMjF8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-  ], "User7",
-      "https://images.unsplash.com/photo-1609127102567-8a9a21dc27d8?ixid=MXwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwzOTh8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"),
-];
+import 'package:whisper/components/helpers.dart';
+import 'package:whisper/components/users-stories.dart';
+import 'package:whisper/socket.dart';
+import 'package:whisper/keys/story-keys.dart';
 
 class StoryPage extends StatefulWidget {
   const StoryPage({
     Key? key,
     required this.userIndex,
+    required this.isMyStory,
+    required this.sampleUsers,
     this.withCloseIcon = true,
   }) : super(key: key);
+
   final int userIndex;
-  final bool withCloseIcon; // if false --> open from expandedBody
+  final List<User> sampleUsers;
+  final bool withCloseIcon;
+  final bool isMyStory;
+
   @override
   _StoryPageState createState() => _StoryPageState();
 }
@@ -97,11 +31,13 @@ class _StoryPageState extends State<StoryPage> {
   void initState() {
     super.initState();
     indicatorAnimationController = ValueNotifier<IndicatorAnimationCommand>(
-        IndicatorAnimationCommand.resume);
+        IndicatorAnimationCommand.resume); // Assuming resume is a valid command
   }
 
   @override
   void dispose() {
+    // Correcting the animation state to a valid constant
+    indicatorAnimationController.value = IndicatorAnimationCommand.pause;
     indicatorAnimationController.dispose();
     super.dispose();
   }
@@ -109,110 +45,254 @@ class _StoryPageState extends State<StoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StoryPageView(
-        itemBuilder: (context, pageIndex, storyIndex) {
-          int currentUserIndex = widget.userIndex + pageIndex;
+      body: widget.sampleUsers.isEmpty
+          ? Center(child: Text("No users available"))
+          : StoryPageView(
+              itemBuilder: (context, pageIndex, storyIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
 
-          // Check if the current user index is within bounds
-          if (currentUserIndex >= sampleUsers.length) {
-            return Container(); // Return an empty container if out of bounds
-          }
+                // Ensure the current user index is within bounds
+                if (currentUserIndex >= widget.sampleUsers.length) {
+                  return Container(); // End the page list if user index exceeds length
+                }
 
-          final user = sampleUsers[currentUserIndex]; // Get the current user
-          final story = user.stories[storyIndex]; // Get the current story
+                final user = widget.sampleUsers[currentUserIndex];
+                if (storyIndex >= 0 && storyIndex < user.stories.length) {
+                  final story = user.stories[storyIndex];
 
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: Container(color: Colors.black),
-              ),
-              Positioned.fill(
-                child: StoryImage(
-                  key: ValueKey(story.imageUrl),
-                  imageProvider: NetworkImage(
-                    story.imageUrl,
-                  ),
-                  fit: BoxFit.fitWidth,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 44, left: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 32,
-                      width: 32,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(user.imageUrl),
-                          fit: BoxFit.cover,
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(color: Colors.black),
+                      ),
+                      Column(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                // Story Image
+                                Positioned.fill(
+                                  child: StoryImage(
+                                    key: ValueKey(story.media),
+                                    imageProvider: NetworkImage(
+                                      story.media,
+                                    ),
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                                // Centered Content
+                                Positioned(
+                                  bottom:
+                                      100, // Adjust this value for placement above the image
+                                  left: 16,
+                                  right: 16,
+                                  child: Text(
+                                    story.content,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Header with User Info
+                      Padding(
+                        padding: const EdgeInsets.only(top: 44, left: 8),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 32,
+                              width: 32,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(user.profilePic == ''
+                                      ? 'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(user.userName)}' // Default avatar URL
+
+                                      : user.profilePic),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              user.userName,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        shape: BoxShape.circle,
                       ),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      user.userName,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    ],
+                  );
+                } else {
+                  return Container(); // Handle the error when storyIndex is out of bounds
+                }
+              },
+              gestureItemBuilder: (context, pageIndex, storyIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
+
+                // Ensure the current user index is within bounds
+                if (currentUserIndex >= widget.sampleUsers.length) {
+                  return Container(); // Return an empty container if out of bounds
+                }
+
+                final user = widget.sampleUsers[currentUserIndex];
+                if (storyIndex >= 0 && storyIndex < user.stories.length) {
+                  final story = user.stories[storyIndex];
+
+                  return Stack(
+                    children: [
+                      if (widget.withCloseIcon)
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 32),
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              color: Colors.white,
+                              icon: const Icon(Icons.close),
+                              key: storyPageKeys.closeButton,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        ),
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              if (widget.isMyStory) ...[
+                                // Heart Icon and Count
+                                Icon(
+                                  Icons.favorite,
+                                  color: story.likes > 0
+                                      ? Colors.red
+                                      : Colors.white70,
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                    width: 4), // Space between icon and number
+                                Text(
+                                  '${story.likes}', // Display the number of likes
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 16), // Adjust spacing
+
+                                // Views Icon and Count
+                                Icon(
+                                  Icons.visibility,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${story.views} views',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+
+                                const Spacer(), // Push delete icon to the other side
+
+                                // Delete Icon
+                                IconButton(
+                                  key: storyPageKeys.deleteStoryButton,
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      // Remove the story from the user's stories list
+                                      widget
+                                          .sampleUsers[widget.userIndex].stories
+                                          .removeAt(storyIndex);
+                                      Navigator.pop(context);
+                                      storyIndex--;
+                                    });
+
+                                    // Call the delete story API
+                                    SocketService.instance
+                                        .deleteStory(story.id);
+
+                                    // Check if there are no more stories left
+                                    if (widget.sampleUsers[widget.userIndex]
+                                        .stories.isEmpty) {
+                                      // If no stories remain, navigate back
+                                      Navigator.pop(context);
+                                    }
+
+                                    print("Story deleted");
+                                  },
+                                ),
+                              ] else ...[
+                                const Spacer(), // Push heart icon to the right
+
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.favorite,
+                                    color: story.liked
+                                        ? Colors.red
+                                        : Colors
+                                            .grey, // Change color based on state
+                                    size: 32, // Larger size for the icon
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      // Handle like functionality
+                                      // story.liked = !story.liked; // Toggle like state
+                                    });
+
+                                    if (story.liked) {
+                                      print("Liked!");
+                                    } else {
+                                      print("Unliked!");
+                                    }
+                                  },
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-
-        gestureItemBuilder: (context, pageIndex, storyIndex) {
-          return Stack(
-            children: [
-              // Conditionally display the close button if withCloseIcon is true
-              if (widget.withCloseIcon)
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 32),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      color: Colors.white,
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
-
-        indicatorAnimationController: indicatorAnimationController,
-        initialStoryIndex: (pageIndex) {
-          return 0; // Start from the first story
-        },
-        pageLength: sampleUsers.length -
-            widget
-                .userIndex, // Remaining users   (i controll the stories open from user to user)
-        storyLength: (int pageIndex) {
-          int currentUserIndex = widget.userIndex + pageIndex;
-
-          // Check if the current user index is within bounds
-          if (currentUserIndex < sampleUsers.length) {
-            return sampleUsers[currentUserIndex]
-                .stories
-                .length; // Get the number of stories for the user
-          }
-          return 0;
-        },
-        onPageLimitReached: () {
-          Navigator.pop(context);
-        },
-      ),
+                    ],
+                  );
+                } else {
+                  return Container(); // Handle the error when storyIndex is out of bounds
+                }
+              },
+              indicatorAnimationController: indicatorAnimationController,
+              initialStoryIndex: (pageIndex) => 0,
+              pageLength: widget.sampleUsers.length - widget.userIndex,
+              storyLength: (int pageIndex) {
+                int currentUserIndex = widget.userIndex + pageIndex;
+                if (currentUserIndex < widget.sampleUsers.length) {
+                  return widget.sampleUsers[currentUserIndex].stories.length;
+                }
+                return 0;
+              },
+              onPageLimitReached: () {
+                Navigator.pop(context);
+              },
+            ),
     );
   }
 }

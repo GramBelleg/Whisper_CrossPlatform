@@ -9,15 +9,15 @@ class EmojiButtonSheet extends StatelessWidget {
   final VoidCallback onGifTap;
 
   const EmojiButtonSheet({
-    Key? key,
+    super.key,
     required this.onEmojiTap,
     required this.onStickerTap,
     required this.onGifTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height / 5,
       width: MediaQuery.of(context).size.width,
       child: Card(

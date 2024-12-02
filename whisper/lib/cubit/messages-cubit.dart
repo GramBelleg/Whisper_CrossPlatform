@@ -5,10 +5,11 @@ import 'package:whisper/models/forwarded-from.dart';
 import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/models/sender.dart';
 import 'package:whisper/services/chat-deletion-service.dart';
-
 import 'package:whisper/services/fetch-messages.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisper/socket.dart';
+
+import '../constants/ip-for-services.dart';
 
 class MessagesCubit extends Cubit<MessagesState> {
   final ChatViewModel _chatViewModel;
@@ -45,6 +46,10 @@ class MessagesCubit extends Cubit<MessagesState> {
       _handleReceivedMessage(data);
     });
 
+    // socket?.on('pfp', (data) {
+    //   receiveMessage(data); // Handle incoming pic directly
+    // });
+
     socket?.onConnectError((error) {
       emit(SocketConnectionError(error.toString()));
     });
@@ -61,6 +66,10 @@ class MessagesCubit extends Cubit<MessagesState> {
       print(err);
     });
   }
+
+  // void receivePic(Map<String, dynamic> data) {
+  //     context.read<SettingsCubit>().setProfilePic(data);
+  // }
 
   void disconnectSocket() {
     socket?.disconnect();

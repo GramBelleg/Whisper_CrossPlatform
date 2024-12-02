@@ -40,14 +40,14 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   TextAlign _textAlign = TextAlign.left; // Default text alignment
   TextDirection _textDirection = TextDirection.ltr; // Default text direction
   bool _isTyping = false;
   bool show = false; // Tracks if the emoji picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
-  ScrollController _scrollController = ScrollController();
-  ScrollController _scrollController2 = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController2 = ScrollController();
   final GlobalKey<FormFieldState<String>> _textFieldKey =
       GlobalKey<FormFieldState<String>>();
   int lastVisibleMessageIndex = 0;
@@ -297,9 +297,9 @@ class _ChatPageState extends State<ChatPage> {
                   child: Stack(children: [
                     SvgPicture.asset(
                       'assets/images/chat-page-back-ground-image.svg',
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      fit: BoxFit.fill, //Todo check in disktop
+                      // height: MediaQuery.of(context).size.height,
+                      // width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover,
                     ),
                     Column(
                       children: [

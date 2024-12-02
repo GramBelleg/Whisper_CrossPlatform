@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/services/shared-preferences.dart';
 
 Future<String> generatePresignedUrl(String blobName) async {
-  final String apiUrl = 'http://192.168.2.100:5000/api/media/read';
+  final String apiUrl = 'http://$ip:5000/api/media/read';
   String? token = await GetToken();
 
   final response = await http.post(
@@ -18,7 +19,6 @@ Future<String> generatePresignedUrl(String blobName) async {
   if (response.statusCode == 200) {
     // Parse the response to extract the presigned URL
     final data = jsonDecode(response.body);
-    print("retrieve url photo successfly${data}");
     return data[
         'presignedUrl']; // Ensure this matches the response from your backend
   } else {

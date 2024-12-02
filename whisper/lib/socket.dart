@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:whisper/components/user-state.dart';
+import 'package:whisper/constants/ip-for-services.dart';
 import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/services/read-file.dart';
 import 'package:whisper/services/shared-preferences.dart';
@@ -25,10 +27,19 @@ class SocketService {
     _initializeSocket(token);
     print(socket);
     GlobalCubitProvider.messagesCubit.setupSocketListeners();
+    socket?.on('pfp', (data) async {
+      print("changed Profile Pic: $data");
+      final UserState? userState = await getUserState();
+      print("this is userid from socket: ${data['userId']} ");
+      if (data['userId'] == await GetId()) {
+        String response = await generatePresignedUrl(data['profilePic']);
+        userState?.copyWith(profilePic: response);
+      }
+    });
   }
 
   void _initializeSocket(String? token) {
-    socket = IO.io("http://192.168.2.100:5000", <String, dynamic>{
+    socket = IO.io("http://$ip:5000", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}
@@ -45,14 +56,15 @@ class SocketService {
     socket?.disconnect();
     socket = null;
   }
-}
 
-// socket?.on('pfp', (data) async {
-//   print("changed Profile Pic: $data");
-//   final UserState? userState = await getUserState();
-//   print("this is userid from socket: ${data['userId']} ");
-//   if (data['userId'] == await GetId()) {
-//     String response = await generatePresignedUrl(data['profilePic']);
-//     userState?.copyWith(profilePic: response);
-//   }
-// });
+  void sendStory(String blobName, String content, String type) {
+    print("send my story");
+    socket
+        ?.emit('story', {"content": content, "media": blobName, "type": type});
+  }
+
+  void deleteStory(int storyId) {
+    print("send storyyy");
+    socket?.emit('deleteStory', {"storyId": storyId});
+  }
+}

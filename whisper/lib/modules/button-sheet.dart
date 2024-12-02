@@ -1,10 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon-creation.dart';
-import 'package:whisper/components/message.dart';
-import 'package:whisper/cubit/messages-cubit.dart';
 import 'package:whisper/global-cubit-provider.dart';
 import 'package:whisper/models/parent-message.dart';
 import 'package:whisper/pages/selected-images-captioning.dart';
@@ -258,7 +255,7 @@ class FileButtonSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height / 3,
       width: MediaQuery.of(context).size.width,
       child: Card(

@@ -72,7 +72,7 @@ class ChatList {
     try {
       List<dynamic> retrievedChats = await fetchChats();
 
-      if (retrievedChats != null && retrievedChats.isNotEmpty) {
+      if (retrievedChats.isNotEmpty) {
         _chatData = retrievedChats.map((chat) => _applyDefaults(chat)).toList();
       } else {
         _chatData = [];

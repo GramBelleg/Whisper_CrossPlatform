@@ -4,60 +4,51 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import '../components/archived-button.dart';
 import '../components/chat-card.dart';
 import '../components/chats.dart';
-import '../components/tap-bar.dart';
-import '../components/stories-widget.dart';
 import 'archived-page.dart';
 import 'search-page.dart';
 
 class MainChats extends StatefulWidget {
   static const String id = '/main_chats_page';
   const MainChats({super.key});
-
   @override
   _MainChatsState createState() => _MainChatsState();
 }
 
 class _MainChatsState extends State<MainChats> {
-  int _selectedIndex = 0;
   final ScrollController _scrollController = ScrollController();
   final ChatList chatList = ChatList();
-  // bool isLoading = true; // Add a loading state
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: buildBottomNavigationBar(
-        _selectedIndex,
-        (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
-      body: DraggableHome(
-        title: _buildTitle(),
-        actions: _buildActions(),
-        body: [
-          FutureBuilder<Widget>(
-            future: _body(), // Use FutureBuilder for the async body
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return snapshot.data!; // Display the body content
-              }
-            },
-          ),
-        ],
-        headerWidget: headerWidget(context),
-        fullyStretchable: true,
-        expandedBody: const SearchPage(),
-        backgroundColor: const Color(0xFF0A122F),
-        appBarColor: const Color(0xFF0A122F),
-        scrollController: _scrollController,
-      ),
+      body: _buildDraggableHome(),
+    );
+  }
+
+  Widget _buildDraggableHome() {
+    return DraggableHome(
+      title: _buildTitle(),
+      actions: _buildActions(),
+      body: [
+        FutureBuilder<Widget>(
+          future: _body(), // Use FutureBuilder for the async body
+          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return snapshot.data!; // Display the body content
+            }
+          },
+        ),
+      ],
+      headerWidget: headerWidget(context),
+      fullyStretchable: true,
+      expandedBody: const SearchPage(),
+      backgroundColor: const Color(0xFF0A122F),
+      appBarColor: const Color(0xFF0A122F),
+      scrollController: _scrollController,
     );
   }
 
@@ -139,28 +130,28 @@ class _MainChatsState extends State<MainChats> {
           Flexible(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: sampleUsers.length,
+              //itemCount: sampleUsers.length,
               itemBuilder: (context, index) {
-                final user = sampleUsers[index];
+                //final user = sampleUsers[index];
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StoryPage(userIndex: index),
-                        ),
-                      );
+                      //Navigator.push(
+                      //context,
+                      // MaterialPageRoute(
+                      //  builder: (context) => StoryPage(userIndex: index),
+                      //),
+                      //);
                     },
                     child: Column(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(user.imageUrl),
+                          // backgroundImage: NetworkImage(user.imageUrl),
                           radius: 30,
                         ),
                         const SizedBox(height: 5),
-                        Text(user.userName),
+                        // Text(user.userName),
                       ],
                     ),
                   ),
@@ -174,8 +165,6 @@ class _MainChatsState extends State<MainChats> {
   }
 
   Future<Widget> _body() async {
-    // Here you can perform any asynchronous operations if necessary
-    //await Future.delayed(const Duration(seconds: 1)); // Simulate some loading
     await chatList.initializeChats();
     return SingleChildScrollView(
       child: Column(

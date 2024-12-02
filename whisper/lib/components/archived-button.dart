@@ -5,10 +5,10 @@ class ArchivedChatsButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const ArchivedChatsButton({
-    Key? key,
+    super.key,
     required this.archivedChats,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

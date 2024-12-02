@@ -8,10 +8,10 @@ class ArchivedChatsPage extends StatefulWidget {
   final ChatList chatList; // ChatList is passed to manage pinning
 
   const ArchivedChatsPage({
-    Key? key,
+    super.key,
     required this.archivedChats,
     required this.chatList, // Update constructor
-  }) : super(key: key);
+  });
 
   @override
   _ArchivedChatsPageState createState() => _ArchivedChatsPageState();

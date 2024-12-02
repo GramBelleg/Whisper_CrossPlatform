@@ -2,17 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom-eye-icon.dart';
-import 'package:whisper/validators/form-validation/email-field-validation.dart';
 import '../constants/colors.dart';
 
 class CustomTextField extends StatefulWidget {
   CustomTextField({
+    super.key,
     required this.label,
     this.prefixIcon,
     required this.isObscure,
     required this.isPassword,
     required this.validate,
     this.controller,
+    this.focusNode,
   });
 
   final TextEditingController? controller;
@@ -21,6 +22,7 @@ class CustomTextField extends StatefulWidget {
   bool? isObscure;
   bool? isPassword;
   String? Function(String?) validate;
+  final FocusNode? focusNode;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -30,12 +32,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void updateIsObscure() {
     setState(() {
-      this.widget.isObscure = !this.widget.isObscure!;
+      widget.isObscure = !widget.isObscure!;
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enableInteractiveSelection: widget.isPassword! ? false : true,
+      focusNode: widget.focusNode,
       controller: this.widget.controller,
       validator: widget.validate,
       obscureText: widget.isObscure!,
