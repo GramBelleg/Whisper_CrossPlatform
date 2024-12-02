@@ -128,6 +128,38 @@ class _SettingsContentState extends State<SettingsContent> {
                 )
               ]
             : [
+                InkWell(
+                  onTap: () {
+                    // Action to add a story
+                    _navigateToStoryCreationScreen(
+                        context); // Call the same function for story creation
+                  },
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: .0),
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                        ),
+                        key: SettingsPageKeys.addStory,
+                        child: Image.asset(
+                          'assets/images/IconStory.png',
+                          fit: BoxFit
+                              .cover, // Ensures the image covers the container
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 TextButton(
                   onPressed: () {
                     context.read<SettingsCubit>().toggleEditing();
@@ -495,36 +527,6 @@ class _SettingsContentState extends State<SettingsContent> {
                       Icons.camera_alt, // Camera icon
                       color: secondNeutralColor,
                       size: 40,
-                    ),
-                  ),
-                ),
-              ],
-              // Add story "+" button (if not editing, or based on some condition)
-              if (!widget.isEditing) ...[
-                Positioned(
-                  bottom: 10, // Position below the image
-                  right: 20, // Align to the bottom-right
-                  child: InkWell(
-                    onTap: () {
-                      // Action to add a story
-                      _navigateToStoryCreationScreen(context);
-                    },
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Color(
-                            0xff4cb9cf), // Background color of the "+" button
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        key: SettingsPageKeys.addStory,
-                        Icons.add, // "+" icon
-                        color: Colors.white,
-                        size: 20,
-                      ),
                     ),
                   ),
                 ),
