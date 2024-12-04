@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
 import 'package:whisper/components/voice_message_card.dart';
 
-class ReceivedVoiceMessageCard extends ReceivedMessage {
+class ReceivedForwardedVoiceMessage extends ReceivedMessage {
   final String blobName;
+  final String senderName;
 
-  ReceivedVoiceMessageCard({
+  ReceivedForwardedVoiceMessage({
     required this.blobName,
     required super.message,
     required super.time,
     required super.isSelected,
     required super.status,
+    required this.senderName,
     super.key,
   });
 
@@ -23,7 +25,8 @@ class ReceivedVoiceMessageCard extends ReceivedMessage {
       isSelected: isSelected,
       status: status,
       isSent: false,
+      forwardedFrom: senderName,
     );
   }
 }
-cd ..
+

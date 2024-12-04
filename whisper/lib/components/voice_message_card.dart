@@ -15,7 +15,7 @@ class VoiceMessageCard extends StatefulWidget {
   final String time;
   final bool isSelected;
   final MessageStatus status;
-
+  final String forwardedFrom;
   final bool isSent;
 
   const VoiceMessageCard({
@@ -25,6 +25,7 @@ class VoiceMessageCard extends StatefulWidget {
     required this.isSelected,
     required this.status,
     required this.isSent,
+    this.forwardedFrom = "",
     super.key,
   });
 
@@ -144,20 +145,35 @@ class VoiceMessageCardState extends State<VoiceMessageCard> {
                     : widget.isSent
                         ? const Color(0xff8D6AEE)
                         : const Color(0xff0a122f),
-                borderRadius: widget.isSent ? BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
-                ) : BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
+                borderRadius: widget.isSent
+                    ? BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                      )
+                    : BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
               ),
               width: MediaQuery.of(context).size.width / 1.3,
               // height: MediaQuery.of(context).size.height / 4,
               child: Column(
                 children: [
+                  widget.forwardedFrom.isNotEmpty
+                      ? Row(
+                          children: [
+                            Icon(FontAwesomeIcons.forward,
+                                color: Colors.white70, size: 12),
+                            Text(
+                              ' Forwarded from: ${widget.forwardedFrom}',
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.white70),
+                            ),
+                          ],
+                        )
+                      : const SizedBox(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -180,13 +196,17 @@ class VoiceMessageCardState extends State<VoiceMessageCard> {
                           color: Colors.white,
                         ),
                       ),
-                      AudioFileWaveforms(
-                        size: Size(MediaQuery.of(context).size.width / 2.5,
-                            MediaQuery.of(context).size.height / 30),
-                        playerController: playerController,
-                        waveformType: WaveformType.long,
-                        playerWaveStyle: waveStyle,
-                      ),
+                      totalDuration == 0
+                          ? CircularProgressIndicator.adaptive()
+                          : AudioFileWaveforms(
+                              size: Size(
+                                  MediaQuery.of(context).size.width / 1.8,
+                                  MediaQuery.of(context).size.height / 30),
+                              playerController: playerController,
+                              waveformType: WaveformType.fitWidth,
+                              enableSeekGesture: true,
+                              playerWaveStyle: waveStyle,
+                            ),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -195,7 +215,8 @@ class VoiceMessageCardState extends State<VoiceMessageCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       totalDuration == 0
-                          ? CircularProgressIndicator.adaptive()
+                          ? Text("Processing...",
+                              style: const TextStyle(color: Colors.white70))
                           : currentPosition == 0
                               ? Text(
                                   _formatDuration(totalDuration).toString(),

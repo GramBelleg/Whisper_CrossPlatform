@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:whisper/components/own-message/forwarded_voice_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_voice_message.dart';
 import 'package:whisper/components/receive-message/received_voice_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
@@ -152,6 +154,20 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
         forwardedSenderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VM") {
+      debugPrint("FORWARDED VOICE MESSAGE HERE");
+      return ForwardedVoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
       );
     } else if (messageData.parentMessage != null && messageData.media == null) {
@@ -316,6 +332,19 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VM")) {
+      return ReceivedForwardedVoiceMessage(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
       );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
