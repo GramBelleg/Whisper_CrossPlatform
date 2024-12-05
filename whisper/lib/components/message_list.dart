@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -40,6 +41,9 @@ class MessageList extends StatefulWidget {
   final ValueChanged<ChatMessage> onRightSwipe;
   final List<int> isSelectedList;
   final int senderId;
+  final PlayerController playerController;
+  final Function(String) onPlay;
+
   const MessageList({
     required this.scrollController,
     required this.messages,
@@ -48,6 +52,8 @@ class MessageList extends StatefulWidget {
     required this.isSelectedList,
     required this.senderId,
     required this.onRightSwipe,
+    required this.playerController,
+    required this.onPlay,
   });
 
   @override
