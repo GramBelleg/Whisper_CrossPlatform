@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/audio_player_widget.dart';
 import 'package:whisper/components/own-message/own_message.dart';
@@ -12,6 +13,7 @@ class VoiceMessageCard extends StatefulWidget {
   final MessageStatus status;
   final String forwardedFrom;
   final bool isSent;
+  final WaveformType waveformType;
 
   const VoiceMessageCard({
     required this.blobName,
@@ -21,6 +23,7 @@ class VoiceMessageCard extends StatefulWidget {
     required this.status,
     required this.isSent,
     this.forwardedFrom = "",
+    required this.waveformType,
     super.key,
   });
 
@@ -71,7 +74,11 @@ class VoiceMessageCardState extends State<VoiceMessageCard> {
                     ],
                   )
                 : const SizedBox(),
-            AudioPlayerWidget(blobName: widget.blobName, isSent: widget.isSent),
+            AudioPlayerWidget(
+              blobName: widget.blobName,
+              isSent: widget.isSent,
+              waveformType: widget.waveformType,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

@@ -11,12 +11,14 @@ import 'package:whisper/services/read_file.dart';
 class AudioPlayerWidget extends StatefulWidget {
   final String blobName;
   final bool isSent;
+  final WaveformType waveformType;
   // final PlayerController playerController;
   // final Function(String) onPlay;
 
   const AudioPlayerWidget({
     required this.blobName,
     required this.isSent,
+    required this.waveformType,
     // required this.playerController,
     // required this.onPlay,
     super.key,
@@ -177,7 +179,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                     size: Size(MediaQuery.of(context).size.width / 1.8,
                         MediaQuery.of(context).size.height / 30),
                     playerController: playerController,
-                    waveformType: WaveformType.fitWidth,
+                    waveformType: widget.waveformType,
                     enableSeekGesture: true,
                     playerWaveStyle: waveStyle,
                   ),

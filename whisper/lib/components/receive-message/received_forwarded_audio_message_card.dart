@@ -1,13 +1,12 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
-import 'package:whisper/components/own-message/own_message.dart';
-import 'package:whisper/components/voice_message_card.dart';
+import 'package:whisper/components/audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_message.dart';
 
-class ForwardedVoiceMessageCard extends OwnMessage {
+class ReceivedForwardedAudioMessageCard extends ReceivedMessage {
   final String blobName;
   final String senderName;
 
-  ForwardedVoiceMessageCard({
+  ReceivedForwardedAudioMessageCard({
     required this.blobName,
     required super.message,
     required super.time,
@@ -19,15 +18,14 @@ class ForwardedVoiceMessageCard extends OwnMessage {
 
   @override
   Widget build(BuildContext context) {
-    return VoiceMessageCard(
+    return AudioMessageCard(
       blobName: blobName,
       message: message,
       time: formatTime(time),
       isSelected: isSelected,
       status: status,
-      isSent: true,
+      isSent: false,
       forwardedFrom: senderName,
-      waveformType: WaveformType.fitWidth,
     );
   }
 }

@@ -3,7 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/components/audio_message_card.dart';
+import 'package:whisper/components/own-message/forwarded_audio_message_card.dart';
 import 'package:whisper/components/own-message/forwarded_voice_message_card.dart';
+import 'package:whisper/components/own-message/sent_audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_audio_message_card.dart';
 import 'package:whisper/components/receive-message/received_forwarded_voice_message.dart';
 import 'package:whisper/components/receive-message/received_voice_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
@@ -177,23 +181,21 @@ class _MessageListState extends State<MessageList> {
         senderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
       );
-    } 
-    // else if (messageData.forwarded == true &&
-    //     messageData.media != null &&
-    //     messageData.media!.isNotEmpty &&
-    //     messageData.type == "AUDIO") {
-    //   debugPrint("FORWARDED AUDIO MESSAGE HERE");
-    //   return AudioMessageCard(
-    //     blobName: messageData.media!,
-    //     message: messageData.content,
-    //     time: messageData.time!,
-    //     isSelected: messageData.id != null &&
-    //         widget.isSelectedList.contains(messageData.id!),
-    //     senderName: messageData.forwardedFrom!.userName,
-    //     status: MessageStatus.sent,
-    //   );
-    // }
-    else if (messageData.parentMessage != null && messageData.media == null) {
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "AUDIO") {
+      debugPrint("FORWARDED AUDIO MESSAGE HERE");
+      return ForwardedAudioMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.parentMessage != null && messageData.media == null) {
       print(
           "aaaaaa${messageData.content}, ${messageData.time!},${messageData.id != null && widget.isSelectedList.contains(messageData.id!)},${messageData.parentMessage!.content},${messageData.parentMessage!.senderName}");
       return RepliedMessageCard(
@@ -293,14 +295,12 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
       );
-    } 
-    
-    else if (messageData.media != null &&
+    } else if (messageData.media != null &&
         messageData.media!.isNotEmpty &&
         messageData.type == "AUDIO") {
       debugPrint("RECEIVED AUDIO MESSAGE HERE");
       debugPrint("media=${messageData.media}, type=${messageData.type}");
-      return SentVoiceMessageCard(
+      return SentAudioMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -308,9 +308,7 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
       );
-    } 
-
-    else {
+    } else {
       if (kDebugMode) print("RECEIVED NORMAL MESSAGE HERE");
       if (kDebugMode)
         print("media=${messageData.media}, type=${messageData.type}");
@@ -378,6 +376,19 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "VM")) {
       return ReceivedForwardedVoiceMessage(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "AUDIO")) {
+      return ReceivedForwardedAudioMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -477,6 +488,19 @@ class _MessageListState extends State<MessageList> {
       debugPrint("RECEIVED VOICE MESSAGE HERE");
       debugPrint("media=${messageData.media}, type=${messageData.type}");
       return ReceivedVoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "AUDIO") {
+      debugPrint("RECEIVED AUDIO MESSAGE HERE");
+      debugPrint("media=${messageData.media}, type=${messageData.type}");
+      return ReceivedAudioMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,

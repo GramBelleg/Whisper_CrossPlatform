@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
 import 'package:whisper/components/voice_message_card.dart';
@@ -26,6 +27,7 @@ class ReceivedForwardedVoiceMessage extends ReceivedMessage {
       status: status,
       isSent: false,
       forwardedFrom: senderName,
+      waveformType: WaveformType.fitWidth,
     );
   }
 }

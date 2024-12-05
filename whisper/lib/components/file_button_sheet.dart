@@ -38,8 +38,8 @@ class FileButtonSheet extends StatelessWidget {
     // Use FilePicker to pick an audio file
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(type: FileType.audio, allowMultiple: false);
-        
-        // for now, let's keep it only one file
+
+    // for now, let's keep it only one file
 
     if (result != null) {
       // Get the selected audio file
@@ -262,6 +262,8 @@ class FileButtonSheet extends StatelessWidget {
               "The following files were too large and skipped: ${rejectedFiles.join(', ')}"),
         ),
       );
+      Navigator.of(context).pop();
+      return;
     }
 
     if (result != null) {
@@ -275,9 +277,9 @@ class FileButtonSheet extends StatelessWidget {
             SnackBar(
               content: Text(
                   "Sending ${file.name}. This may take some time, Please wait..."),
-                  duration: const Duration(seconds: 7),
-                  showCloseIcon: true,
-                  closeIconColor: secondNeutralColor,
+              duration: const Duration(seconds: 7),
+              showCloseIcon: true,
+              closeIconColor: secondNeutralColor,
             ),
           );
           await _sendFile(filePath, file.name, "AUDIO");
