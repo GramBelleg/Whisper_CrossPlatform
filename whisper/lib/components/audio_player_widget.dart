@@ -101,11 +101,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       await playerController.preparePlayer(
         path: filePath,
         shouldExtractWaveform: true,
-      );
-
-      await playerController.extractWaveformData(
-        path: filePath,
-        noOfSamples: waveStyle.getSamplesForWidth(300),
+        noOfSamples: 40,
       );
 
       totalDuration = await playerController
