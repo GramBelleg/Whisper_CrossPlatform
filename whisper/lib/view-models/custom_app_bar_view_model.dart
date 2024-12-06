@@ -1,4 +1,6 @@
 import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/models/chat_message.dart';
+import 'package:whisper/services/fetch_message_by_id.dart';
 
 class CustomAppBarViewModel {
   CustomAppBarViewModel();
@@ -20,6 +22,16 @@ class CustomAppBarViewModel {
           .emitDeleteMessageForEveryone(selectedMessageIds, chatId);
     } catch (e) {
       throw Exception("Error deleting messages for everyone: $e");
+    }
+  }
+
+  Future<void> editMessage(int messageId) async {
+    try {
+      final message = await fetchMessage(messageId);
+      print("hiiiiiiiiiiiiiii");
+      GlobalCubitProvider.messagesCubit.editMessage(messageId, message.content);
+    } catch (e) {
+      throw Exception("Error editing message: $e");
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/pages/forward_menu.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
@@ -11,7 +12,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final int chatId;
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
-
+  final bool isMine;
   const CustomAppBar({
     super.key,
     required this.isSelected,
@@ -20,6 +21,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.clearSelection,
     required this.chatViewModel, // Initialize ChatViewModel
     required this.chatId,
+    required this.isMine,
   });
 
   @override
@@ -190,7 +192,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     } else if (value == 'Pin') {
                       // Handle pin action
                     } else if (value == 'Edit') {
-                      // Handle edit action
+                      viewModel.editMessage(
+                        widget.isSelected.first,
+                      );
+                      if (widget.clearSelection != null) {
+                        widget.clearSelection!();
+                      }
                     } else if (value == 'Copy') {
                       // Handle copy action
                     }
@@ -205,10 +212,11 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       child: Text('Pin'),
                       //todo if messages is pin make text unpin
                     ),
-                    const PopupMenuItem(
-                      value: 'Edit',
-                      child: Text('Edit'),
-                    ),
+                    if (widget.isMine)
+                      const PopupMenuItem(
+                        value: 'Edit',
+                        child: Text('Edit'),
+                      ),
                     const PopupMenuItem(
                       value: 'Copy',
                       child: Text('Copy'),
@@ -219,8 +227,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ],
           )
         : AppBar(
-            iconTheme: const IconThemeData(
-              color: Color(0xff8D6AEE), // Default color for icons
+            iconTheme: IconThemeData(
+              color: primaryColor, // Default color for icons
             ),
             backgroundColor: const Color(0xff0A122F),
             leadingWidth: 100,

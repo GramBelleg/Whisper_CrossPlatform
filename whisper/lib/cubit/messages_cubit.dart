@@ -55,7 +55,9 @@ class MessagesCubit extends Cubit<MessagesState> {
     socket?.on('deleteMessage', (data) {
       _handleDeletedMessage(data);
     });
-
+    socket?.on('editMessage', (data) {
+      handleEditedMessage(data);
+    });
     socket?.on('error', (err) {
       print(err);
     });
@@ -179,5 +181,29 @@ class MessagesCubit extends Cubit<MessagesState> {
     final ids = List<int>.from(data['messages']);
     final chatId = data['chatId'];
     emit(MessagesDeletedSuccessfully(ids));
+  }
+
+  void editMessage(int messageId, String content) {
+    emit(MessageEditing(content, messageId));
+  }
+
+  void emitEditMessage(int messageId, int chatID, String content) {
+    final data = {
+      'id': messageId,
+      'chatId': chatID,
+      'content': content,
+    };
+    try {
+      socket?.emit("editMessage", data);
+    } catch (e) {
+      emit(MessageEditError(e.toString()));
+    }
+  }
+
+  void handleEditedMessage(Map<String, dynamic> data) {
+    print("edit message:${data}");
+    final messageId = data['messageId'];
+    final content = data['content'];
+    emit(MessageEdited(content, messageId));
   }
 }

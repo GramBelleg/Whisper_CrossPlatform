@@ -61,7 +61,9 @@ class _ChatPageState extends State<ChatPage> {
   bool _isRecording = false;
   bool _isPlaying = false;
   RecorderController recorderController = RecorderController();
-
+  bool _isEditing = false;
+  String _editingMessage = "";
+  int _editingMessageId = 0;
   @override
   void initState() {
     super.initState();
@@ -99,6 +101,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _isTyping = text.isNotEmpty;
     });
+    _editingMessage = "";
   }
 
   void _toggleEmojiPicker() {
@@ -160,6 +163,20 @@ class _ChatPageState extends State<ChatPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting message: ${state.error}')),
       );
+    } else if (state is MessageEditing) {
+      setState(() {
+        _isEditing = true;
+        _editingMessage = state.content;
+        _editingMessageId = state.messageId;
+        handleOncancelReply();
+      });
+    } else if (state is MessageEdited) {
+      print("zeyaaaaaaaaaaaaad${state.messageId}");
+      setState(() {
+        int index = messages.indexWhere((msg) => msg.id == state.messageId);
+        messages[index].content = state.content;
+        handleCancelEditing();
+      });
     }
   }
 
@@ -233,6 +250,24 @@ class _ChatPageState extends State<ChatPage> {
     } else {}
   }
 
+  void handleEditMessage() {
+    GlobalCubitProvider.messagesCubit.emitEditMessage(
+      _editingMessageId,
+      widget.ChatID,
+      _controller.text,
+    );
+    handleCancelEditing();
+  }
+
+  void handleCancelEditing() {
+    setState(() {
+      _isEditing = false;
+      _editingMessage = "";
+      _editingMessageId = 0;
+      _controller.clear();
+    });
+  }
+
   void startRecording() async {
     try {
       bool permission = await recorderController.checkPermission();
@@ -284,6 +319,11 @@ class _ChatPageState extends State<ChatPage> {
           clearSelection: clearIsSelected,
           chatId: widget.ChatID,
           chatViewModel: ChatViewModel(),
+          isMine: isSelectedList.length == 1 &&
+              isSelectedList.first != null &&
+              messages.any((message) =>
+                  message.id == isSelectedList.first &&
+                  message.sender?.id == widget.senderId),
         ),
         body: BlocProvider<MessagesCubit>.value(
           value: GlobalCubitProvider.messagesCubit,
@@ -377,6 +417,10 @@ class _ChatPageState extends State<ChatPage> {
                                                 isReplying: _isReplying,
                                                 handleOncancelReply:
                                                     handleOncancelReply,
+                                                isEditing: _isEditing,
+                                                editingMessage: _editingMessage,
+                                                handleCancelEditing:
+                                                    handleCancelEditing,
                                               )),
                                   ),
                                   Padding(
@@ -397,29 +441,43 @@ class _ChatPageState extends State<ChatPage> {
                                                 color: Color(0xff8D6AEE),
                                               ),
                                             )
-                                          : _isTyping
+                                          : _isEditing
                                               ? IconButton(
                                                   onPressed: () {
-                                                    handleSendMessage();
+                                                    handleEditMessage();
                                                   },
                                                   icon: FaIcon(
-                                                    FontAwesomeIcons.paperPlane,
+                                                    FontAwesomeIcons.check,
                                                     color: Color(0xff8D6AEE),
                                                   ),
                                                 )
-                                              : IconButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      startRecording();
-                                                      _isRecording = true;
-                                                      _isTyping = false;
-                                                    });
-                                                  },
-                                                  icon: FaIcon(
-                                                    FontAwesomeIcons.microphone,
-                                                    color: Color(0xff8D6AEE),
-                                                  ),
-                                                ),
+                                              : _isTyping
+                                                  ? IconButton(
+                                                      onPressed: () {
+                                                        handleSendMessage();
+                                                      },
+                                                      icon: FaIcon(
+                                                        FontAwesomeIcons
+                                                            .paperPlane,
+                                                        color:
+                                                            Color(0xff8D6AEE),
+                                                      ),
+                                                    )
+                                                  : IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          startRecording();
+                                                          _isRecording = true;
+                                                          _isTyping = false;
+                                                        });
+                                                      },
+                                                      icon: FaIcon(
+                                                        FontAwesomeIcons
+                                                            .microphone,
+                                                        color:
+                                                            Color(0xff8D6AEE),
+                                                      ),
+                                                    ),
                                     ),
                                   ),
                                 ],

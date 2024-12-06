@@ -48,3 +48,18 @@ class MessagesDeleteError extends MessagesState {
   final String error;
   MessagesDeleteError(this.error);
 }
+
+class MessageEditing extends MessagesState {
+  final String content;
+  final int messageId;
+  MessageEditing(this.content, this.messageId);
+}
+class MessageEdited extends MessagesState {
+  final String content;
+  final int messageId;
+  MessageEdited(this.content, this.messageId);
+}
+class MessageEditError extends MessagesState {
+  final String error;
+  MessageEditError(this.error);
+}
