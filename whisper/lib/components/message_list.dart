@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:whisper/components/own-message/forwarded_gif_message_card.dart';
+import 'package:whisper/components/own-message/sent_gif_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
 import 'package:whisper/components/own-message/replied_file_message_card.dart';
@@ -153,6 +155,22 @@ class _MessageListState extends State<MessageList> {
         forwardedSenderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
       );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "GIF") {
+      if (kDebugMode) print("RECEIVED GIF MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return ForwardedGifMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       print(
           "aaaaaa${messageData.content}, ${messageData.time!},${messageData.id != null && widget.isSelectedList.contains(messageData.id!)},${messageData.parentMessage!.content},${messageData.parentMessage!.senderName}");
@@ -247,6 +265,20 @@ class _MessageListState extends State<MessageList> {
       if (kDebugMode)
         print("media=${messageData.media}, type=${messageData.type}");
       return VoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "GIF") {
+      if (kDebugMode) print("RECEIVED GIF MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return SentGifMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,

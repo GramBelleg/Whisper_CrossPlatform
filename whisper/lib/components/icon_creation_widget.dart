@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 class IconCreationWidget extends StatelessWidget {
   final IconData icon;
   final String text;
+  final TextStyle textStyle;
   final Color color;
   final Function onTap;
 
@@ -9,6 +11,7 @@ class IconCreationWidget extends StatelessWidget {
     super.key,
     required this.icon,
     required this.text,
+    required this.textStyle,
     required this.color,
     required this.onTap,
   });
@@ -28,7 +31,10 @@ class IconCreationWidget extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          Text(text),
+          Text(
+            text,
+            style: textStyle,
+          ),
         ],
       ),
     );

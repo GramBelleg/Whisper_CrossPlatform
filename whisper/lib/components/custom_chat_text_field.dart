@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/gif_picker.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/components/file_button_sheet.dart';
 import 'package:whisper/components/emoji_button_sheet.dart';
@@ -17,6 +18,7 @@ class CustomChatTextField extends StatefulWidget {
   final ParentMessage? parentMessage;
   final bool isReplying;
   final VoidCallback toggleEmojiPicker;
+  final VoidCallback toggleGifPicker;
   final VoidCallback handleOncancelReply;
 
   CustomChatTextField({
@@ -27,6 +29,7 @@ class CustomChatTextField extends StatefulWidget {
     required this.textAlign,
     required this.textDirection,
     required this.toggleEmojiPicker,
+    required this.toggleGifPicker,
     required this.chatId,
     required this.senderId,
     required this.userName,
@@ -117,8 +120,13 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
             Navigator.pop(context);
             widget.toggleEmojiPicker();
           },
-          onStickerTap: () {},
-          onGifTap: () {},
+          onStickerTap: () {
+            Navigator.pop(context);
+          },
+          onGifTap: () {
+            Navigator.pop(context);
+            widget.toggleGifPicker();
+          },
         ),
       );
     }

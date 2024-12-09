@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon_creation_widget.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/global_cubit_provider.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/pages/selected_image_captioning.dart';
@@ -258,6 +259,7 @@ class FileButtonSheet extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: Card(
         margin: const EdgeInsets.all(18),
+        color: firstSecondaryColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
           child: Column(
@@ -267,18 +269,21 @@ class FileButtonSheet extends StatelessWidget {
                   IconCreationWidget(
                       icon: Icons.insert_drive_file,
                       text: "Document",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.indigo,
                       onTap: _pickFile),
                   Spacer(flex: 1),
                   IconCreationWidget(
                       icon: Icons.camera_alt,
                       text: "Camera",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.pink,
                       onTap: _pickImageFromCamera),
                   Spacer(flex: 1),
                   IconCreationWidget(
                       icon: Icons.insert_photo,
                       text: "Gallery",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.purple,
                       onTap: _pickImageFromGallery),
                 ],
@@ -289,18 +294,21 @@ class FileButtonSheet extends StatelessWidget {
                   IconCreationWidget(
                       icon: Icons.headset,
                       text: "Audio",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.orange,
                       onTap: _pickAudio),
                   Spacer(flex: 1),
                   IconCreationWidget(
                       icon: Icons.location_pin,
                       text: "Location",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.teal,
                       onTap: () {}),
                   Spacer(flex: 1),
                   IconCreationWidget(
                       icon: Icons.person,
                       text: "Contacts",
+                      textStyle: TextStyle(color: secondNeutralColor),
                       color: Colors.blue,
                       onTap: () {}),
                 ],
