@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/components/own-message/forwarded_gif_message_card.dart';
 import 'package:whisper/components/own-message/sent_gif_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_gif_message_card.dart';
+import 'package:whisper/components/receive-message/received_gif_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
 import 'package:whisper/components/own-message/replied_file_message_card.dart';
@@ -349,6 +351,19 @@ class _MessageListState extends State<MessageList> {
             widget.isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
       );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "GIF")) {
+      return ReceivedForwardedGifMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
         message: messageData.content,
@@ -427,6 +442,17 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "VIDEO")) {
       return VideoReceivedMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "GIF")) {
+      return ReceivedGifMessageCard(
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
