@@ -25,12 +25,10 @@ class _GifPickerState extends State<GifPicker> {
       isLoading = true;
     });
 
-    String defaultQuery = 'trending';
-    String searchQuery = query.isEmpty ? defaultQuery : query;
 
     final response = await http.get(
       Uri.parse(
-          "https://tenor.googleapis.com/v2/search?q=$searchQuery&key=$tenorApiKey&client_key=my_test_app&limit=9"),
+          "https://tenor.googleapis.com/v2/search?q=$query&key=$tenorApiKey&client_key=my_test_app&limit=9"),
     );
 
     if (response.statusCode == 200) {
@@ -50,6 +48,12 @@ class _GifPickerState extends State<GifPicker> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    searchGifs("trending");
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.3,
@@ -62,6 +66,7 @@ class _GifPickerState extends State<GifPicker> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _searchController,
+              onChanged: (value) => searchGifs(value),
               style: TextStyle(color: secondNeutralColor),
               decoration: InputDecoration(
                 labelText: 'Search GIFs',
@@ -69,13 +74,6 @@ class _GifPickerState extends State<GifPicker> {
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: primaryColor),
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: secondNeutralColor,
-                  ),
-                  onPressed: () => searchGifs(_searchController.text),
                 ),
               ),
             ),
