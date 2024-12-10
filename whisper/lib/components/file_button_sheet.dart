@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon_creation_widget.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/pages/selected_image_captioning.dart';
 import 'dart:io';
@@ -33,19 +34,16 @@ class FileButtonSheet extends StatelessWidget {
     required this.handleOncancelReply,
   }) : super(key: key);
 
-  void _pickAudio(BuildContext context) async {
+  void _pickAudio() async {
     // Use FilePicker to pick an audio file
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-    );
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(type: FileType.audio, allowMultiple: false);
+
+    // for now, let's keep it only one file
 
     if (result != null) {
       // Get the selected audio file
-      String? filePath = result.files.single.path;
-      String? fileName = result.files.single.name;
-
-      // You can now send the audio file or show a message with the file name
-      print("Audio selected: $fileName at $filePath");
+      handlePickAudio(result);
 
       // Add logic to send the audio or display it in the chat
       // For example:
@@ -248,6 +246,49 @@ class FileButtonSheet extends StatelessWidget {
       );
       Navigator.of(context).pop();
       print("File selection canceled");
+    }
+  }
+
+  void handlePickAudio(FilePickerResult? result) async {
+    List<String> rejectedFiles = [];
+    result = await filterFilesLessThan50MB(result, rejectedFiles);
+
+    if (rejectedFiles.isNotEmpty) {
+      print(
+          "The following files were too large and skipped: ${rejectedFiles.join(', ')}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "The following files were too large and skipped: ${rejectedFiles.join(', ')}"),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
+    if (result != null) {
+      Navigator.of(context).pop();
+      for (PlatformFile file in result.files) {
+        String? filePath = file.path;
+
+        if (filePath != null) {
+          print("Audio selected: ${file.name} at $filePath");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  "Sending ${file.name}. This may take some time, Please wait..."),
+              duration: const Duration(seconds: 7),
+              showCloseIcon: true,
+              closeIconColor: secondNeutralColor,
+            ),
+          );
+          await _sendFile(filePath, file.name, "AUDIO");
+        } else {
+          print("File path is null for ${file.name}");
+        }
+      }
+    } else {
+      print("Audio selection canceled");
     }
   }
 

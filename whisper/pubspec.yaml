@@ -82,6 +82,7 @@ dependencies:
   app_links: ^6.3.2
   flutter_inappwebview: ^6.1.5
   audio_waveforms: ^1.1.0
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:

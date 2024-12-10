@@ -59,8 +59,9 @@ class _ChatPageState extends State<ChatPage> {
 
   // Voice Recording Utilities
   bool _isRecording = false;
-  bool _isPlaying = false;
+  String? currentlyPlayingBlobName;
   RecorderController recorderController = RecorderController();
+  late PlayerController globalPlayerController;
 
   @override
   void initState() {
@@ -74,6 +75,7 @@ class _ChatPageState extends State<ChatPage> {
         });
       }
     });
+    globalPlayerController = PlayerController();
   }
 
   @override
@@ -81,6 +83,7 @@ class _ChatPageState extends State<ChatPage> {
     _controller.dispose();
     focusNode.dispose();
     recorderController.dispose();
+    globalPlayerController.dispose();
     super.dispose();
   }
 
@@ -274,6 +277,16 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void onPlay(String blobName) {
+    if (currentlyPlayingBlobName != null &&
+        currentlyPlayingBlobName != blobName) {
+      globalPlayerController.pausePlayer();
+    }
+    setState(() {
+      currentlyPlayingBlobName = blobName;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,6 +327,8 @@ class _ChatPageState extends State<ChatPage> {
                                 onRightSwipe: handleOnRightSwipe,
                                 isSelectedList: isSelectedList,
                                 senderId: widget.senderId!,
+                                playerController: globalPlayerController,
+                                onPlay: onPlay,
                               )),
                         ),
                         Align(
