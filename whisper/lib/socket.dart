@@ -23,6 +23,7 @@ class SocketService {
   Future<void> connectSocket() async {
     _clearExistingListeners();
     String? token = await getToken();
+    print("tokeeeeeeeen:$token");
     _initializeSocket(token);
     print(socket);
     GlobalCubitProvider.messagesCubit.setupSocketListeners();

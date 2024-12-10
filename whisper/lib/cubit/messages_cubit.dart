@@ -202,7 +202,7 @@ class MessagesCubit extends Cubit<MessagesState> {
 
   void handleEditedMessage(Map<String, dynamic> data) {
     print("edit message:${data}");
-    final messageId = data['messageId'];
+    final messageId = data['id'];
     final content = data['content'];
     emit(MessageEdited(content, messageId));
   }

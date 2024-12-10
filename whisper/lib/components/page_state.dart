@@ -7,7 +7,8 @@ import 'package:whisper/services/fetch_user_info.dart';
 import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/cubit/settings_cubit.dart';
-import 'package:whisper/socket.dart'; 
+import 'package:whisper/socket.dart';
+
 class PageState extends StatefulWidget {
   static const String id = '/page_state';
   const PageState({super.key});
@@ -25,6 +26,7 @@ class _MyPageState extends State<PageState> {
   @override
   void initState() {
     super.initState();
+    SocketService.instance.connectSocket();
     loadUserInfo();
   }
 
@@ -42,7 +44,6 @@ class _MyPageState extends State<PageState> {
 
   @override
   Widget build(BuildContext context) {
-    SocketService.instance.connectSocket();
     return BlocProvider(
       create: (context) =>
           SettingsCubit()..loadUserState(), // Provide the cubit

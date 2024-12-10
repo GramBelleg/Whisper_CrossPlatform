@@ -9,6 +9,7 @@ import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/global_cubit_provider.dart';
 import 'package:whisper/models/chat_message.dart';
+import 'package:whisper/models/chat_message_manager.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/components/custom_app_bar.dart';
 import 'package:whisper/components/emoji_select.dart';
@@ -52,7 +53,7 @@ class _ChatPageState extends State<ChatPage> {
       GlobalKey<FormFieldState<String>>();
   int lastVisibleMessageIndex = 0;
   List<int> isSelectedList = [];
-  List<ChatMessage> messages = [];
+  ChatMessageManager chatMessageManager = ChatMessageManager();
   ParentMessage? _replyingTo; // Stores the message being replied to
   bool _isReplying = false; // Tracks if in reply mode
   double paddingSpaceForReplay = 0;
@@ -122,64 +123,6 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _handleMessagesState(BuildContext context, MessagesState state) {
-    if (state is MessagesLoading) {
-      print("loading");
-    } else if (state is MessageFetchedSuccessfully) {
-      setState(() {
-        messages = state.messages;
-        messages = messages.reversed.toList();
-      });
-    } else if (state is MessageFetchedWrong) {
-      print("error");
-    } else if (state is MessageSent) {
-      setState(() {
-        if (state.message.chatId == widget.ChatID) {
-          messages.insert(0, state.message);
-        }
-      });
-    } else if (state is MessageReceived) {
-      print("received");
-      handleOncancelReply();
-      DateTime receivedTime = state.message.time!.toLocal();
-      int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
-      if (state.message.chatId == widget.ChatID) {
-        if (index != -1) {
-          setState(() {
-            messages[index] = state.message;
-          });
-        } else {
-          setState(() {
-            messages.insert(0, state.message);
-          });
-        }
-      }
-    } else if (state is MessagesDeletedSuccessfully) {
-      print("deletedk${state.deletedIds}");
-      setState(() {
-        messages.removeWhere((msg) => state.deletedIds.contains(msg.id));
-      });
-    } else if (state is MessagesDeleteError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting message: ${state.error}')),
-      );
-    } else if (state is MessageEditing) {
-      setState(() {
-        _isEditing = true;
-        _editingMessage = state.content;
-        _editingMessageId = state.messageId;
-        handleOncancelReply();
-      });
-    } else if (state is MessageEdited) {
-      print("zeyaaaaaaaaaaaaad${state.messageId}");
-      setState(() {
-        int index = messages.indexWhere((msg) => msg.id == state.messageId);
-        messages[index].content = state.content;
-        handleCancelEditing();
-      });
-    }
-  }
-
   double getContainerHeight(BuildContext context) {
     double height;
     if (show) {
@@ -217,7 +160,6 @@ class _ChatPageState extends State<ChatPage> {
           id: messageData.id!,
           content: messageData.content,
           senderName: messageData.sender!.userName);
-      // paddingSpaceForReplay = 70;
     });
   }
 
@@ -257,6 +199,12 @@ class _ChatPageState extends State<ChatPage> {
       _controller.text,
     );
     handleCancelEditing();
+  }
+
+  void handleEditingMessage(String content, int messageId) {
+    _isEditing = true;
+    _editingMessage = content;
+    _editingMessageId = messageId;
   }
 
   void handleCancelEditing() {
@@ -321,7 +269,7 @@ class _ChatPageState extends State<ChatPage> {
           chatViewModel: ChatViewModel(),
           isMine: isSelectedList.length == 1 &&
               isSelectedList.first != null &&
-              messages.any((message) =>
+              chatMessageManager.messages.any((message) =>
                   message.id == isSelectedList.first &&
                   message.sender?.id == widget.senderId),
         ),
@@ -329,7 +277,17 @@ class _ChatPageState extends State<ChatPage> {
           value: GlobalCubitProvider.messagesCubit,
           child: BlocListener<MessagesCubit, MessagesState>(
               listener: (context, state) {
-                _handleMessagesState(context, state);
+                setState(() {
+                  chatMessageManager.handleMessagesState(
+                      context,
+                      state,
+                      widget.ChatID,
+                      widget.userName,
+                      widget.senderId!,
+                      handleOncancelReply,
+                      handleCancelEditing,
+                      handleEditingMessage);
+                });
               },
               child: Container(
                 color: const Color(0xff0a254a),
@@ -348,7 +306,7 @@ class _ChatPageState extends State<ChatPage> {
                                   bottom: paddingSpaceForReplay),
                               child: MessageList(
                                 scrollController: _scrollController2,
-                                messages: messages,
+                                messages: chatMessageManager.messages,
                                 onLongPress: handleLongPressSelection,
                                 onTap: handleOnTapSelection,
                                 onRightSwipe: handleOnRightSwipe,

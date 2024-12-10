@@ -5,11 +5,13 @@ import 'package:whisper/constants/ip_for_services.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/show_loading_dialog.dart';
+import 'package:whisper/socket.dart';
 
 class LogoutService {
   static Future<void> logoutFromAllDevices(BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/user/logoutAll');
     final token = await getToken();
+
     showLoadingDialog(context);
     try {
       final response = await http.get(
@@ -23,6 +25,7 @@ class LogoutService {
 
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        SocketService.instance.dispose();
         print('Response: $data');
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -62,6 +65,7 @@ class LogoutService {
 
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        SocketService.instance.dispose();
         print('Response: $data');
         Navigator.pushNamedAndRemoveUntil(
           context,
