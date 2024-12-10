@@ -127,7 +127,8 @@ class _MainChatsState extends State<MainChats> {
                   if (index == 0) {
                     return _buildMyStoryWidget(myUser);
                   } else {
-                    return _buildUserStoryWidget(users[index - 1], users);
+                    return _buildUserStoryWidget(
+                        users[index - 1], users, index - 1);
                   }
                 },
               ),
@@ -195,7 +196,7 @@ class _MainChatsState extends State<MainChats> {
     );
   }
 
-  Widget _buildUserStoryWidget(User user, List<User> users) {
+  Widget _buildUserStoryWidget(User user, List<User> users, int userIndex) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
@@ -203,7 +204,8 @@ class _MainChatsState extends State<MainChats> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => StoryPage(users: users, userIndex: 0),
+              builder: (context) =>
+                  StoryPage(users: users, userIndex: userIndex),
             ),
           );
         },

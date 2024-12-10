@@ -9,8 +9,8 @@ class ProfileSection extends StatelessWidget {
   final String profilePicState;
   final String usernameState;
   final UserState? userState;
-  final Function() showImageSourceDialog;
-  final Function() showProfileOrStatusOptions;
+  final Function()? showImageSourceDialog;
+  final Function()? showProfileOrStatusOptions;
 
   const ProfileSection({
     Key? key,
@@ -18,9 +18,9 @@ class ProfileSection extends StatelessWidget {
     required this.hasStory,
     required this.profilePicState,
     required this.usernameState,
-    required this.userState,
-    required this.showImageSourceDialog,
-    required this.showProfileOrStatusOptions,
+    this.userState,
+    this.showImageSourceDialog,
+    this.showProfileOrStatusOptions,
   }) : super(key: key);
 
   @override
@@ -48,10 +48,10 @@ class ProfileSection extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     if (isEditing) {
-                      showImageSourceDialog();
+                      showImageSourceDialog!();
                     } else {
                       if (hasStory) {
-                        showProfileOrStatusOptions();
+                        showProfileOrStatusOptions!();
                       } else {
                         viewProfilePhoto(context, profilePicState);
                       }
@@ -69,19 +69,12 @@ class ProfileSection extends StatelessWidget {
                                 Colors.grey, BlendMode.saturation)
                             : const ColorFilter.mode(
                                 Colors.transparent, BlendMode.saturation),
-                        child: profilePicState.isEmpty
-                            ? Image.network(
-                                'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(usernameState)}',
-                                fit: BoxFit.cover,
-                                width: 140,
-                                height: 140,
-                              )
-                            : Image.network(
-                                profilePicState,
-                                fit: BoxFit.cover,
-                                width: 140,
-                                height: 140,
-                              ),
+                        child: Image.network(
+                          profilePicState,
+                          fit: BoxFit.cover,
+                          width: 140,
+                          height: 140,
+                        ),
                       ),
                     ),
                   ),

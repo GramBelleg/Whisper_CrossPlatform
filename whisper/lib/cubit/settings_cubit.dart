@@ -91,7 +91,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     final userState = (state as SettingsLoaded).userState;
     userState?.copyWith(
         profilePic:
-            'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(userState.name)}');
+            'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(userState.username)}');
     _emitUpdatedState();
   }
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/models/user_state.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
@@ -33,7 +34,8 @@ Future<UserState?> fetchUserInfo() async {
         username: data['userName'] ?? 'unknown_user',
         email: data['email'] ?? 'No email',
         bio: data['bio'] ?? '',
-        profilePic: data['profilePic'] ?? '',
+        profilePic: data['profilePic'] ??
+            "https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(data['userName'])}",
         lastSeen: data['lastSeen'] ?? '',
         status: data['status'] ?? 'offline',
         phoneNumber: data['phoneNumber'] ?? 'Not provided',
