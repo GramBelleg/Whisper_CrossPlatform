@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../pages/contacts.dart';
 import '../pages/main_chats.dart';
-import '../pages/setting.dart';
+import '../pages/profile_setting.dart';
 
 class AppNavigator {
   static Widget getScreen(int selectedIndex) {
