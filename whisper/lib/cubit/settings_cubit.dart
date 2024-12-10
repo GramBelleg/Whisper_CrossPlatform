@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/models/user_state.dart';
+import 'package:whisper/services/fetch_user_info.dart';
 import 'package:whisper/services/send_confirmation_code_email.dart';
 import 'package:whisper/services/verify_email_code.dart';
 import 'package:whisper/services/read_file.dart';
@@ -27,57 +29,78 @@ class SettingsCubit extends Cubit<SettingsState> {
   String phoneNumberState = '';
   String bioState = '';
 
+  String nameStateUpdate = '';
+  String usernameStateUpdate = '';
+  String emailStateUpdate = '';
+  String phoneNumberStateUpdate = '';
+  String bioStateUpdate = '';
+
   SettingsCubit()
       : nameController = TextEditingController(),
         usernameController = TextEditingController(),
         phoneController = TextEditingController(),
         emailController = TextEditingController(),
         bioController = TextEditingController(),
-        super(SettingsInitial());
+        super(SettingsLoading());
 
   // Helper method to update the state
   void _emitUpdatedState() async {
     final userState = await getUserState();
     emit(SettingsLoaded(
-      userState: userState,
-      isEditing: isEditing,
-      nameController: nameController,
-      usernameController: usernameController,
-      emailController: emailController,
-      bioController: bioController,
-      phoneController: phoneController,
-      nameState: nameState,
-      usernameState: usernameState,
-      emailState: emailState,
-      phoneNumberState: phoneNumberState,
-      bioState: bioState,
-    ));
+        userState: userState,
+        isEditing: isEditing,
+        nameController: nameController,
+        usernameController: usernameController,
+        emailController: emailController,
+        bioController: bioController,
+        phoneController: phoneController,
+        nameState: userState!.name,
+        usernameState: userState.username,
+        emailState: userState.email,
+        phoneNumberState: userState.phoneNumber,
+        bioState: userState.bio,
+        nameStateUpdate: nameStateUpdate,
+        usernameStateUpdate: usernameStateUpdate,
+        emailStateUpdate: emailStateUpdate,
+        phoneNumberStateUpdate: phoneNumberStateUpdate,
+        bioStateUpdate: bioStateUpdate,
+        profilePicState: userState.profilePic,
+        hasStory: userState.hasStory));
   }
 
-  void sendMyStory(String blobName, String content, String type) {
-    SocketService.instance.sendStory(blobName, content, type);
+  void sendMyStory(String content, String blobName, String type) {
+    print("send my story");
+    SocketService.instance.sendStory(content, blobName, type);
   }
 
   void deleteMyStory(int storyId) {
-    print("delete my storyyy");
+    print("delete my story");
     SocketService.instance.deleteStory(storyId);
   }
 
-  void sendProfilePhoto(String blobName) {
-    socket?.emit('pfp', {'profilePic': blobName});
+  void sendProfilePhoto(String blobName, {bool toRemove = false}) {
+    if (!toRemove) {
+      socket?.emit('pfp', {'profilePic': blobName});
+    } else {
+      socket?.emit('pfp', {'profilePic': null});
+    }
   }
 
   void removeProfilePic() {
-    sendProfilePhoto('');
+    sendProfilePhoto('', toRemove: true);
     final userState = (state as SettingsLoaded).userState;
-    userState?.copyWith(profilePic: '');
+    userState?.copyWith(
+        profilePic:
+            'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(userState.name)}');
     _emitUpdatedState();
   }
 
   Future<void> loadUserState() async {
     try {
-      final userState = await getUserState();
+      emit(SettingsLoading());
+      final userState = await fetchUserInfo();
       if (userState != null) {
+        await saveUserState(userState); // save in shared preferences
         _populateControllers(userState);
         _emitUpdatedState();
       } else {
@@ -102,46 +125,48 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   Future<void> resetStateMessages() async {
-    nameState = '';
-    usernameState = '';
-    emailState = '';
-    phoneNumberState = '';
-    bioState = '';
+    nameStateUpdate = '';
+    usernameStateUpdate = '';
+    emailStateUpdate = '';
+    phoneNumberStateUpdate = '';
+    bioStateUpdate = '';
     _populateControllers(await getUserState() as UserState);
     _emitUpdatedState();
   }
 
   Future<void> updateHasStoryUserState() async {
     final userState = await getUserState();
-    if (!userState!.hasStory)
-      userState?.copyWith(hasStory: !userState.hasStory);
+    if (!userState!.hasStory) {
+      //remove if condation after update backend this
+      userState.copyWith(hasStory: !userState.hasStory);
+    }
     print("update hasStory");
     _emitUpdatedState();
   }
 
   // Setter functions for States
-  Future<void> setNameState(String state) async {
-    nameState = state;
+  Future<void> setNameStateUpdate(String state) async {
+    nameStateUpdate = state;
     _emitUpdatedState();
   }
 
-  Future<void> setUsernameState(String state) async {
-    usernameState = state;
+  Future<void> setUsernameStateUpdate(String state) async {
+    usernameStateUpdate = state;
     _emitUpdatedState();
   }
 
-  Future<void> setPhoneNumberState(String state) async {
-    phoneNumberState = state;
+  Future<void> setPhoneNumberStateUpdate(String state) async {
+    phoneNumberStateUpdate = state;
     _emitUpdatedState();
   }
 
-  Future<void> setEmailState(String state) async {
-    emailState = state;
+  Future<void> setEmailStateUpdate(String state) async {
+    emailStateUpdate = state;
     _emitUpdatedState();
   }
 
-  Future<void> setBioState(String state) async {
-    bioState = state;
+  Future<void> setBioStateUpdate(String state) async {
+    bioStateUpdate = state;
     _emitUpdatedState();
   }
 
@@ -192,10 +217,5 @@ class SettingsCubit extends Cubit<SettingsState> {
       _emitUpdatedState();
     }
     return response;
-  }
-
-  @override
-  Future<void> close() {
-    return super.close();
   }
 }

@@ -1,4 +1,4 @@
-import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
 
 class CustomAppBarViewModel {
   CustomAppBarViewModel();

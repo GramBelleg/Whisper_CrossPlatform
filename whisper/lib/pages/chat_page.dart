@@ -7,7 +7,7 @@ import 'package:whisper/components/custom_chat_text_field.dart';
 import 'package:whisper/components/reply_preview.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
-import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/components/custom_app_bar.dart';
