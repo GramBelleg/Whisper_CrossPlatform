@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ChatViewModel {
   List<ChatMessage> _messages = [];
@@ -11,29 +12,36 @@ class ChatViewModel {
   Future<void> fetchChatMessages(int chatId) async {
     final url = Uri.parse('http://$ip:5000/api/messages/$chatId');
     String? token = await getToken();
-
     if (token == null) {
-      throw Exception('Authorization token is missing');
+      print('Authorization token is missing');
+      return;
     }
 
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = json.decode(response.body);
 
-      List<dynamic> messagesData = jsonData['messages'];
-      print(messagesData);
+        List<dynamic> messagesData = jsonData['messages'];
+        print(messagesData);
 
-      _messages =
-          messagesData.map((message) => ChatMessage.fromJson(message)).toList();
-    } else {
-      throw Exception('Failed to load chat messages: ${response.statusCode}');
+        _messages = messagesData
+            .map((message) => ChatMessage.fromJson(message))
+            .toList();
+        await cacheMessages(chatId, _messages);
+      } else {
+        print('Failed to load chat messages: ${response.statusCode}');
+      }
+    } catch (e) {
+      _messages = await loadCachedMessages(chatId);
+      print('Error while fetching chat messages: $e');
     }
   }
 }

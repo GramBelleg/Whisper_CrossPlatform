@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/models/chat_message.dart';
+import 'package:whisper/services/shared_preferences.dart';
 
 class ChatMessageManager {
   List<ChatMessage> messages = [];
@@ -72,9 +73,11 @@ class ChatMessageManager {
         } else {
           addMessage(state.message);
         }
+        cacheSingleMessage(chatId, state.message);
       }
     } else if (state is MessagesDeletedSuccessfully) {
       removeMessagesByIds(state.deletedIds);
+      removeCachedMessagesByIds(chatId, state.deletedIds);
     } else if (state is MessagesDeleteError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting message: ${state.error}')),
@@ -84,6 +87,7 @@ class ChatMessageManager {
       handleCancelReply();
     } else if (state is MessageEdited) {
       editMessageContentById(state.messageId, state.content);
+      editCachedMessageContentById(chatId, state.messageId, state.content);
       handleCancelEditing();
     }
   }

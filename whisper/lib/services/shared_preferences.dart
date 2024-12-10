@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/models/user_state.dart';
 
 final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
@@ -72,6 +73,72 @@ Future<UserState?> getUserState() async {
   print('Loaded UserState: $userState');
   return userState;
 }
+
+Future<void> cacheMessages(int chatId, List<ChatMessage> messages) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String> cachedMessages =
+      messages.map((message) => jsonEncode(message.toJson())).toList();
+  await prefs.setStringList('cached_messages_$chatId', cachedMessages);
+  print('Messages for chatId $chatId cached');
+}
+
+Future<void> cacheSingleMessage(int chatId, ChatMessage message) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String cachedMessage = jsonEncode(message.toJson());
+  await prefs.setString('cached_message_$chatId', cachedMessage);
+  print('Single message for chatId $chatId cached');
+}
+
+Future<List<ChatMessage>> loadCachedMessages(int chatId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String>? cachedMessages = prefs.getStringList('cached_messages_$chatId');
+  if (cachedMessages != null) {
+    return cachedMessages
+        .map((messageJson) => ChatMessage.fromJson(jsonDecode(messageJson)))
+        .toList();
+  }
+  return [];
+}
+
+Future<void> removeCachedMessagesByIds(int chatId, List<int> messageIds) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String>? cachedMessages = prefs.getStringList('cached_messages_$chatId');
+
+  if (cachedMessages != null) {
+    List<String> filteredMessages = cachedMessages.where((messageJson) {
+      ChatMessage message = ChatMessage.fromJson(jsonDecode(messageJson));
+      return !messageIds.contains(message.id);
+    }).toList();
+    await prefs.setStringList('cached_messages_$chatId', filteredMessages);
+    print(
+        'Messages with IDs ${messageIds.join(', ')} removed for chatId $chatId');
+  }
+}
+
+Future<void> editCachedMessageContentById(
+    int chatId, int id, String newContent) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String>? cachedMessages = prefs.getStringList('cached_messages_$chatId');
+  if (cachedMessages != null) {
+    try {
+      String messageJson = cachedMessages.firstWhere((messageJson) {
+        ChatMessage message = ChatMessage.fromJson(jsonDecode(messageJson));
+        return message.id == id;
+      });
+      ChatMessage message = ChatMessage.fromJson(jsonDecode(messageJson));
+      message.content = newContent;
+      cachedMessages[cachedMessages.indexOf(messageJson)] =
+          jsonEncode(message.toJson());
+      await prefs.setStringList('cached_messages_$chatId', cachedMessages);
+      print('Message content updated for message ID $id in chatId $chatId');
+    } catch (e) {
+      print('Message with ID $id not found.');
+    }
+  }
+}
+
+
+
 
 // Future<void> saveUser(User user) async {
 //   SharedPreferences prefs = await SharedPreferences.getInstance();
