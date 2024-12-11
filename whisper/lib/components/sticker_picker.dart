@@ -1,15 +1,10 @@
 import 'dart:io';
-import 'dart:math';
-
+import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:whisper/constants/ip_for_services.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/services/stickers_service.dart';
-import 'package:whisper/services/upload_file.dart';
 
 class StickerPicker extends StatefulWidget {
   final Function(String) onStickerSelected;
@@ -32,17 +27,14 @@ class _StickerPickerState extends State<StickerPicker> {
       isLoading = true;
     });
 
-    await stickersService.downloadAllDbSickers();
+    await stickersService.syncStickersWithDb();
 
     Directory? baseDir = await getExternalStorageDirectory();
     String stickersDir = "${baseDir!.path}/stickers";
 
     if (await Directory(stickersDir).exists()) {
-      List<String> stickerFiles = Directory(stickersDir)
-          .listSync()
-          .where((file) => file is File && file.path.endsWith('.webp'))
-          .map((file) => file.path)
-          .toList();
+      List<String> stickerFiles =
+          Directory(stickersDir).listSync().map((file) => file.path).toList();
       setState(() {
         stickers = stickerFiles;
       });
@@ -68,12 +60,17 @@ class _StickerPickerState extends State<StickerPicker> {
       String? filePath = file.path;
       print("Sticker selected: ${file.name} at $filePath");
       if (filePath != null) {
-        String blobName = await stickersService.uploadSticker(filePath);
+        setState(() {
+          isLoading = true;
+        });
 
-        // // //TODO: recheck this
-        // setState(() {
-        //   stickers.add(blobName);
-        // });
+        await stickersService.uploadSticker(filePath);
+
+        fetchStickers();
+
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
@@ -95,9 +92,21 @@ class _StickerPickerState extends State<StickerPicker> {
       height: MediaQuery.of(context).size.height * 0.4,
       color: firstNeutralColor,
       child: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeWidth: 2,
+                ),
+                Text(' Refreshing stickers db',
+                    style: TextStyle(color: Colors.white)),
+              ],
+            )
           : stickers.isEmpty
               ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Center(
                       child: Text(
@@ -126,14 +135,16 @@ class _StickerPickerState extends State<StickerPicker> {
                           String stickerPath = stickers[index];
                           return GestureDetector(
                             onTap: () {
-                              widget.onStickerSelected(stickers[index]);
+                              widget.onStickerSelected(
+                                  path.basename(stickers[index]));
                             },
                             child: Container(
                               height: 50,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
+                                // border: Border.all(color: Colors.white),
                               ),
                               child: Image.file(
                                 File(stickerPath),

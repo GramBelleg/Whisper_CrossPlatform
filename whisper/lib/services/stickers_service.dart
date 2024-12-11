@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 class StickersService {
   String? _token;
 
-  Future<List<String>> fetchExistingStickersBlobNames() async {
+  Future<List<String>> fetchDbStickersBlobNames() async {
     _token = await getToken();
 
     try {
@@ -141,7 +141,7 @@ class StickersService {
     }
   }
 
-  Future<void> downloadAllDbSickers() async {
+  Future<void> syncStickersWithDb() async {
     // let's put all the stickers in a folder called stickers
     await Permission.storage.request();
     Directory? baseDir = await getExternalStorageDirectory();
@@ -152,12 +152,12 @@ class StickersService {
     }
 
     Dio dio = Dio();
-    final List<String> blobNames = await fetchExistingStickersBlobNames();
+    final List<String> blobNames = await fetchDbStickersBlobNames();
     for (String blobName in blobNames) {
       String stickerPath = "$stickersDir/$blobName";
 
       // change extension of the files from .sticker to .webp
-      stickerPath = stickerPath.replaceFirst(".sticker", ".webp");
+      // stickerPath = stickerPath.replaceFirst(".sticker", ".webp");
 
       if (!File(stickerPath).existsSync()) {
         String fileUrl = await generatePresignedUrl(blobName);
@@ -167,6 +167,17 @@ class StickersService {
         if (File(stickerPath).existsSync()) {
           print("Sticker downloaded successfully at $stickerPath");
         }
+      }
+    }
+
+    List<String> ExistingStickerFiles =
+        Directory(stickersDir).listSync().map((file) => file.path).toList();
+
+    // if the sticker file is not ti the blobNames, delete it
+    for (String stickerFile in ExistingStickerFiles) {
+      if (!blobNames.contains(stickerFile.split('/').last)) {
+        File(stickerFile).delete();
+        print("Deleted $stickerFile");
       }
     }
   }
