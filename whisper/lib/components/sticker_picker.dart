@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:whisper/constants/ip_for_services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -30,20 +32,27 @@ class _StickerPickerState extends State<StickerPicker> {
       isLoading = true;
     });
 
-    stickers = await stickersService.fetchExistingStickersBlobNames();
+    await stickersService.downloadAllDbSickers();
 
-    // stickers_presignedurls =
-    //     await stickersService.fetchExistingStickersPresignedUrls();
+    Directory? baseDir = await getExternalStorageDirectory();
+    String stickersDir = "${baseDir!.path}/stickers";
+
+    if (await Directory(stickersDir).exists()) {
+      List<String> stickerFiles = Directory(stickersDir)
+          .listSync()
+          .where((file) => file is File && file.path.endsWith('.webp'))
+          .map((file) => file.path)
+          .toList();
+      setState(() {
+        stickers = stickerFiles;
+      });
+    }
 
     setState(() {
       isLoading = false;
       isError = false;
     });
   }
-
-  // Future<void> sendSticker(String filePath, String content) async {
-  //   String uploadResult = await uploadFile(filePath);
-  // }
 
   Future<void> addStickerFromPhone() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -61,10 +70,10 @@ class _StickerPickerState extends State<StickerPicker> {
       if (filePath != null) {
         String blobName = await stickersService.uploadSticker(filePath);
 
-        // //TODO: recheck this
-        setState(() {
-          stickers.add(blobName);
-        });
+        // // //TODO: recheck this
+        // setState(() {
+        //   stickers.add(blobName);
+        // });
       }
     }
   }
@@ -114,6 +123,7 @@ class _StickerPickerState extends State<StickerPicker> {
                         itemCount: stickers.length,
                         padding: EdgeInsets.all(10),
                         itemBuilder: (context, index) {
+                          String stickerPath = stickers[index];
                           return GestureDetector(
                             onTap: () {
                               widget.onStickerSelected(stickers[index]);
@@ -125,9 +135,9 @@ class _StickerPickerState extends State<StickerPicker> {
                                 color: Colors.blue,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
-                                stickers[index],
-                                style: TextStyle(fontSize: 24),
+                              child: Image.file(
+                                File(stickerPath),
+                                fit: BoxFit.cover,
                               ),
                             ),
                           );

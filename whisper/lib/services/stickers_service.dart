@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:whisper/services/read_file.dart';
 
 import '../constants/ip_for_services.dart';
 import 'shared_preferences.dart';
@@ -38,7 +41,7 @@ class StickersService {
     }
   }
 
-  Future<List<String>> getPresignedURLforStickers() async {
+  Future<List<String>> getPresignedURLforUploadingStickers() async {
     // 1. Get the presigned URL from /media/write
     final String apiUrl = 'http://$ip:5000/api/media/write';
     String? token = await getToken();
@@ -73,7 +76,7 @@ class StickersService {
   }
 
   Future<String> uploadSticker(String filePath) async {
-    final List<String> temp = await getPresignedURLforStickers();
+    final List<String> temp = await getPresignedURLforUploadingStickers();
     final String presignedUrl = temp[0];
     final String blobName = temp[1];
     print("TRYING TO UPLOAD STICKER: $presignedUrl");
@@ -135,6 +138,36 @@ class StickersService {
       }
     } catch (e) {
       throw Exception("Failed to download sticker: $e");
+    }
+  }
+
+  Future<void> downloadAllDbSickers() async {
+    // let's put all the stickers in a folder called stickers
+    await Permission.storage.request();
+    Directory? baseDir = await getExternalStorageDirectory();
+    String stickersDir = "${baseDir!.path}/stickers";
+    // create stickersDir if it does not extist
+    if (!await Directory(stickersDir).exists()) {
+      await Directory(stickersDir).create(recursive: true);
+    }
+
+    Dio dio = Dio();
+    final List<String> blobNames = await fetchExistingStickersBlobNames();
+    for (String blobName in blobNames) {
+      String stickerPath = "$stickersDir/$blobName";
+
+      // change extension of the files from .sticker to .webp
+      stickerPath = stickerPath.replaceFirst(".sticker", ".webp");
+
+      if (!File(stickerPath).existsSync()) {
+        String fileUrl = await generatePresignedUrl(blobName);
+        print("Downloading new sticker: $fileUrl");
+        await dio.download(fileUrl, stickerPath);
+
+        if (File(stickerPath).existsSync()) {
+          print("Sticker downloaded successfully at $stickerPath");
+        }
+      }
     }
   }
 }
