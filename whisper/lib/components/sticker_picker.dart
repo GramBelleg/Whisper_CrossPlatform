@@ -68,9 +68,6 @@ class _StickerPickerState extends State<StickerPicker> {
 
         fetchStickers();
 
-        setState(() {
-          isLoading = false;
-        });
       }
     }
   }
@@ -116,7 +113,10 @@ class _StickerPickerState extends State<StickerPicker> {
                     ),
                     IconButton(
                       onPressed: addStickerFromPhone,
-                      icon: Icon(Icons.add),
+                      icon: Icon(
+                        Icons.add,
+                        size: 30,
+                      ),
                     )
                   ],
                 )

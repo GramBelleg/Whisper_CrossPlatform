@@ -60,7 +60,7 @@ class _GifMessageCardState extends State<GifMessageCard> {
                   bottomRight: Radius.circular(20),
                 ),
         ),
-        width: MediaQuery.of(context).size.width / 1.4,
+        width: 220,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -105,6 +105,7 @@ class _GifMessageCardState extends State<GifMessageCard> {
                 );
               },
             ),
+            SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -113,6 +114,7 @@ class _GifMessageCardState extends State<GifMessageCard> {
                   style: const TextStyle(fontSize: 12, color: Colors.white70),
                 ),
                 SizedBox(width: 2),
+                widget.isSent ?
                 Icon(
                   widget.status == MessageStatus.seen
                       ? FontAwesomeIcons.checkDouble
@@ -123,7 +125,8 @@ class _GifMessageCardState extends State<GifMessageCard> {
                       ? Colors.blue
                       : Colors.white,
                   size: 12,
-                ),
+                ) : const SizedBox(),
+                SizedBox(width: 10),
               ],
             )
           ],

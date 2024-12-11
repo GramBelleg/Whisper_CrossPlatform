@@ -109,36 +109,35 @@ class StickersService {
     }
   }
 
-  // TODO: Implement downloadSticker(String blobName)
   //to download the sticker from a given blobName
-  Future<void> downloadSticker(String fileUrl, String blobName) async {
+  Future<String> downloadSticker(String blobName) async {
     // check if the file is already downloaded
     // if not, download the file
     try {
+      // await Permission.storage.request();
       Directory? baseDir = await getExternalStorageDirectory();
       String stickersDir = "${baseDir!.path}/stickers";
       // create stickersDir if it does not extist
       if (!await Directory(stickersDir).exists()) {
         await Directory(stickersDir).create(recursive: true);
       }
+      Dio dio = Dio();
+      final stickerPath = "$stickersDir/$blobName";
+      if (!File(stickerPath).existsSync()) {
+        String fileUrl = await generatePresignedUrl(blobName);
+        print("Downloading new sticker: $fileUrl");
+        await dio.download(fileUrl, stickerPath);
 
-      final file = File("$stickersDir/$blobName");
-      if (!file.existsSync()) {
-        await http.get(Uri.parse(fileUrl)).then(
-          (response) {
-            if (response.statusCode == 200) {
-              final file = File("$stickersDir/$blobName");
-              file.writeAsBytes(response.bodyBytes);
-            } else {
-              throw Exception(
-                  "Failed to download sticker: ${response.statusCode}");
-            }
-          },
-        );
+        if (File(stickerPath).existsSync()) {
+          print("Sticker downloaded successfully at $stickerPath");
+        }
+      } else {
+        return stickerPath;
       }
     } catch (e) {
-      throw Exception("Failed to download sticker: $e");
+      throw Exception("Failed to download this sticker: $e");
     }
+    return "FAILED";
   }
 
   Future<void> syncStickersWithDb() async {
@@ -170,11 +169,11 @@ class StickersService {
       }
     }
 
-    List<String> ExistingStickerFiles =
+    List<String> existingStickerFiles =
         Directory(stickersDir).listSync().map((file) => file.path).toList();
 
-    // if the sticker file is not ti the blobNames, delete it
-    for (String stickerFile in ExistingStickerFiles) {
+    // if the sticker file is not in the blobNames, delete it
+    for (String stickerFile in existingStickerFiles) {
       if (!blobNames.contains(stickerFile.split('/').last)) {
         File(stickerFile).delete();
         print("Deleted $stickerFile");
