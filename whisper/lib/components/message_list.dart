@@ -13,6 +13,15 @@ import 'package:whisper/components/receive-message/received_audio_message_card.d
 import 'package:whisper/components/receive-message/received_forwarded_audio_message_card.dart';
 import 'package:whisper/components/receive-message/received_forwarded_voice_message.dart';
 import 'package:whisper/components/receive-message/received_voice_message_card.dart';
+import 'package:whisper/components/own-message/forwarded_gif_message_card.dart';
+import 'package:whisper/components/own-message/forwarded_sticker_message_card.dart';
+import 'package:whisper/components/own-message/sent_gif_message_card.dart';
+import 'package:whisper/components/own-message/sent_sticker_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_gif_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_sticker_message_card.dart';
+import 'package:whisper/components/receive-message/received_gif_message_card.dart';
+import 'package:whisper/components/receive-message/received_sticker_message_card.dart';
+import 'package:whisper/components/sticker_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
 import 'package:whisper/components/own-message/replied_file_message_card.dart';
@@ -213,6 +222,38 @@ class _MessageListState extends State<MessageList> {
         senderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
       );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "GIF") {
+      if (kDebugMode) print("RECEIVED GIF MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return ForwardedGifMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "STICKER") {
+      if (kDebugMode) print("RECEIVED STICKER MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return ForwardedStickerMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       print(
           "aaaaaa${messageData.content}, ${messageData.time!},${messageData.id != null && widget.isSelectedList.contains(messageData.id!)},${messageData.parentMessage!.content},${messageData.parentMessage!.senderName}");
@@ -326,6 +367,34 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
       );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "GIF") {
+      if (kDebugMode) print("RECEIVED GIF MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return SentGifMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "STICKER") {
+      if (kDebugMode) print("RECEIVED STICKER MESSAGE HERE");
+      if (kDebugMode)
+        print("media=${messageData.media}, type=${messageData.type}");
+      return SentStickerMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
     } else {
       if (kDebugMode) print("RECEIVED NORMAL MESSAGE HERE");
       if (kDebugMode)
@@ -407,6 +476,32 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "AUDIO")) {
       return ReceivedForwardedAudioMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "GIF")) {
+      return ReceivedForwardedGifMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "STICKER")) {
+      return ReceivedForwardedStickerMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -525,6 +620,28 @@ class _MessageListState extends State<MessageList> {
         status: MessageStatus.sent,
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "GIF")) {
+      return ReceivedGifMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "STICKER")) {
+      return ReceivedStickerMessageCard(
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        blobName: messageData.media!,
       );
     } else {
       return NormalReceivedMessageCard(

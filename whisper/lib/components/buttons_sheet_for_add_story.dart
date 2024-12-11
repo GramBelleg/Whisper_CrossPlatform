@@ -84,12 +84,14 @@ class ImagePickerButtonSheetForStory extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconCreationWidget(
+                textStyle: TextStyle(),
                 icon: Icons.camera_alt,
                 text: "Camera",
                 color: Colors.pink,
                 onTap: () => _pickImageFromCamera(context),
               ),
               IconCreationWidget(
+                textStyle: TextStyle(),
                 icon: Icons.photo,
                 text: "Gallery",
                 color: Colors.purple,

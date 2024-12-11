@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:whisper/constants/colors.dart';
 
 class EmojiSelect extends StatelessWidget {
   final TextEditingController controller;
@@ -44,6 +45,26 @@ class EmojiSelect extends StatelessWidget {
           TextPosition(offset: controller.text.length),
         );
       },
+      config: Config(
+        // TODO: edit hegit to be same as opened keyboard
+        height: MediaQuery.of(context).size.height / 2.5,
+        categoryViewConfig: CategoryViewConfig(
+          backgroundColor: firstNeutralColor,
+          indicatorColor: highlightColor,
+        ),
+        emojiViewConfig: EmojiViewConfig(
+          backgroundColor: firstNeutralColor,
+          columns: 7,
+          emojiSizeMax: 32.0,
+          verticalSpacing: 0,
+          horizontalSpacing: 0,
+          recentsLimit: 28,
+          buttonMode: ButtonMode.MATERIAL,
+        ),
+        bottomActionBarConfig: BottomActionBarConfig(
+          enabled: false,
+        ),
+      ),
     );
   }
 }
