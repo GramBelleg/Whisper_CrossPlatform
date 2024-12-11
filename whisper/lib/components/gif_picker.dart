@@ -25,6 +25,8 @@ class _GifPickerState extends State<GifPicker> {
       isLoading = true;
     });
 
+    query = query.isEmpty ? 'funny' : query;
+    query = query.trim().replaceAll(' ', '+');
 
     final response = await http.get(
       Uri.parse(
@@ -36,6 +38,7 @@ class _GifPickerState extends State<GifPicker> {
       gifs = data['results'];
       setState(() {
         isLoading = false;
+        isError = false;
       });
     } else {
       setState(() {
