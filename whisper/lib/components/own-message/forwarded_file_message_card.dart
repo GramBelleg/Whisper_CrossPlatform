@@ -116,7 +116,7 @@ class _ForwardedFileMessageCardState
                           maxWidth: MediaQuery.of(context).size.width * 0.8,
                         ),
                         child: Card(
-                          color: const Color(0xff8D6AEE),
+                          color: primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(20),

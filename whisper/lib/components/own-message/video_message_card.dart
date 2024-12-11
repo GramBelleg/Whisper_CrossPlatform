@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/blob_url_manager.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/pages/full_screen_video_page.dart';
 import 'package:whisper/services/read_file.dart';
+import 'package:whisper/services/shared_preferences.dart';
 
 class VideoMessageCard extends OwnMessage {
   final String blobName;
@@ -63,7 +65,7 @@ class _VideoMessageCardStateful extends StatefulWidget {
 class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
   VideoPlayerController? _videoController;
   bool _isInitialized = false;
-  String videoUrl = "";
+  String? videoUrl = "";
 
   @override
   void initState() {
@@ -74,14 +76,8 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
   Future<void> _initializeVideo() async {
     if (mounted) {
       try {
-        if (BlobUrlManager.isExist(widget.blobName)) {
-          videoUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
-          print("zzzzzzzzzzzzz");
-        } else {
-          videoUrl = await generatePresignedUrl(widget.blobName);
-          BlobUrlManager.addBlobUrl(widget.blobName, videoUrl);
-        }
-        _videoController = VideoPlayerController.network(videoUrl)
+        videoUrl = await loadImageUrl(widget.blobName);
+        _videoController = VideoPlayerController.network(videoUrl!)
           // ..setVolume(0) // Mute the audio
           ..initialize().then((_) {
             if (mounted) {
@@ -128,7 +124,7 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     child: Card(
-                      color: const Color(0xFF8D6AEE),
+                      color: primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
@@ -144,7 +140,7 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => FullScreenVideoPage(
-                                      videoUrl: videoUrl,
+                                      videoUrl: videoUrl!,
                                     ),
                                   ),
                                 );

@@ -40,7 +40,7 @@ class RepliedReceivedMessageCard extends ReceivedMessage {
                 maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color: const Color(0xff0A122F),
+                color: firstNeutralColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),

@@ -24,9 +24,7 @@ class NormalReceivedMessageCard extends ReceivedMessage {
       alignment: Alignment.centerLeft,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        color: isSelected
-            ? selectColor
-            : Colors.transparent,
+        color: isSelected ? selectColor : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +37,7 @@ class NormalReceivedMessageCard extends ReceivedMessage {
                     maxWidth: MediaQuery.of(context).size.width * 0.8,
                   ),
                   child: Card(
-                    color: const Color(0xff0A122F),
+                    color: firstNeutralColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),

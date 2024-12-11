@@ -1,3 +1,6 @@
+import 'package:whisper/services/read_file.dart';
+import 'package:whisper/services/shared_preferences.dart';
+
 String formatName(String fullName) {
   List<String> names = fullName.split(" ");
 
@@ -7,5 +10,25 @@ String formatName(String fullName) {
   } else {
     // If only one name is present, return as is
     return fullName;
+  }
+}
+
+Future<String?> loadImageUrl(String blobName) async {
+  String? savedImageUrl = await getImageUrl(blobName);
+  if (savedImageUrl != null) {
+    return savedImageUrl;
+  } else {
+    return await generateAndSaveImageUrl(blobName);
+  }
+}
+
+Future<String?> generateAndSaveImageUrl(String blobName) async {
+  try {
+    print("blobName:$blobName");
+    String url = await generatePresignedUrl(blobName);
+    await saveImageUrl(blobName, url);
+    return url;
+  } catch (e) {
+    print('Error generating or saving image URL: $e');
   }
 }

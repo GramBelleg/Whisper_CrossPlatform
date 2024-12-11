@@ -27,9 +27,7 @@ class ForwardedMessageCard extends OwnMessage {
       alignment: Alignment.centerRight,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        color: isSelected
-            ? selectColor
-            : Colors.transparent,
+        color: isSelected ? selectColor : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -39,7 +37,7 @@ class ForwardedMessageCard extends OwnMessage {
                 maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color: const Color(0xff8D6AEE),
+                color: primaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),

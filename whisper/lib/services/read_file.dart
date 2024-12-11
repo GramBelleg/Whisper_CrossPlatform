@@ -23,7 +23,7 @@ Future<String> generatePresignedUrl(String blobName) async {
         'presignedUrl']; // Ensure this matches the response from your backend
   } else {
     // Handle error
-    print('Error: ${response.statusCode}, ${response.body}');
+    print('Errors: ${response.statusCode}, ${response.body}');
     return '';
   }
 }

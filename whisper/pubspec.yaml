@@ -58,6 +58,8 @@ dependencies:
   flutter_cached_pdfview: ^0.4.3
   visibility_detector: ^0.4.0+2
   flutter_lints: ^5.0.0
+  vibration: ^2.0.1
+  scrollable_positioned_list: ^0.3.8
   flutter:
     sdk: flutter
 

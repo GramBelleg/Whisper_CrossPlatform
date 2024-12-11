@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whisper/blob_url_manager.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
@@ -73,7 +74,7 @@ class _RepliedReceivedVideoMessageCardState
     extends State<_RepliedReceivedVideoMessageCardStateful> {
   VideoPlayerController? _videoController;
   bool _isInitialized = false;
-  String videoUrl = "";
+  String? videoUrl = "";
 
   @override
   void initState() {
@@ -84,14 +85,8 @@ class _RepliedReceivedVideoMessageCardState
   Future<void> _initializeVideo() async {
     if (mounted) {
       try {
-         if (BlobUrlManager.isExist(widget.blobName)) {
-          videoUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
-          print("zzzzzzzzzzzzz");
-        } else {
-          videoUrl = await generatePresignedUrl(widget.blobName);
-          BlobUrlManager.addBlobUrl(widget.blobName, videoUrl);
-        }
-        _videoController = VideoPlayerController.network(videoUrl)
+        videoUrl = await loadImageUrl(widget.blobName);
+        _videoController = VideoPlayerController.network(videoUrl!)
           ..setVolume(0) // Mute the audio
           ..initialize().then((_) {
             if (mounted) {
@@ -136,8 +131,7 @@ class _RepliedReceivedVideoMessageCardState
                 maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color:
-                    const Color(0xff0A122F), // Dark color for received messages
+                color: firstNeutralColor, // Dark color for received messages
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
@@ -187,7 +181,7 @@ class _RepliedReceivedVideoMessageCardState
                             context,
                             MaterialPageRoute(
                               builder: (context) => FullScreenVideoPage(
-                                videoUrl: videoUrl,
+                                videoUrl: videoUrl!,
                               ),
                             ),
                           );

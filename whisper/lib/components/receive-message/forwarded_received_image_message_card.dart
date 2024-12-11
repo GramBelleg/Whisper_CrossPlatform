@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/blob_url_manager.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
@@ -65,27 +66,20 @@ class _ForwardedReceivedImageMessageCardStateful extends StatefulWidget {
 
 class _ForwardedReceivedImageMessageCardState
     extends State<_ForwardedReceivedImageMessageCardStateful> {
-  String imageUrl = "";
+  String? imageUrl = "";
 
   @override
   void initState() {
     super.initState();
-    if (BlobUrlManager.isExist(widget.blobName)) {
-      imageUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
-    } else {
-      _generateImageUrl(widget.blobName);
-    }
+    _loadImageUrl();
   }
 
-  Future<void> _generateImageUrl(String blobName) async {
-    try {
-      String url = await generatePresignedUrl(blobName);
+  Future<void> _loadImageUrl() async {
+    String? url = await loadImageUrl(widget.blobName);
+    if (mounted) {
       setState(() {
         imageUrl = url;
-        BlobUrlManager.addBlobUrl(widget.blobName, url);
       });
-    } catch (e) {
-      print('Error generating image URL: $e');
     }
   }
 
@@ -94,7 +88,7 @@ class _ForwardedReceivedImageMessageCardState
     return Align(
       alignment:
           Alignment.centerLeft, // Align to the left for received messages
-      child: imageUrl.isEmpty
+      child: imageUrl!.isEmpty
           ? const CircularProgressIndicator() // Show loading until image URL is fetched
           : Container(
               color: widget.isSelected ? selectColor : Colors.transparent,
@@ -107,8 +101,7 @@ class _ForwardedReceivedImageMessageCardState
                       maxWidth: MediaQuery.of(context).size.width * 0.8,
                     ),
                     child: Card(
-                      color: const Color(
-                          0xff0A122F), // Dark color for received messages
+                      color: firstNeutralColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
@@ -147,13 +140,13 @@ class _ForwardedReceivedImageMessageCardState
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => FullScreenImagePage(
-                                      imageUrl: imageUrl,
+                                      imageUrl: imageUrl!,
                                     ),
                                   ),
                                 );
                               },
                               child: Image.network(
-                                imageUrl,
+                                imageUrl!,
                                 width: double.infinity,
                                 height: 200,
                                 fit: BoxFit.cover,

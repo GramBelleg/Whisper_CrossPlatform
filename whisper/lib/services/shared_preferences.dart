@@ -137,6 +137,21 @@ Future<void> editCachedMessageContentById(
   }
 }
 
+Future<void> saveImageUrl(String blobName, String imageUrl) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('image_url_$blobName', imageUrl);
+  print('Image URL saved for blob name $blobName: $imageUrl');
+}
+
+Future<String?> getImageUrl(String blobName) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? imageUrl = prefs.getString('image_url_$blobName');
+  if (imageUrl != null) {
+    print('Loaded image URL for blob name $blobName: $imageUrl');
+    return imageUrl;
+  }
+  return null;
+}
 
 
 

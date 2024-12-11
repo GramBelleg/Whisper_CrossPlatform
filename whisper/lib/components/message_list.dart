@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/message_list_keys.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
 import 'package:whisper/components/own-message/replied_file_message_card.dart';
@@ -30,7 +33,6 @@ import 'package:whisper/components/receive-message/replied-received-message-card
 import 'package:whisper/components/receive-message/video_received_message_card.dart';
 
 class MessageList extends StatefulWidget {
-  final ScrollController scrollController;
   final List<ChatMessage> messages;
   final ValueChanged<ChatMessage> onLongPress;
   final ValueChanged<ChatMessage> onTap;
@@ -38,7 +40,6 @@ class MessageList extends StatefulWidget {
   final List<int> isSelectedList;
   final int senderId;
   const MessageList({
-    required this.scrollController,
     required this.messages,
     required this.onLongPress,
     required this.onTap,
@@ -53,7 +54,7 @@ class MessageList extends StatefulWidget {
 
 class _MessageListState extends State<MessageList> {
   late List<ChatMessage> previousMessages;
-
+  ItemScrollController itemScrollController = ItemScrollController();
   @override
   void initState() {
     super.initState();
@@ -67,9 +68,10 @@ class _MessageListState extends State<MessageList> {
     // Detect if a new message was added
     if (widget.messages.length > previousMessages.length) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (widget.scrollController.hasClients) {
-          widget.scrollController
-              .jumpTo(widget.scrollController.position.minScrollExtent);
+        if (itemScrollController.isAttached) {
+          itemScrollController.jumpTo(
+            index: 0, // Scroll to the first item (most recent message)
+          );
         }
       });
 
@@ -80,21 +82,37 @@ class _MessageListState extends State<MessageList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ScrollablePositionedList.builder(
       reverse: true,
-      controller: widget.scrollController,
+      itemScrollController: itemScrollController,
       itemCount: widget.messages.length,
       itemBuilder: (context, index) {
         final messageData = widget.messages[index];
         return SwipeTo(
-          key: ValueKey(messageData.id),
-          iconColor: Color(0xff8D6AEE),
+          key: ValueKey('${MessageListKeys.swipeKeyPrefix}${messageData.id}'),
+          iconColor: primaryColor,
           onRightSwipe: (details) {
             widget.onRightSwipe(messageData);
           },
           child: GestureDetector(
+            key: ValueKey('${MessageListKeys.tapKeyPrefix}${messageData.id}'),
             onLongPress: () => widget.onLongPress(messageData),
-            onTap: () => widget.onTap(messageData),
+            onTap: () {
+              widget.onTap(messageData);
+              if (messageData.parentMessage?.id != null) {
+                int parentIndex = widget.messages.indexWhere(
+                  (message) => message.id == messageData.parentMessage?.id,
+                );
+
+                if (parentIndex != -1) {
+                  itemScrollController.scrollTo(
+                    index: parentIndex,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              }
+            },
             child: messageData.sender!.id == widget.senderId
                 ? _buildSenderMessage(messageData)
                 : _buildReceiverMessage(messageData),

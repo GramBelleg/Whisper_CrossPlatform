@@ -5,9 +5,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom_chat_text_field.dart';
 import 'package:whisper/components/reply_preview.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/keys/chat_page_keys.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/models/chat_message_manager.dart';
 import 'package:whisper/models/parent_message.dart';
@@ -18,6 +20,7 @@ import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:whisper/services/upload_file.dart';
+import 'package:vibration/vibration.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
@@ -100,7 +103,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     }
     setState(() {
-      _isTyping = text.isNotEmpty;
+      _isTyping = text.trim() != '';
     });
     _editingMessage = "";
   }
@@ -136,21 +139,25 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void handleLongPressSelection(ChatMessage messageData) {
-    setState(() {
-      if (!isSelectedList.contains(messageData.id!)) {
-        isSelectedList.add(messageData.id!);
-      }
-    });
+    if (messageData.id != null) {
+      setState(() {
+        if (!isSelectedList.contains(messageData.id!)) {
+          isSelectedList.add(messageData.id!);
+        }
+      });
+    }
   }
 
   void handleOnTapSelection(ChatMessage messageData) {
-    setState(() {
-      if (isSelectedList.contains(messageData.id!)) {
-        isSelectedList.remove(messageData.id!);
-      } else if (!isSelectedList.isEmpty) {
-        isSelectedList.add(messageData.id!);
-      }
-    });
+    if (messageData.id != null) {
+      setState(() {
+        if (isSelectedList.contains(messageData.id!)) {
+          isSelectedList.remove(messageData.id!);
+        } else if (!isSelectedList.isEmpty) {
+          isSelectedList.add(messageData.id!);
+        }
+      });
+    }
   }
 
   void handleOnRightSwipe(ChatMessage messageData) {
@@ -175,7 +182,7 @@ class _ChatPageState extends State<ChatPage> {
   void handleSendMessage() {
     if (_isTyping) {
       GlobalCubitProvider.messagesCubit.sendMessage(
-        content: _controller.text,
+        content: _controller.text.trim(),
         chatId: widget.ChatID,
         senderId: widget.senderId!,
         parentMessage: _replyingTo,
@@ -193,6 +200,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void handleEditMessage() {
+    if (_controller.text.trim() == '') {
+      Vibration.vibrate(duration: 200);
+      return;
+    }
     GlobalCubitProvider.messagesCubit.emitEditMessage(
       _editingMessageId,
       widget.ChatID,
@@ -305,7 +316,7 @@ class _ChatPageState extends State<ChatPage> {
                               padding: EdgeInsets.only(
                                   bottom: paddingSpaceForReplay),
                               child: MessageList(
-                                scrollController: _scrollController2,
+                                // scrollController: _scrollController2,
                                 messages: chatMessageManager.messages,
                                 onLongPress: handleLongPressSelection,
                                 onTap: handleOnTapSelection,
@@ -347,17 +358,19 @@ class _ChatPageState extends State<ChatPage> {
                                                         .width,
                                                     50.0),
                                                 decoration: BoxDecoration(
-                                                  color: Color(0xff0A122F),
+                                                  color: firstNeutralColor,
                                                   borderRadius:
                                                       BorderRadius.circular(10),
                                                 ),
-                                                waveStyle: const WaveStyle(
-                                                  waveColor: Color(0xff8D6AEE),
+                                                waveStyle: WaveStyle(
+                                                  waveColor: primaryColor,
                                                   extendWaveform: true,
                                                   showMiddleLine: false,
                                                 ),
                                               )
                                             : CustomChatTextField(
+                                                key:
+                                                    Key(ChatPageKeys.textField),
                                                 scrollController:
                                                     _scrollController,
                                                 focusNode: focusNode,
@@ -385,9 +398,11 @@ class _ChatPageState extends State<ChatPage> {
                                     padding: EdgeInsets.only(bottom: 5),
                                     child: CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: Color(0xff0A122F),
+                                      backgroundColor: firstNeutralColor,
                                       child: _isRecording && !_isTyping
                                           ? IconButton(
+                                              key: Key(ChatPageKeys
+                                                  .stopRecordButton),
                                               onPressed: () {
                                                 setState(() {
                                                   stopRecording();
@@ -396,32 +411,37 @@ class _ChatPageState extends State<ChatPage> {
                                               },
                                               icon: FaIcon(
                                                 FontAwesomeIcons.stop,
-                                                color: Color(0xff8D6AEE),
+                                                color: primaryColor,
                                               ),
                                             )
                                           : _isEditing
                                               ? IconButton(
+                                                  key: Key(ChatPageKeys
+                                                      .editMessageButton),
                                                   onPressed: () {
                                                     handleEditMessage();
                                                   },
                                                   icon: FaIcon(
                                                     FontAwesomeIcons.check,
-                                                    color: Color(0xff8D6AEE),
+                                                    color: primaryColor,
                                                   ),
                                                 )
                                               : _isTyping
                                                   ? IconButton(
+                                                      key: Key(ChatPageKeys
+                                                          .sendButton),
                                                       onPressed: () {
                                                         handleSendMessage();
                                                       },
                                                       icon: FaIcon(
                                                         FontAwesomeIcons
                                                             .paperPlane,
-                                                        color:
-                                                            Color(0xff8D6AEE),
+                                                        color: primaryColor,
                                                       ),
                                                     )
                                                   : IconButton(
+                                                      key: Key(ChatPageKeys
+                                                          .recordButton),
                                                       onPressed: () {
                                                         setState(() {
                                                           startRecording();
@@ -432,8 +452,7 @@ class _ChatPageState extends State<ChatPage> {
                                                       icon: FaIcon(
                                                         FontAwesomeIcons
                                                             .microphone,
-                                                        color:
-                                                            Color(0xff8D6AEE),
+                                                        color: primaryColor,
                                                       ),
                                                     ),
                                     ),
@@ -442,6 +461,7 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               show
                                   ? EmojiSelect(
+                                      key: Key(ChatPageKeys.emojiPicker),
                                       controller: _controller,
                                       scrollController: _scrollController,
                                       onTypingStatusChanged: (isTyping) {

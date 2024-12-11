@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/full_screen_vedio_page_keys.dart';
 
 class FullScreenVideoPage extends StatefulWidget {
   final String videoUrl;
@@ -14,15 +15,26 @@ class FullScreenVideoPage extends StatefulWidget {
 class _FullScreenVideoPageState extends State<FullScreenVideoPage> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
-
+  bool _isError = false;
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(widget.videoUrl)
       ..initialize().then((_) {
-        setState(() {}); // Rebuild once the video is initialized
-        _controller.play();
-        _isPlaying = true;
+        if (mounted) {
+          setState(() {
+            _isError = false;
+          });
+          _controller.play();
+          _isPlaying = true;
+        }
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            _isError = true;
+          });
+        }
+        print('Error initializing video: $error');
       });
   }
 
@@ -51,6 +63,7 @@ class _FullScreenVideoPageState extends State<FullScreenVideoPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
+          key: Key(FullScreenVideoPageKeys.backButton),
           icon: Icon(
             Icons.arrow_back,
             color: primaryColor,
@@ -62,25 +75,41 @@ class _FullScreenVideoPageState extends State<FullScreenVideoPage> {
         elevation: 0, // Optional: removes shadow from AppBar
       ),
       body: Center(
-        child: _controller.value.isInitialized
-            ? Stack(
-                alignment: Alignment.center,
-                children: [
-                  AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
+        child: _isError
+            ? Container(
+                key: Key(FullScreenVideoPageKeys.errorContainer),
+                color: firstSecondaryColor,
+                child: const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.white,
+                    size: 70,
                   ),
-                  GestureDetector(
-                    onTap: _togglePlayPause,
-                    child: Icon(
-                      _isPlaying ? Icons.pause : Icons.play_arrow,
-                      color: Colors.white,
-                      size: 64,
-                    ),
-                  ),
-                ],
+                ),
               )
-            : const CircularProgressIndicator(), // Show loading until video is initialized
+            : _controller.value.isInitialized
+                ? Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AspectRatio(
+                        key: Key(FullScreenVideoPageKeys.videoPlayerContainer),
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                      GestureDetector(
+                        onTap: _togglePlayPause,
+                        child: Icon(
+                          key: Key(FullScreenVideoPageKeys.playPauseButton),
+                          _isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 64,
+                        ),
+                      ),
+                    ],
+                  )
+                : const CircularProgressIndicator(
+                    key: Key(FullScreenVideoPageKeys.loadingIndicator),
+                  ), // Show loading until video is initialized
       ),
     );
   }

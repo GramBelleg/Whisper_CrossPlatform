@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/components/icon_creation_widget.dart';
 import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/keys/file_button_sheet_keys.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/pages/selected_image_captioning.dart';
 import 'dart:io';
@@ -265,18 +266,21 @@ class FileButtonSheet extends StatelessWidget {
               Row(
                 children: [
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.documentIcon),
                       icon: Icons.insert_drive_file,
                       text: "Document",
                       color: Colors.indigo,
                       onTap: _pickFile),
                   Spacer(flex: 1),
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.cameraIcon),
                       icon: Icons.camera_alt,
                       text: "Camera",
                       color: Colors.pink,
                       onTap: _pickImageFromCamera),
                   Spacer(flex: 1),
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.galleryIcon),
                       icon: Icons.insert_photo,
                       text: "Gallery",
                       color: Colors.purple,
@@ -287,18 +291,21 @@ class FileButtonSheet extends StatelessWidget {
               Row(
                 children: [
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.audioIcon),
                       icon: Icons.headset,
                       text: "Audio",
                       color: Colors.orange,
                       onTap: _pickAudio),
                   Spacer(flex: 1),
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.locationIcon),
                       icon: Icons.location_pin,
                       text: "Location",
                       color: Colors.teal,
                       onTap: () {}),
                   Spacer(flex: 1),
                   IconCreationWidget(
+                      key: Key(FileButtonSheetKeys.contactsIcon),
                       icon: Icons.person,
                       text: "Contacts",
                       color: Colors.blue,

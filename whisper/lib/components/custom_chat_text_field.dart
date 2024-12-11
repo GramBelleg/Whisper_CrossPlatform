@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/custom_chat_text_field_keys.dart';
+import 'package:whisper/keys/file_button_sheet_keys.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/components/file_button_sheet.dart';
 import 'package:whisper/components/emoji_button_sheet.dart';
@@ -87,7 +89,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
 
   InputDecoration _buildInputDecoration(BuildContext context) {
     return InputDecoration(
-      fillColor: const Color(0xff0A122F),
+      fillColor: firstNeutralColor,
       filled: true,
       hintText: "Message Here",
       hintStyle: const TextStyle(color: Colors.white54),
@@ -116,6 +118,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
         show ? FontAwesomeIcons.keyboard : FontAwesomeIcons.faceSmile,
         color: primaryColor,
       ),
+      key: Key(CustomChatTextFieldKeys.prefixIcon), // Key added
     );
   }
 
@@ -127,8 +130,10 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
               FontAwesomeIcons.paperclip,
               color: primaryColor,
             ),
+            key: Key(CustomChatTextFieldKeys.filePickerButton),
           )
         : IconButton(
+            key: Key(CustomChatTextFieldKeys.cancelEditing),
             onPressed: () {
               widget.controller.clear();
               widget.handleCancelEditing();
@@ -173,6 +178,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
         forwardedFromUserId: null,
         context: context,
         handleOncancelReply: widget.handleOncancelReply,
+        key: Key(FileButtonSheetKeys.fileButtonSheet),
       ),
     );
   }
