@@ -19,6 +19,7 @@ class CustomChatTextField extends StatefulWidget {
   final bool isReplying;
   final VoidCallback toggleEmojiPicker;
   final VoidCallback toggleGifPicker;
+  final VoidCallback toggleStickerPicker;
   final VoidCallback handleOncancelReply;
 
   CustomChatTextField({
@@ -30,6 +31,7 @@ class CustomChatTextField extends StatefulWidget {
     required this.textDirection,
     required this.toggleEmojiPicker,
     required this.toggleGifPicker,
+    required this.toggleStickerPicker,
     required this.chatId,
     required this.senderId,
     required this.userName,
@@ -122,6 +124,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
           },
           onStickerTap: () {
             Navigator.pop(context);
+            widget.toggleStickerPicker();
           },
           onGifTap: () {
             Navigator.pop(context);

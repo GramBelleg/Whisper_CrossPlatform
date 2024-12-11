@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom_chat_text_field.dart';
 import 'package:whisper/components/gif_picker.dart';
 import 'package:whisper/components/reply_preview.dart';
+import 'package:whisper/components/sticker_picker.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/global_cubit_provider.dart';
@@ -47,6 +48,7 @@ class _ChatPageState extends State<ChatPage> {
   bool _isTyping = false;
   bool showEmojiPicker = false; // Tracks if the emoji picker is visible
   bool showGifPicker = false; // Tracks if the gif picker is visible
+  bool showStickerPicker = false; // Tracks if the sticker picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
   final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollController2 = ScrollController();
@@ -72,6 +74,7 @@ class _ChatPageState extends State<ChatPage> {
         setState(() {
           showEmojiPicker = false;
           showGifPicker = false;
+          showStickerPicker = false;
           isSelectedList.clear();
         });
       }
@@ -112,6 +115,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       showEmojiPicker = !showEmojiPicker;
       showGifPicker = false;
+      showStickerPicker = false;
       isSelectedList.clear();
     });
   }
@@ -125,6 +129,21 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       showGifPicker = !showGifPicker;
       showEmojiPicker = false;
+      showStickerPicker = false;
+      isSelectedList.clear();
+    });
+  }
+
+  void _toggleStickerPicker() {
+    if (showStickerPicker) {
+      focusNode.requestFocus();
+    } else {
+      focusNode.unfocus();
+    }
+    setState(() {
+      showStickerPicker = !showStickerPicker;
+      showEmojiPicker = false;
+      showGifPicker = false;
       isSelectedList.clear();
     });
   }
@@ -308,6 +327,24 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  void handleStickerSend(String blobName) async {
+    GlobalCubitProvider.messagesCubit.sendMessage(
+      extension: "sticker",
+      content: blobName,
+      chatId: widget.ChatID,
+      senderId: widget.senderId!,
+      parentMessage: _replyingTo,
+      senderName: widget.userName,
+      isReplying: _isReplying,
+      isForward: false,
+      type: "STICKER",
+      media: blobName, //TODO: recheck this
+    );
+    setState(() {
+      showStickerPicker = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -406,6 +443,8 @@ class _ChatPageState extends State<ChatPage> {
                                                     _toggleEmojiPicker,
                                                 toggleGifPicker:
                                                     _toggleGifPicker,
+                                                toggleStickerPicker:
+                                                    _toggleStickerPicker,
                                                 chatId: widget.ChatID,
                                                 senderId: widget.senderId!,
                                                 userName: widget.userName,
@@ -471,6 +510,9 @@ class _ChatPageState extends State<ChatPage> {
                                       })
                                   : showGifPicker
                                       ? GifPicker(onGifSelected: handleGifSend)
+                                      : showStickerPicker
+                                          ? StickerPicker(
+                                              onStickerSelected: handleStickerSend)
                                       : Container()
                             ],
                           ),
@@ -479,10 +521,11 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ]),
                   onWillPop: () {
-                    if (showEmojiPicker | showGifPicker) {
+                    if (showEmojiPicker | showGifPicker | showStickerPicker) {
                       setState(() {
                         showEmojiPicker = false;
                         showGifPicker = false;
+                        showStickerPicker = false;
                       });
                     } else {
                       Navigator.pop(context);

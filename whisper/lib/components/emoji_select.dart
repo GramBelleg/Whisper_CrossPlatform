@@ -48,34 +48,23 @@ class EmojiSelect extends StatelessWidget {
       config: Config(
         // TODO: edit hegit to be same as opened keyboard
         height: MediaQuery.of(context).size.height / 2.5,
-          categoryViewConfig: CategoryViewConfig(
-            backgroundColor: firstNeutralColor,
-            indicatorColor: highlightColor,
-          ),
-          emojiViewConfig: EmojiViewConfig(
-            backgroundColor: firstNeutralColor,
-            columns: 7,
-            emojiSizeMax: 32.0,
-            verticalSpacing: 0,
-            horizontalSpacing: 0,
-            recentsLimit: 28,
-            buttonMode: ButtonMode.MATERIAL,
-          ),
-          bottomActionBarConfig: BottomActionBarConfig(
-            enabled: false,
-          )
-          // noRecentsText: 'No Recents',
-          // noRecentsStyle: const TextStyle(fontSize: 20, color: Colors.black26),
-          // categoryIcons: const CategoryIcons(),
-          // initCategory: Category.RECENT,
-          // bgColor: const Color(0xFFF2F2F2),
-          // indicatorColor: Colors.blue,
-          // iconColor: Colors.grey,
-          // iconColorSelected: Colors.blue,
-          // progressIndicatorColor: Colors.blue,
-          // showRecentsTab: true,
-
-          ),
+        categoryViewConfig: CategoryViewConfig(
+          backgroundColor: firstNeutralColor,
+          indicatorColor: highlightColor,
+        ),
+        emojiViewConfig: EmojiViewConfig(
+          backgroundColor: firstNeutralColor,
+          columns: 7,
+          emojiSizeMax: 32.0,
+          verticalSpacing: 0,
+          horizontalSpacing: 0,
+          recentsLimit: 28,
+          buttonMode: ButtonMode.MATERIAL,
+        ),
+        bottomActionBarConfig: BottomActionBarConfig(
+          enabled: false,
+        ),
+      ),
     );
   }
 }
