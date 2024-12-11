@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/custom_chat_text_field.dart';
+import 'package:whisper/components/gif_picker.dart';
 import 'package:whisper/components/reply_preview.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/components/sticker_picker.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
 // import 'package:whisper/global_cubit_provider.dart';
@@ -49,7 +51,9 @@ class _ChatPageState extends State<ChatPage> {
   TextAlign _textAlign = TextAlign.left; // Default text alignment
   TextDirection _textDirection = TextDirection.ltr; // Default text direction
   bool _isTyping = false;
-  bool show = false; // Tracks if the emoji picker is visible
+  bool showEmojiPicker = false; // Tracks if the emoji picker is visible
+  bool showGifPicker = false; // Tracks if the gif picker is visible
+  bool showStickerPicker = false; // Tracks if the sticker picker is visible
   FocusNode focusNode = FocusNode(); // FocusNode for the TextFormField
   final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollController2 = ScrollController();
@@ -78,7 +82,9 @@ class _ChatPageState extends State<ChatPage> {
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
-          show = false;
+          showEmojiPicker = false;
+          showGifPicker = false;
+          showStickerPicker = false;
           isSelectedList.clear();
         });
       }
@@ -114,13 +120,43 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _toggleEmojiPicker() {
-    if (show) {
+    if (showEmojiPicker) {
       focusNode.requestFocus();
     } else {
       focusNode.unfocus();
     }
     setState(() {
-      show = !show;
+      showEmojiPicker = !showEmojiPicker;
+      showGifPicker = false;
+      showStickerPicker = false;
+      isSelectedList.clear();
+    });
+  }
+
+  void _toggleGifPicker() {
+    if (showGifPicker) {
+      focusNode.requestFocus();
+    } else {
+      focusNode.unfocus();
+    }
+    setState(() {
+      showGifPicker = !showGifPicker;
+      showEmojiPicker = false;
+      showStickerPicker = false;
+      isSelectedList.clear();
+    });
+  }
+
+  void _toggleStickerPicker() {
+    if (showStickerPicker) {
+      focusNode.requestFocus();
+    } else {
+      focusNode.unfocus();
+    }
+    setState(() {
+      showStickerPicker = !showStickerPicker;
+      showEmojiPicker = false;
+      showGifPicker = false;
       isSelectedList.clear();
     });
   }
@@ -133,7 +169,7 @@ class _ChatPageState extends State<ChatPage> {
 
   double getContainerHeight(BuildContext context) {
     double height;
-    if (show) {
+    if (showEmojiPicker) {
       height = MediaQuery.of(context).size.height - 400;
     } else if (MediaQuery.of(context).viewInsets.bottom != 0) {
       height = MediaQuery.of(context).size.height - 450;
@@ -283,6 +319,42 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  void handleGifSend(String gifUrl) async {
+    GlobalCubitProvider.messagesCubit.sendMessage(
+      extension: "gif",
+      content: gifUrl,
+      chatId: widget.ChatID,
+      senderId: widget.senderId!,
+      parentMessage: _replyingTo,
+      senderName: widget.userName,
+      isReplying: _isReplying,
+      isForward: false,
+      type: "GIF",
+      media: gifUrl, //TODO: recheck this
+    );
+    setState(() {
+      showGifPicker = true;
+    });
+  }
+
+  void handleStickerSend(String blobName) async {
+    GlobalCubitProvider.messagesCubit.sendMessage(
+      extension: "sticker",
+      content: blobName,
+      chatId: widget.ChatID,
+      senderId: widget.senderId!,
+      parentMessage: _replyingTo,
+      senderName: widget.userName,
+      isReplying: _isReplying,
+      isForward: false,
+      type: "STICKER",
+      media: blobName, //TODO: recheck this
+    );
+    setState(() {
+      showStickerPicker = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -398,6 +470,10 @@ class _ChatPageState extends State<ChatPage> {
                                                 textDirection: _textDirection,
                                                 toggleEmojiPicker:
                                                     _toggleEmojiPicker,
+                                                toggleGifPicker:
+                                                    _toggleGifPicker,
+                                                toggleStickerPicker:
+                                                    _toggleStickerPicker,
                                                 chatId: widget.ChatID,
                                                 senderId: widget.senderId!,
                                                 userName: widget.userName,
@@ -476,7 +552,7 @@ class _ChatPageState extends State<ChatPage> {
                                   ),
                                 ],
                               ),
-                              show
+                              showEmojiPicker
                                   ? EmojiSelect(
                                       key: Key(ChatPageKeys.emojiPicker),
                                       controller: _controller,
@@ -486,7 +562,12 @@ class _ChatPageState extends State<ChatPage> {
                                           _isTyping = isTyping;
                                         });
                                       })
-                                  : Container()
+                                  : showGifPicker
+                                      ? GifPicker(onGifSelected: handleGifSend)
+                                      : showStickerPicker
+                                          ? StickerPicker(
+                                              onStickerSelected: handleStickerSend)
+                                      : Container()
                             ],
                           ),
                         ),
@@ -494,9 +575,11 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ]),
                   onWillPop: () {
-                    if (show) {
+                    if (showEmojiPicker | showGifPicker | showStickerPicker) {
                       setState(() {
-                        show = false;
+                        showEmojiPicker = false;
+                        showGifPicker = false;
+                        showStickerPicker = false;
                       });
                     } else {
                       Navigator.pop(context);
