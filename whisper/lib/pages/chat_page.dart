@@ -8,8 +8,9 @@ import 'package:whisper/components/reply_preview.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
-import 'package:whisper/global_cubit_provider.dart';
+// import 'package:whisper/global_cubit_provider.dart';
 import 'package:whisper/keys/chat_page_keys.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/models/chat_message_manager.dart';
 import 'package:whisper/models/parent_message.dart';
@@ -63,11 +64,13 @@ class _ChatPageState extends State<ChatPage> {
 
   // Voice Recording Utilities
   bool _isRecording = false;
-  bool _isPlaying = false;
+  String? currentlyPlayingBlobName;
   RecorderController recorderController = RecorderController();
   bool _isEditing = false;
   String _editingMessage = "";
   int _editingMessageId = 0;
+  late PlayerController globalPlayerController;
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +83,7 @@ class _ChatPageState extends State<ChatPage> {
         });
       }
     });
+    globalPlayerController = PlayerController();
   }
 
   @override
@@ -87,6 +91,7 @@ class _ChatPageState extends State<ChatPage> {
     _controller.dispose();
     focusNode.dispose();
     recorderController.dispose();
+    globalPlayerController.dispose();
     super.dispose();
   }
 
@@ -268,6 +273,16 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  void onPlay(String blobName) {
+    if (currentlyPlayingBlobName != null &&
+        currentlyPlayingBlobName != blobName) {
+      globalPlayerController.pausePlayer();
+    }
+    setState(() {
+      currentlyPlayingBlobName = blobName;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -323,6 +338,8 @@ class _ChatPageState extends State<ChatPage> {
                                 onRightSwipe: handleOnRightSwipe,
                                 isSelectedList: isSelectedList,
                                 senderId: widget.senderId!,
+                                playerController: globalPlayerController,
+                                onPlay: onPlay,
                               )),
                         ),
                         Align(

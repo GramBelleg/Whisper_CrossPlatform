@@ -1,3 +1,4 @@
+import 'package:whisper/models/user_view.dart';
 
 class Story {
   final int id;
@@ -9,8 +10,7 @@ class Story {
   final DateTime date;
   final bool isArchived;
   final String privacy;
-
-  // Optional fields for viewed and liked (default to `false` if missing in JSON)
+  final List<UserView> storyViews;
   final bool viewed;
   final bool liked;
 
@@ -19,11 +19,12 @@ class Story {
     required this.content,
     required this.media,
     required this.type,
-    required this.likes,
-    required this.views,
+    this.likes = 0,
+    this.views = 0,
     required this.date,
-    required this.isArchived,
-    required this.privacy,
+    this.isArchived = false,
+    this.privacy = "Everyone",
+    this.storyViews = const [], // Default empty list
     this.viewed = false,
     this.liked = false,
   });
@@ -40,6 +41,9 @@ class Story {
       'date': date.toIso8601String(),
       'isArchived': isArchived,
       'privacy': privacy,
+      'storyViews': storyViews
+          .map((view) => view.toJson())
+          .toList(), // Serialize storyViews
       'viewed': viewed,
       'liked': liked,
     };
@@ -58,6 +62,11 @@ class Story {
           DateTime.now(), // Default to current date if parsing fails
       isArchived: json['isArchived'] ?? false,
       privacy: json['privacy'] ?? 'Everyone',
+      storyViews: json['storyViews'] != null
+          ? (json['storyViews'] as List)
+              .map((viewJson) => UserView.fromJson(viewJson))
+              .toList()
+          : const [], // Deserialize storyViews
       viewed: json['viewed'] ?? false,
       liked: json['liked'] ?? false,
     );
@@ -74,6 +83,7 @@ class Story {
     DateTime? date,
     bool? isArchived,
     String? privacy,
+    List<UserView>? storyViews,
     bool? viewed,
     bool? liked,
   }) {
@@ -87,6 +97,7 @@ class Story {
       date: date ?? this.date,
       isArchived: isArchived ?? this.isArchived,
       privacy: privacy ?? this.privacy,
+      storyViews: storyViews ?? this.storyViews,
       viewed: viewed ?? this.viewed,
       liked: liked ?? this.liked,
     );

@@ -1,5 +1,4 @@
-import 'package:whisper/global_cubit_provider.dart';
-import 'package:whisper/models/chat_message.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/services/fetch_message_by_id.dart';
 
 class CustomAppBarViewModel {

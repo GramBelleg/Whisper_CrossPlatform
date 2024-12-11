@@ -1,9 +1,18 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/message_list_keys.dart';
+import 'package:whisper/components/audio_message_card.dart';
+import 'package:whisper/components/own-message/forwarded_audio_message_card.dart';
+import 'package:whisper/components/own-message/forwarded_voice_message_card.dart';
+import 'package:whisper/components/own-message/sent_audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_audio_message_card.dart';
+import 'package:whisper/components/receive-message/received_forwarded_voice_message.dart';
+import 'package:whisper/components/receive-message/received_voice_message_card.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/components/own-message/forwarded_file_message_card.dart';
 import 'package:whisper/components/own-message/replied_file_message_card.dart';
@@ -18,7 +27,7 @@ import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/components/own-message/replied_message_card.dart';
 import 'package:whisper/components/own-message/replied_video_message_card.dart';
 import 'package:whisper/components/own-message/video_message_card.dart';
-import 'package:whisper/components/own-message/voice_message_card.dart';
+import 'package:whisper/components/own-message/sent_voice_message_card.dart';
 import 'package:whisper/components/receive-message/file_received_message_card.dart';
 import 'package:whisper/components/receive-message/forwarded_received_video_message_card.dart';
 import 'package:whisper/components/receive-message/forwarded_file_received_message_card.dart';
@@ -39,6 +48,9 @@ class MessageList extends StatefulWidget {
   final ValueChanged<ChatMessage> onRightSwipe;
   final List<int> isSelectedList;
   final int senderId;
+  final PlayerController playerController;
+  final Function(String) onPlay;
+
   const MessageList({
     required this.messages,
     required this.onLongPress,
@@ -46,6 +58,8 @@ class MessageList extends StatefulWidget {
     required this.isSelectedList,
     required this.senderId,
     required this.onRightSwipe,
+    required this.playerController,
+    required this.onPlay,
   });
 
   @override
@@ -171,6 +185,34 @@ class _MessageListState extends State<MessageList> {
         forwardedSenderName: messageData.forwardedFrom!.userName,
         status: MessageStatus.sent,
       );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VM") {
+      debugPrint("FORWARDED VOICE MESSAGE HERE");
+      return ForwardedVoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "AUDIO") {
+      debugPrint("FORWARDED AUDIO MESSAGE HERE");
+      return ForwardedAudioMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+        status: MessageStatus.sent,
+      );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       print(
           "aaaaaa${messageData.content}, ${messageData.time!},${messageData.id != null && widget.isSelectedList.contains(messageData.id!)},${messageData.parentMessage!.content},${messageData.parentMessage!.senderName}");
@@ -261,10 +303,22 @@ class _MessageListState extends State<MessageList> {
     } else if (messageData.media != null &&
         messageData.media!.isNotEmpty &&
         messageData.type == "VM") {
-      if (kDebugMode) print("RECEIVED VOICE MESSAGE HERE");
-      if (kDebugMode)
-        print("media=${messageData.media}, type=${messageData.type}");
-      return VoiceMessageCard(
+      debugPrint("RECEIVED VOICE MESSAGE HERE");
+      debugPrint("media=${messageData.media}, type=${messageData.type}");
+      return SentVoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "AUDIO") {
+      debugPrint("RECEIVED AUDIO MESSAGE HERE");
+      debugPrint("media=${messageData.media}, type=${messageData.type}");
+      return SentAudioMessageCard(
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -334,6 +388,32 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
         messageSenderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "VM")) {
+      return ReceivedForwardedVoiceMessage(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
+      );
+    } else if (messageData.forwarded == true &&
+        messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        (messageData.type == "AUDIO")) {
+      return ReceivedForwardedAudioMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+        senderName: messageData.forwardedFrom!.userName,
       );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
@@ -419,6 +499,32 @@ class _MessageListState extends State<MessageList> {
         isSelected: messageData.id != null &&
             widget.isSelectedList.contains(messageData.id!),
         blobName: messageData.media!,
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "VM") {
+      debugPrint("RECEIVED VOICE MESSAGE HERE");
+      debugPrint("media=${messageData.media}, type=${messageData.type}");
+      return ReceivedVoiceMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
+      );
+    } else if (messageData.media != null &&
+        messageData.media!.isNotEmpty &&
+        messageData.type == "AUDIO") {
+      debugPrint("RECEIVED AUDIO MESSAGE HERE");
+      debugPrint("media=${messageData.media}, type=${messageData.type}");
+      return ReceivedAudioMessageCard(
+        blobName: messageData.media!,
+        message: messageData.content,
+        time: messageData.time!,
+        status: MessageStatus.sent,
+        isSelected: messageData.id != null &&
+            widget.isSelectedList.contains(messageData.id!),
       );
     } else {
       return NormalReceivedMessageCard(

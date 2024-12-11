@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:whisper/pages/view_profile_image.dart';
+
 import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
@@ -11,6 +14,21 @@ String formatName(String fullName) {
     // If only one name is present, return as is
     return fullName;
   }
+}
+
+bool isValidUrl(String str) {
+  final urlPattern = r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$';
+  final result = RegExp(urlPattern).hasMatch(str);
+  return result;
+}
+
+void viewProfilePhoto(BuildContext context, String photoUrl) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => FullScreenPhotoScreen(photoUrl: photoUrl),
+    ),
+  );
 }
 
 Future<String?> loadImageUrl(String blobName) async {

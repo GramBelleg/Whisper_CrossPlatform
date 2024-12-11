@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/keys/forward_menu_keys.dart';
 import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/fetch_message_by_id.dart';
