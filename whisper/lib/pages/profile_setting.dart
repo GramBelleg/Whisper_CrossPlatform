@@ -218,9 +218,9 @@ class _SettingsContentState extends State<SettingsContent> {
               ProfileSection(
                 isEditing: widget.isEditing,
                 hasStory: widget.hasStory,
-                profilePicState: widget.profilePicState,
-                usernameState: widget.usernameState,
-                userState: widget.userState,
+                profilePic: widget.profilePicState,
+                name: widget.nameState,
+                status: widget.userState!.status,
                 showImageSourceDialog: _showImageSourceDialog,
                 showProfileOrStatusOptions: _showProfileOrStatusOptions,
               ),

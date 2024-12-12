@@ -6,8 +6,9 @@ import 'package:whisper/models/user_state.dart';
 class ProfilePage extends StatelessWidget {
   final bool hasStory;
   final String profilePic;
-  final String username;
-  final UserState? userState;
+  final String name;
+  final String status; // if you want to add # of members
+
   final Function()? showImageSourceDialog;
   final Function()? showProfileOrStatusOptions;
 
@@ -15,8 +16,8 @@ class ProfilePage extends StatelessWidget {
     Key? key,
     required this.hasStory,
     required this.profilePic,
-    required this.username,
-    required this.userState,
+    required this.name,
+    this.status = '', // defult
     this.showImageSourceDialog,
     this.showProfileOrStatusOptions,
   }) : super(key: key);
@@ -34,9 +35,9 @@ class ProfilePage extends StatelessWidget {
       ),
       body: ProfileSection(
         hasStory: hasStory,
-        profilePicState: profilePic,
-        usernameState: username,
-        userState: userState,
+        profilePic: profilePic,
+        name: name,
+        status: "status",
         showImageSourceDialog: null,
         showProfileOrStatusOptions: null,
       ),

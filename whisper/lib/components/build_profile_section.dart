@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/models/user_state.dart';
 
 class ProfileSection extends StatelessWidget {
   final bool isEditing;
   final bool hasStory;
-  final String profilePicState;
-  final String usernameState;
-  final UserState? userState;
+  final String profilePic;
+  final String name;
+  final String status;
+
   final Function()? showImageSourceDialog;
   final Function()? showProfileOrStatusOptions;
 
@@ -16,9 +16,9 @@ class ProfileSection extends StatelessWidget {
     Key? key,
     this.isEditing = false,
     required this.hasStory,
-    required this.profilePicState,
-    required this.usernameState,
-    required this.userState,
+    required this.profilePic,
+    required this.name,
+    required this.status,
     this.showImageSourceDialog,
     this.showProfileOrStatusOptions,
   }) : super(key: key);
@@ -53,7 +53,7 @@ class ProfileSection extends StatelessWidget {
                       if (hasStory) {
                         showProfileOrStatusOptions!();
                       } else {
-                        viewProfilePhoto(context, profilePicState);
+                        viewProfilePhoto(context, profilePic);
                       }
                     }
                   },
@@ -70,7 +70,7 @@ class ProfileSection extends StatelessWidget {
                             : const ColorFilter.mode(
                                 Colors.transparent, BlendMode.saturation),
                         child: Image.network(
-                          profilePicState,
+                          profilePic,
                           fit: BoxFit.cover,
                           width: 140,
                           height: 140,
@@ -99,16 +99,15 @@ class ProfileSection extends StatelessWidget {
           const SizedBox(height: 16),
           if (!isEditing) ...[
             Text(
-              userState?.name ?? '',
+              name,
               style: TextStyle(color: secondNeutralColor, fontSize: 20),
             ),
             const SizedBox(height: 4),
             Text(
-              userState?.status == "Online" ? "Online" : "Offline",
+              status == "Online" ? "Online" : "Offline",
               style: TextStyle(
-                color: userState?.status == "Online"
-                    ? const Color(0xFF4CB9CF)
-                    : Colors.grey,
+                color:
+                    status == "Online" ? const Color(0xFF4CB9CF) : Colors.grey,
               ),
             ),
           ],
