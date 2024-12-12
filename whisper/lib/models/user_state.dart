@@ -66,6 +66,7 @@ class UserState extends Equatable {
     );
 
     // Save the updated state after any changes
+    print("saveUserState in copy with in user state");
     await saveUserState(updatedUserState);
 
     return updatedUserState; // Return the updated UserState

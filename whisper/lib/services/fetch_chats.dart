@@ -18,7 +18,7 @@ Future<List<dynamic>> fetchChats() async {
 
     if (response.statusCode == 200) {
       List<dynamic> chats = jsonDecode(response.body);
-      print(chats);
+      print("chats  $chats");
       return chats;
     } else {
       throw Exception('Failed to load chats');

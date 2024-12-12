@@ -68,6 +68,16 @@ class SettingsCubit extends Cubit<SettingsState> {
         hasStory: userState.hasStory));
   }
 
+  Future<void> receiveMyProfilePic(String? blobName) async {
+    String imageUrl = blobName != null || blobName != ''
+        ? await generatePresignedUrl(blobName!)
+        : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(usernameState)}';
+    print("changed Profile Pic");
+    final userState = (state as SettingsLoaded).userState;
+    userState?.copyWith(profilePic: imageUrl);
+    _emitUpdatedState();
+  }
+
   void sendMyStory(String content, String blobName, String type) {
     print("send my story");
     SocketService.instance.sendStory(content, blobName, type);
@@ -88,10 +98,6 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   void removeProfilePic() {
     sendProfilePhoto('', toRemove: true);
-    final userState = (state as SettingsLoaded).userState;
-    userState?.copyWith(
-        profilePic:
-            'https://ui-avatars.com/api/?background=8D6AEE&size=128&color=fff&name=${formatName(userState.username)}');
     _emitUpdatedState();
   }
 

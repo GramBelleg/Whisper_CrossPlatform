@@ -14,11 +14,11 @@ class ProfileSection extends StatelessWidget {
 
   const ProfileSection({
     Key? key,
-    required this.isEditing,
+    this.isEditing = false,
     required this.hasStory,
     required this.profilePicState,
     required this.usernameState,
-    this.userState,
+    required this.userState,
     this.showImageSourceDialog,
     this.showProfileOrStatusOptions,
   }) : super(key: key);

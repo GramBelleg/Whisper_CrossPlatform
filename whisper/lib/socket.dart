@@ -2,9 +2,8 @@ import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisper/constants/ip_for_services.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
-import 'package:whisper/models/user_state.dart';
-import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 class SocketService {
@@ -31,11 +30,12 @@ class SocketService {
 
     socket?.on('pfp', (data) async {
       print("changed Profile Pic: $data");
-      final UserState? userState = await getUserState();
       print("this is userid from socket: ${data['userId']} ");
       if (data['userId'] == await getId()) {
-        String response = await generatePresignedUrl(data['profilePic']);
-        userState?.copyWith(profilePic: response);
+        GlobalSettingsCubitProvider.settingsCubit
+            .receiveMyProfilePic(data['profilePic']);
+      } else {
+        // to do receive another pfp
       }
     });
   }

@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
-import 'package:whisper/cubit/settings_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/pages/confirmation_code.dart';
 import 'package:whisper/pages/forget_password_email.dart';
@@ -24,7 +24,8 @@ import 'package:whisper/services/visibility_service.dart';
 
 void main() {
   runApp(MultiBlocProvider(providers: [
-    BlocProvider(create: (context) => SettingsCubit()),
+    BlocProvider(
+        create: (context) => GlobalSettingsCubitProvider.settingsCubit),
 
     BlocProvider(
         create: (context) =>
