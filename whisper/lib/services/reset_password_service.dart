@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
@@ -8,6 +9,7 @@ import 'package:whisper/services/show_loading_dialog.dart';
 
 import '../models/reset_password_credentials.dart';
 import '../pages/log_out_after_reset_password.dart';
+import 'login_service.dart';
 
 class ResetPasswordService {
   static Future<void> sendResetCode(String email, BuildContext context) async {
@@ -70,7 +72,8 @@ class ResetPasswordService {
         print('Response: $data');
         await saveToken(data['userToken']);
         await saveId(data['user']['id']);
-
+        String? firebaseToken = await FirebaseMessaging.instance.getToken();
+        await LoginService.registerFCMToken(firebaseToken, data['userToken'], context);
         Navigator.pushNamed(context, LogoutAfterResetPassword.id);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

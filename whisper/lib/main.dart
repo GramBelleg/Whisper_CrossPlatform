@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +23,11 @@ import 'package:whisper/services/chat_deletion_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/services/visibility_service.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsCubit()),
 

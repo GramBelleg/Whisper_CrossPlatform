@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:app_links/app_links.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
+import '../services/login_service.dart';
 import '../services/show_loading_dialog.dart';
 
 class LoginWithGithub extends StatefulWidget {
@@ -74,7 +76,8 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                   if (data['status'] == 'success') {
                     await saveToken(data['userToken']);
                     await saveId(data['user']['id']);
-
+                    String? firebaseToken = await FirebaseMessaging.instance.getToken();
+                    await LoginService.registerFCMToken(firebaseToken, data['userToken'], context);
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       PageState.id,
