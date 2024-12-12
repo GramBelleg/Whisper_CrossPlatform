@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/pages/forward_menu.dart';
+import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 
@@ -259,7 +260,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () async{
+                  print("HE7777");
+                  await CallsService.makeACall(context, widget.chatId);
+                },
                 icon: const FaIcon(FontAwesomeIcons.phone),
               ),
             ],

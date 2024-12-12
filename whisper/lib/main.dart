@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:whisper/pages/main_chats.dart';
 import 'package:whisper/pages/reset_password.dart';
 import 'package:whisper/pages/sign_up.dart';
 import 'package:whisper/services/blocked_users_service.dart';
+import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/chat_deletion_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/services/visibility_service.dart';
@@ -28,6 +30,8 @@ import 'firebase_options.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await CallsService.initializeAwesomeNotifications();
+  FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsCubit()),
 
@@ -53,6 +57,14 @@ class Whisper extends StatefulWidget {
 }
 
 class _WhisperState extends State<Whisper> {
+
+  @override
+  @pragma("vm:entry-point")
+  void initState() {
+    super.initState();
+    CallsService.setListeners();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

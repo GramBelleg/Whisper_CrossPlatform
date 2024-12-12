@@ -12,7 +12,7 @@ import 'package:whisper/services/show_loading_dialog.dart';
 class LoginService {
   static Future<void> registerFCMToken(String? fcmToken,String token, BuildContext context) async {
     final url = Uri.parse('http://$ip:5000/api/notifications/registerFCMToken');
-
+    print("BEFORE");
     showLoadingDialog(context);
     try{
       final response = await http.post(
@@ -47,9 +47,9 @@ class LoginService {
         body: jsonEncode(loginCred.toMap()),
       );
       Navigator.pop(context);
-
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        print("Before");
         String? firebaseToken = await FirebaseMessaging.instance.getToken();
         print("FIRE BASE TOKEN : $firebaseToken");
         await registerFCMToken(firebaseToken,data['userToken'], context);
