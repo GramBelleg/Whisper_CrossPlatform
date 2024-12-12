@@ -11,6 +11,7 @@ FlashyTabBar buildBottomNavigationBar(
     items: [
       FlashyTabBarItem(
         icon: const Icon(
+          key: Key("ContactsPageKey"),
           Icons.contacts,
           color: Color(0xff8D6AEE),
         ),
@@ -21,6 +22,7 @@ FlashyTabBar buildBottomNavigationBar(
       ),
       FlashyTabBarItem(
         icon: const Icon(
+          key: Key("ChatsPageKey"),
           Icons.chat,
           color: Color(0xff8D6AEE),
         ),
@@ -31,6 +33,7 @@ FlashyTabBar buildBottomNavigationBar(
       ),
       FlashyTabBarItem(
         icon: const Icon(
+          key: Key("SettingsPageKey"),
           Icons.settings,
           color: Color(0xff8D6AEE),
         ),
