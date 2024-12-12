@@ -31,7 +31,7 @@ Future<UserState?> fetchUserInfo() async {
       if (data['profilePic'] == '') {
         print("receiveMyProfilePic   ${data['profilePic']}");
       }
-      String? mediaUrl = data['profilePic'] != null || data['profilePic'] != ''
+      String? mediaUrl = data['profilePic'] != null
           ? await generatePresignedUrl(data['profilePic'])
           : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(data['userName'])}';
       // Create and return a UserState object with all fields, handling null values

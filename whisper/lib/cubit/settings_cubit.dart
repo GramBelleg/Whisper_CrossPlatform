@@ -69,8 +69,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   Future<void> receiveMyProfilePic(String? blobName) async {
-    String imageUrl = blobName != null || blobName != ''
-        ? await generatePresignedUrl(blobName!)
+    String imageUrl = blobName != null
+        ? await generatePresignedUrl(blobName)
         : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(usernameState)}';
     print("changed Profile Pic");
     final userState = (state as SettingsLoaded).userState;
