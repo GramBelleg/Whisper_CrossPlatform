@@ -11,6 +11,7 @@ class ReceivedAudioMessageCard extends ReceivedMessage {
     required super.time,
     required super.isSelected,
     required super.status,
+    required super.senderName,
     super.key,
   });
 

@@ -21,12 +21,14 @@ class ForwardedFileReceivedMessageCard extends ReceivedMessage {
     required bool isSelected,
     required MessageStatus status,
     required this.messageSenderName,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -38,6 +40,7 @@ class ForwardedFileReceivedMessageCard extends ReceivedMessage {
       message: message,
       time: formatTime(time),
       isSelected: isSelected,
+      senderName: senderName,
       status: status,
     );
   }
@@ -50,7 +53,7 @@ class _ForwardedFileReceivedMessageCardStateful extends StatefulWidget {
   final bool isSelected;
   final MessageStatus status;
   final String originalSenderName;
-
+  final String senderName;
   const _ForwardedFileReceivedMessageCardStateful({
     required this.blobName,
     required this.message,
@@ -58,6 +61,7 @@ class _ForwardedFileReceivedMessageCardStateful extends StatefulWidget {
     required this.isSelected,
     required this.status,
     required this.originalSenderName,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -144,6 +148,14 @@ class _ForwardedFileReceivedMessageCardState
                                   color: Colors.white),
                             ),
                             const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             Row(
                               children: [
                                 Icon(

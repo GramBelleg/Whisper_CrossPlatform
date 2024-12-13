@@ -22,6 +22,7 @@ class RepliedReceivedVideoMessageCard extends ReceivedMessage {
     required this.repliedContent,
     required this.repliedSenderName,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
@@ -29,6 +30,7 @@ class RepliedReceivedVideoMessageCard extends ReceivedMessage {
           isSelected: isSelected,
           key: key,
           status: status,
+          senderName: senderName,
         );
 
   @override
@@ -41,6 +43,7 @@ class RepliedReceivedVideoMessageCard extends ReceivedMessage {
       status: status,
       repliedContent: repliedContent,
       repliedSenderName: repliedSenderName,
+      senderName: senderName,
     );
   }
 }
@@ -53,7 +56,7 @@ class _RepliedReceivedVideoMessageCardStateful extends StatefulWidget {
   final MessageStatus status;
   final String repliedContent;
   final String repliedSenderName;
-
+  final String senderName;
   const _RepliedReceivedVideoMessageCardStateful({
     required this.blobName,
     required this.message,
@@ -62,6 +65,7 @@ class _RepliedReceivedVideoMessageCardStateful extends StatefulWidget {
     required this.status,
     required this.repliedContent,
     required this.repliedSenderName,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -175,6 +179,14 @@ class _RepliedReceivedVideoMessageCardState
                       ),
                       const SizedBox(height: 5),
                       // Display video player
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5),
+                        child: Text(
+                          "${widget.senderName}:",
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(

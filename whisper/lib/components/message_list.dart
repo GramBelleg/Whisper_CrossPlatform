@@ -412,6 +412,7 @@ class _MessageListState extends State<MessageList> {
   Widget _buildReceiverMessage(ChatMessage messageData) {
     if (messageData.forwarded == true && messageData.media == null) {
       return ForwardedReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -424,6 +425,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "DOC")) {
       return ForwardedFileReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -437,6 +439,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "IMAGE")) {
       return ForwardedReceivedImageMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -450,6 +453,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "VIDEO")) {
       return ForwardedReceivedVideoMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -512,6 +516,7 @@ class _MessageListState extends State<MessageList> {
       );
     } else if (messageData.parentMessage != null && messageData.media == null) {
       return RepliedReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -525,6 +530,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "DOC")) {
       return FileRepliedReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -539,6 +545,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "IMAGE")) {
       return RepliedImageReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -553,6 +560,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "VIDEO")) {
       return RepliedReceivedVideoMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.parentMessage!.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -566,6 +574,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "DOC")) {
       return FileReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -577,6 +586,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "IMAGE")) {
       return ImageReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -588,6 +598,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "VIDEO")) {
       return VideoReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -601,6 +612,7 @@ class _MessageListState extends State<MessageList> {
       debugPrint("RECEIVED VOICE MESSAGE HERE");
       debugPrint("media=${messageData.media}, type=${messageData.type}");
       return ReceivedVoiceMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -614,6 +626,7 @@ class _MessageListState extends State<MessageList> {
       debugPrint("RECEIVED AUDIO MESSAGE HERE");
       debugPrint("media=${messageData.media}, type=${messageData.type}");
       return ReceivedAudioMessageCard(
+        senderName: messageData.sender!.userName,
         blobName: messageData.media!,
         message: messageData.content,
         time: messageData.time!,
@@ -625,6 +638,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "GIF")) {
       return ReceivedGifMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -636,6 +650,7 @@ class _MessageListState extends State<MessageList> {
         messageData.media!.isNotEmpty &&
         (messageData.type == "STICKER")) {
       return ReceivedStickerMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,
@@ -645,6 +660,7 @@ class _MessageListState extends State<MessageList> {
       );
     } else {
       return NormalReceivedMessageCard(
+        senderName: messageData.sender!.userName,
         message: messageData.content,
         time: messageData.time!,
         status: MessageStatus.sent,

@@ -4,7 +4,6 @@ import 'package:whisper/components/receive-message/received_message.dart';
 
 class ReceivedForwardedAudioMessageCard extends ReceivedMessage {
   final String blobName;
-  final String senderName;
 
   ReceivedForwardedAudioMessageCard({
     required this.blobName,
@@ -12,7 +11,7 @@ class ReceivedForwardedAudioMessageCard extends ReceivedMessage {
     required super.time,
     required super.isSelected,
     required super.status,
-    required this.senderName,
+    required super.senderName,
     super.key,
   });
 

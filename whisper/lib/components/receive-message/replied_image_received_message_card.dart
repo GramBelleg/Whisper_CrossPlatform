@@ -21,12 +21,14 @@ class RepliedImageReceivedMessageCard extends ReceivedMessage {
     required this.repliedContent,
     required this.repliedSenderName,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -40,6 +42,7 @@ class RepliedImageReceivedMessageCard extends ReceivedMessage {
       status: status,
       repliedContent: repliedContent,
       repliedSenderName: repliedSenderName,
+      senderName: senderName,
     );
   }
 }
@@ -52,7 +55,7 @@ class _RepliedImageReceivedMessageCardStateful extends StatefulWidget {
   final MessageStatus status;
   final String repliedContent;
   final String repliedSenderName;
-
+  final String senderName;
   const _RepliedImageReceivedMessageCardStateful({
     required this.blobName,
     required this.message,
@@ -61,6 +64,7 @@ class _RepliedImageReceivedMessageCardStateful extends StatefulWidget {
     required this.status,
     required this.repliedContent,
     required this.repliedSenderName,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -146,6 +150,14 @@ class _RepliedImageReceivedMessageCardState
                               ),
                             ),
                             const SizedBox(height: 5),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             // Display the image message
                             GestureDetector(
                               onTap: () {

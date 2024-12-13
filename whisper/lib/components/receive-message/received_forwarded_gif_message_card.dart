@@ -4,11 +4,10 @@ import 'package:whisper/components/receive-message/received_message.dart';
 
 class ReceivedForwardedGifMessageCard extends ReceivedMessage {
   final String blobName;
-  final String senderName;
 
   ReceivedForwardedGifMessageCard({
     required this.blobName,
-    required this.senderName,
+    required super.senderName,
     required super.message,
     required super.time,
     required super.isSelected,

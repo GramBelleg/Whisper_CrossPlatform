@@ -19,12 +19,14 @@ class ForwardedReceivedImageMessageCard extends ReceivedMessage {
     required bool isSelected,
     required MessageStatus status,
     required this.messageSenderName,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -37,6 +39,7 @@ class ForwardedReceivedImageMessageCard extends ReceivedMessage {
       isSelected: isSelected,
       status: status,
       forwardedSenderName: messageSenderName,
+      senderName: senderName,
     );
   }
 }
@@ -48,7 +51,7 @@ class _ForwardedReceivedImageMessageCardStateful extends StatefulWidget {
   final bool isSelected;
   final MessageStatus status;
   final String forwardedSenderName;
-
+  final String senderName;
   const _ForwardedReceivedImageMessageCardStateful({
     required this.blobName,
     required this.message,
@@ -56,6 +59,7 @@ class _ForwardedReceivedImageMessageCardStateful extends StatefulWidget {
     required this.isSelected,
     required this.status,
     required this.forwardedSenderName,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -133,6 +137,14 @@ class _ForwardedReceivedImageMessageCardState
                               ),
                             ),
                             const SizedBox(height: 6),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             // Display the image
                             GestureDetector(
                               onTap: () {

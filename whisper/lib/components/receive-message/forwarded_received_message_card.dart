@@ -13,12 +13,14 @@ class ForwardedReceivedMessageCard extends ReceivedMessage {
     required bool isSelected,
     required this.messageSenderName,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -70,6 +72,14 @@ class ForwardedReceivedMessageCard extends ReceivedMessage {
                             color: Colors.white),
                       ),
                       const SizedBox(height: 3), // Reduced space
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5),
+                        child: Text(
+                          "$senderName:",
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ),
                       Text(
                         message, // Forwarded message content
                         style:

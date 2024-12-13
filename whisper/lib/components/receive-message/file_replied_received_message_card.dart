@@ -23,12 +23,14 @@ class FileRepliedReceivedMessageCard extends ReceivedMessage {
     required MessageStatus status,
     required this.repliedContent,
     required this.repliedSenderName,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -42,6 +44,7 @@ class FileRepliedReceivedMessageCard extends ReceivedMessage {
       status: status,
       repliedContent: repliedContent,
       repliedSenderName: repliedSenderName,
+      senderName: senderName,
     );
   }
 }
@@ -54,6 +57,7 @@ class _FileRepliedReceivedMessageCardStateful extends StatefulWidget {
   final MessageStatus status;
   final String repliedContent;
   final String repliedSenderName;
+  final String senderName;
 
   const _FileRepliedReceivedMessageCardStateful({
     required this.blobName,
@@ -63,6 +67,7 @@ class _FileRepliedReceivedMessageCardStateful extends StatefulWidget {
     required this.status,
     required this.repliedContent,
     required this.repliedSenderName,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -163,6 +168,14 @@ class _FileRepliedReceivedMessageCardState
                               ),
                             ),
                             const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             Row(
                               children: [
                                 Icon(

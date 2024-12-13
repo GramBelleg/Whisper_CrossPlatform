@@ -20,12 +20,14 @@ class ForwardedReceivedVideoMessageCard extends ReceivedMessage {
     required bool isSelected,
     required this.messageSenderName,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -38,7 +40,8 @@ class ForwardedReceivedVideoMessageCard extends ReceivedMessage {
       time: formatTime(time),
       isSelected: isSelected,
       status: status,
-      senderName: messageSenderName,
+      messageSenderName: messageSenderName,
+      senderName: senderName,
     );
   }
 }
@@ -50,6 +53,7 @@ class _ForwardedReceivedVideoMessageCardStateful extends StatefulWidget {
   final String time;
   final bool isSelected;
   final MessageStatus status;
+  final String messageSenderName;
   final String senderName;
 
   const _ForwardedReceivedVideoMessageCardStateful({
@@ -59,6 +63,7 @@ class _ForwardedReceivedVideoMessageCardStateful extends StatefulWidget {
     required this.time,
     required this.isSelected,
     required this.status,
+    required this.messageSenderName,
     required this.senderName,
     Key? key,
   }) : super(key: key);
@@ -148,13 +153,21 @@ class _ForwardedReceivedVideoMessageCardState
                                   fontSize: 12, color: Colors.white70),
                             ),
                             Text(
-                              widget.senderName,
+                              widget.messageSenderName,
                               style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white),
                             ),
                             const SizedBox(height: 6),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             // Video Player
                             GestureDetector(
                               onTap: () {

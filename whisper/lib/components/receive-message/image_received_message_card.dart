@@ -17,12 +17,14 @@ class ImageReceivedMessageCard extends ReceivedMessage {
     required DateTime time,
     required bool isSelected,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -35,6 +37,7 @@ class ImageReceivedMessageCard extends ReceivedMessage {
       time: formatTime(time),
       isSelected: isSelected,
       status: status,
+      senderName: senderName,
     );
   }
 }
@@ -46,7 +49,7 @@ class _ImageReceivedMessageCardStateful extends StatefulWidget {
   final String time;
   final bool isSelected;
   final MessageStatus status;
-
+  final String senderName;
   const _ImageReceivedMessageCardStateful({
     required this.blobName,
     required this.caption,
@@ -54,6 +57,7 @@ class _ImageReceivedMessageCardStateful extends StatefulWidget {
     required this.time,
     required this.isSelected,
     required this.status,
+    required this.senderName,
     Key? key,
   }) : super(key: key);
 
@@ -108,6 +112,14 @@ class _ImageReceivedMessageCardState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Display the image
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "${widget.senderName}:",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(

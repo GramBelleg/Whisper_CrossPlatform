@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
 import 'package:whisper/components/sticker_message_card.dart';
 
-class ReceivedForwardedStickerMessageCard extends ReceivedMessage{
+class ReceivedForwardedStickerMessageCard extends ReceivedMessage {
   final String blobName;
-  final String senderName;
 
   ReceivedForwardedStickerMessageCard({
     required this.blobName,
-    required this.senderName,
+    required super.senderName,
     required super.message,
     required super.time,
     required super.isSelected,

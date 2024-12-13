@@ -9,12 +9,14 @@ class NormalReceivedMessageCard extends ReceivedMessage {
     required DateTime time,
     required bool isSelected,
     required MessageStatus status,
+    required String senderName,
     Key? key,
   }) : super(
           message: message,
           time: time,
           isSelected: isSelected,
           status: status,
+          senderName: senderName,
           key: key,
         );
 
@@ -58,6 +60,14 @@ class NormalReceivedMessageCard extends ReceivedMessage {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Text(
+                                  "$senderName:",
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ),
                               Text(
                                 message,
                                 style: const TextStyle(
