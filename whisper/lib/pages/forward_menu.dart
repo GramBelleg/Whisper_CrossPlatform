@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_cubit_provider.dart';
+import 'package:whisper/keys/forward_menu_keys.dart';
 import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/fetch_message_by_id.dart';
 import 'package:whisper/services/friend_service.dart';
@@ -103,7 +104,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
             content: message.content,
             chatId: friend.id,
             senderId: senderId,
-            parentMessage: message.parentMessage,
+            parentMessage: null,
             senderName: friend.name,
             isReplying: false,
             isForward: true,
@@ -160,11 +161,14 @@ class _ForwardMenuState extends State<ForwardMenu> {
             const ForwardMenuHeader(),
             _buildSearchBar(),
             SelectedFriendsChip(
+                key: ForwardMenuKeys.selectedFriendChip,
                 selectedIndexes: _selectedFriendIndexes,
                 friends: _filteredFriends),
             const Divider(color: Colors.white),
             _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    key: ForwardMenuKeys.loadingIndicator,
+                    child: CircularProgressIndicator())
                 : _buildFriendList(),
             _buildForwardButton(),
           ],
@@ -177,6 +181,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: TextField(
+        key: ForwardMenuKeys.searchBar,
         controller: _searchController,
         decoration: const InputDecoration(
           labelText: 'Search Friends...',
@@ -192,6 +197,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
   Widget _buildFriendList() {
     return Flexible(
       child: ListView.builder(
+        key: ForwardMenuKeys.friendList,
         shrinkWrap: true,
         itemCount: _filteredFriends.length,
         itemBuilder: (context, index) {
@@ -210,6 +216,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
+        key: ForwardMenuKeys.forwardButton,
         onPressed: _forwardMessages,
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 50),

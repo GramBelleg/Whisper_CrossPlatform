@@ -108,7 +108,7 @@ class _FileMessageCardState extends State<_FileMessageCardStateful> {
                           maxWidth: MediaQuery.of(context).size.width * 0.75,
                         ),
                         child: Card(
-                          color: const Color(0xFF8D6AEE),
+                          color: primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),

@@ -30,7 +30,7 @@ class ForwardedReceivedMessageCard extends ReceivedMessage {
       child: Container(
         width: MediaQuery.of(context).size.width,
         color: isSelected
-            ? selectColor// Highlight selected
+            ? selectColor // Highlight selected
             : Colors.transparent,
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
@@ -41,8 +41,7 @@ class ForwardedReceivedMessageCard extends ReceivedMessage {
                 maxWidth: MediaQuery.of(context).size.width * 0.8,
               ),
               child: Card(
-                color:
-                    const Color(0xff0A122F), // Dark color for received messages
+                color: firstNeutralColor, // Dark color for received messages
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),

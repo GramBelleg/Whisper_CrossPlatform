@@ -5,8 +5,8 @@ import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/settings_cubit.dart';
-import 'package:whisper/cubit/user_story_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
+import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/pages/confirmation_code.dart';
 import 'package:whisper/pages/forget_password_email.dart';
 import 'package:whisper/pages/login_with_git_hub.dart';
@@ -20,21 +20,21 @@ import 'package:whisper/pages/sign_up.dart';
 import 'package:whisper/services/blocked_users_service.dart';
 import 'package:whisper/services/chat_deletion_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
-import 'package:whisper/services/user_stories_service.dart';
 import 'package:whisper/services/visibility_service.dart';
 
 void main() {
-  runApp(MultiBlocProvider(child: Whisper(), providers: [
+  runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsCubit()),
 
     BlocProvider(
         create: (context) =>
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
-    // BlocProvider(create: (context) => UserCubit()),
+    //BlocProvider(create: (context) => UserCubit()),
     BlocProvider(create: (context) => VisibilityCubit(VisibilityService())),
     BlocProvider(create: (context) => BlockedUsersCubit(BlockedUsersService())),
-    BlocProvider(create: (context) => UserStoryCubit(UserStoriesService())),
-  ]));
+    BlocProvider(
+        create: (context) => GlobalUserStoryCubitProvider.userStoryCubit),
+  ], child: Whisper()));
 }
 
 class UserStoryService {}
@@ -55,7 +55,6 @@ class _WhisperState extends State<Whisper> {
       initialRoute: Login.id,
       theme: ThemeData(fontFamily: 'ABeeZee'),
       routes: {
-        Login.id: (context) => Login(),
         Signup.id: (context) => Signup(),
         ForgotPasswordEmail.id: (context) => ForgotPasswordEmail(),
         ConfirmationCode.id: (context) => ConfirmationCode(),
@@ -75,6 +74,7 @@ class _WhisperState extends State<Whisper> {
               },
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
+        Login.id: (context) => Login(),
 
         ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
         // ChatPage.id: (context) => ChatPage(),

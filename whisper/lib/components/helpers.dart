@@ -1,3 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:whisper/pages/view_profile_image.dart';
+
+import 'package:whisper/services/read_file.dart';
+import 'package:whisper/services/shared_preferences.dart';
+
 String formatName(String fullName) {
   List<String> names = fullName.split(" ");
 
@@ -7,5 +13,40 @@ String formatName(String fullName) {
   } else {
     // If only one name is present, return as is
     return fullName;
+  }
+}
+
+bool isValidUrl(String str) {
+  final urlPattern = r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$';
+  final result = RegExp(urlPattern).hasMatch(str);
+  return result;
+}
+
+void viewProfilePhoto(BuildContext context, String photoUrl) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => FullScreenPhotoScreen(photoUrl: photoUrl),
+    ),
+  );
+}
+
+Future<String?> loadImageUrl(String blobName) async {
+  String? savedImageUrl = await getImageUrl(blobName);
+  if (savedImageUrl != null) {
+    return savedImageUrl;
+  } else {
+    return await generateAndSaveImageUrl(blobName);
+  }
+}
+
+Future<String?> generateAndSaveImageUrl(String blobName) async {
+  try {
+    print("blobName:$blobName");
+    String url = await generatePresignedUrl(blobName);
+    await saveImageUrl(blobName, url);
+    return url;
+  } catch (e) {
+    print('Error generating or saving image URL: $e');
   }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/blob_url_manager.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/pages/full_screen_image_page.dart';
 import 'package:whisper/services/read_file.dart';
+import 'package:whisper/services/shared_preferences.dart';
 
 class ImageMessageCard extends OwnMessage {
   final String blobName;
@@ -60,35 +62,53 @@ class _ImageMessageCardStateful extends StatefulWidget {
 }
 
 class _ImageMessageCardState extends State<_ImageMessageCardStateful> {
-  String imageUrl = "";
-
+  String? imageUrl = "";
+  bool isConnected = true;
   @override
   void initState() {
     super.initState();
-    if (BlobUrlManager.isExist(widget.blobName)) {
-      imageUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
-    } else {
-      _generateImageUrl(widget.blobName);
+    _loadImageUrl();
+  }
+
+  Future<void> _loadImageUrl() async {
+    String? url = await loadImageUrl(widget.blobName);
+    if (mounted) {
+      setState(() {
+        imageUrl = url;
+      });
     }
   }
 
-  Future<void> _generateImageUrl(String blobName) async {
-    try {
-      String url = await generatePresignedUrl(blobName);
-      setState(() {
-        imageUrl = url;
-        BlobUrlManager.addBlobUrl(widget.blobName, url);
-      });
-    } catch (e) {
-      print('Error generating image URL: $e');
-    }
-  }
+  // Future<void> loadImageUrl() async {
+  //   String? savedImageUrl = await getImageUrl(widget.blobName);
+  //   if (!mounted) return;
+  //   if (savedImageUrl != null) {
+  //     setState(() {
+  //       imageUrl = savedImageUrl;
+  //     });
+  //   } else {
+  //     await generateAndSaveImageUrl(widget.blobName);
+  //   }
+  // }
+
+  // Future<void> generateAndSaveImageUrl(String blobName) async {
+  //   try {
+  //     String url = await generatePresignedUrl(blobName);
+  //     if (!mounted) return;
+  //     setState(() {
+  //       imageUrl = url;
+  //     });
+  //     await saveImageUrl(blobName, url);
+  //   } catch (e) {
+  //     print('Error generating or saving image URL: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: imageUrl.isEmpty
+      child: imageUrl!.isEmpty
           ? const CircularProgressIndicator() // Show loading until image URL is fetched
           : Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -103,7 +123,7 @@ class _ImageMessageCardState extends State<_ImageMessageCardStateful> {
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     child: Card(
-                      color: const Color(0xFF8D6AEE),
+                      color: primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
@@ -120,16 +140,35 @@ class _ImageMessageCardState extends State<_ImageMessageCardStateful> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => FullScreenImagePage(
-                                      imageUrl: imageUrl,
+                                      imageUrl: imageUrl!,
                                     ),
                                   ),
                                 );
                               },
                               child: Image.network(
-                                imageUrl,
+                                imageUrl!,
                                 width: double.infinity,
                                 height: 200,
                                 fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 200,
+                                    color: firstSecondaryColor,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Colors.white,
+                                        size: 50,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(height: 6),

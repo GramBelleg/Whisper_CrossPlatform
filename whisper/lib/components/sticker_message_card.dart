@@ -38,13 +38,13 @@ class _StickerMessageCardState extends State<StickerMessageCard> {
     print("Downloading sticker ${widget.blobName} to device");
     stickerPath = await StickersService().downloadSticker(widget.blobName);
 
-    if (stickerPath.isNotEmpty) {
+    if (stickerPath.isNotEmpty && mounted) {
       setState(() {
         isStickerDownloaded = true;
       });
     }
 
-    if (stickerPath == "FAILED") {
+    if (stickerPath == "FAILED" && mounted) {
       setState(() {
         isStickerDownloaded = false;
         failedToDownload = true;
@@ -109,7 +109,7 @@ class _StickerMessageCardState extends State<StickerMessageCard> {
                     : const CircularProgressIndicator(),
             const SizedBox(height: 5),
             Container(
-              width: 80,
+              width: 85,
               decoration: BoxDecoration(
                 color: widget.isSelected
                     ? selectColor
@@ -129,18 +129,18 @@ class _StickerMessageCardState extends State<StickerMessageCard> {
                   ),
                   SizedBox(width: 2),
                   widget.isSent
-                      ?
-                  Icon(
-                    widget.status == MessageStatus.seen
-                        ? FontAwesomeIcons.checkDouble
-                        : widget.status == MessageStatus.received
-                            ? FontAwesomeIcons.checkDouble
-                            : FontAwesomeIcons.check,
-                    color: widget.status == MessageStatus.seen
-                        ? Colors.blue
-                        : Colors.white,
-                    size: 12,
-                  ) : SizedBox(),
+                      ? Icon(
+                          widget.status == MessageStatus.seen
+                              ? FontAwesomeIcons.checkDouble
+                              : widget.status == MessageStatus.received
+                                  ? FontAwesomeIcons.checkDouble
+                                  : FontAwesomeIcons.check,
+                          color: widget.status == MessageStatus.seen
+                              ? Colors.blue
+                              : Colors.white,
+                          size: 12,
+                        )
+                      : SizedBox(),
                 ],
               ),
             )

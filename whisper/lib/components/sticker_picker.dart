@@ -50,7 +50,7 @@ class _StickerPickerState extends State<StickerPicker> {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
-      allowedExtensions: ['webp'],
+      allowedExtensions: ['webp', 'jpg', 'jpeg', 'png'],
     );
 
     if (result != null) {
@@ -67,7 +67,6 @@ class _StickerPickerState extends State<StickerPicker> {
         await stickersService.uploadSticker(filePath);
 
         fetchStickers();
-
       }
     }
   }

@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/custom_chat_text_field_keys.dart';
+import 'package:whisper/keys/file_button_sheet_keys.dart';
 import 'package:whisper/components/gif_picker.dart';
 import 'package:whisper/models/parent_message.dart';
 import 'package:whisper/components/file_button_sheet.dart';
@@ -21,6 +25,9 @@ class CustomChatTextField extends StatefulWidget {
   final VoidCallback toggleGifPicker;
   final VoidCallback toggleStickerPicker;
   final VoidCallback handleOncancelReply;
+  final bool isEditing;
+  final String editingMessage;
+  final VoidCallback handleCancelEditing;
 
   CustomChatTextField({
     required this.scrollController,
@@ -38,6 +45,9 @@ class CustomChatTextField extends StatefulWidget {
     required this.parentMessage,
     required this.isReplying,
     required this.handleOncancelReply,
+    required this.isEditing,
+    required this.editingMessage,
+    required this.handleCancelEditing,
     Key? key,
   }) : super(key: key);
 
@@ -47,6 +57,22 @@ class CustomChatTextField extends StatefulWidget {
 
 class _CustomChatTextFieldState extends State<CustomChatTextField> {
   bool show = false;
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial text to the editing message if in editing mode
+    if (widget.editingMessage.isNotEmpty) {
+      widget.controller.text = widget.editingMessage;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomChatTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.editingMessage.isNotEmpty) {
+      widget.controller.text = widget.editingMessage;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +94,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
 
   InputDecoration _buildInputDecoration(BuildContext context) {
     return InputDecoration(
-      fillColor: const Color(0xff0A122F),
+      fillColor: firstNeutralColor,
       filled: true,
       hintText: "Message Here",
       hintStyle: const TextStyle(color: Colors.white54),
@@ -95,19 +121,33 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
       onPressed: () => _handlePrefixIconPress(),
       icon: FaIcon(
         show ? FontAwesomeIcons.keyboard : FontAwesomeIcons.faceSmile,
-        color: const Color(0xff8D6AEE),
+        color: primaryColor,
       ),
+      key: Key(CustomChatTextFieldKeys.prefixIcon), // Key added
     );
   }
 
   Widget _buildSuffixIcon(BuildContext context) {
-    return IconButton(
-      onPressed: () => _handleSuffixIconPress(),
-      icon: const FaIcon(
-        FontAwesomeIcons.paperclip,
-        color: Color(0xff8D6AEE),
-      ),
-    );
+    return !widget.isEditing
+        ? IconButton(
+            onPressed: () => _handleSuffixIconPress(),
+            icon: FaIcon(
+              FontAwesomeIcons.paperclip,
+              color: primaryColor,
+            ),
+            key: Key(CustomChatTextFieldKeys.filePickerButton),
+          )
+        : IconButton(
+            key: Key(CustomChatTextFieldKeys.cancelEditing),
+            onPressed: () {
+              widget.controller.clear();
+              widget.handleCancelEditing();
+            },
+            icon: FaIcon(
+              FontAwesomeIcons.xmark,
+              color: primaryColor,
+            ),
+          );
   }
 
   void _handlePrefixIconPress() {
@@ -149,6 +189,7 @@ class _CustomChatTextFieldState extends State<CustomChatTextField> {
         forwardedFromUserId: null,
         context: context,
         handleOncancelReply: widget.handleOncancelReply,
+        key: Key(FileButtonSheetKeys.fileButtonSheet),
       ),
     );
   }

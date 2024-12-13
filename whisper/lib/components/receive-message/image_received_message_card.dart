@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/blob_url_manager.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/own-message/own_message.dart';
 import 'package:whisper/components/receive-message/received_message.dart';
@@ -63,27 +64,20 @@ class _ImageReceivedMessageCardStateful extends StatefulWidget {
 
 class _ImageReceivedMessageCardState
     extends State<_ImageReceivedMessageCardStateful> {
-  String imageUrl = "";
+  String? imageUrl = "";
 
   @override
   void initState() {
     super.initState();
-    if (BlobUrlManager.isExist(widget.blobName)) {
-      imageUrl = BlobUrlManager.getBlobUrl(widget.blobName)!;
-    } else {
-      _generateImageUrl(widget.blobName);
-    }
+    _loadImageUrl();
   }
 
-  Future<void> _generateImageUrl(String blobName) async {
-    try {
-      String url = await generatePresignedUrl(blobName);
+  Future<void> _loadImageUrl() async {
+    String? url = await loadImageUrl(widget.blobName);
+    if (mounted) {
       setState(() {
         imageUrl = url;
-        BlobUrlManager.addBlobUrl(widget.blobName, url);
       });
-    } catch (e) {
-      print('Error generating image URL: $e');
     }
   }
 
@@ -91,7 +85,7 @@ class _ImageReceivedMessageCardState
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: imageUrl.isEmpty
+      child: imageUrl!.isEmpty
           ? const CircularProgressIndicator() // Show loading until image URL is fetched
           : Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -103,7 +97,7 @@ class _ImageReceivedMessageCardState
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     child: Card(
-                      color: const Color(0xff0A122F),
+                      color: firstNeutralColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
@@ -120,13 +114,13 @@ class _ImageReceivedMessageCardState
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => FullScreenImagePage(
-                                      imageUrl: imageUrl,
+                                      imageUrl: imageUrl!,
                                     ),
                                   ),
                                 );
                               },
                               child: Image.network(
-                                imageUrl,
+                                imageUrl!,
                                 width: double.infinity,
                                 height: 200,
                                 fit: BoxFit.cover,

@@ -8,22 +8,42 @@ class UserStoryInitial extends UserStoryState {}
 class UserStoryLoading extends UserStoryState {}
 
 class UserStoryLoaded extends UserStoryState {
-  final List<User> users; // List of users that have stories
-
-  UserStoryLoaded({required this.users});
+  final List<User> users;
+  final User? me;
+  UserStoryLoaded({required this.users, required this.me});
 }
 
 class UserStoryStoriesLoaded extends UserStoryState {
-  final List<Story> stories; // List of stories for the selected user
+  final int userId; // User ID whose stories are loaded
+  final List<Story> stories;
 
-  UserStoryStoriesLoaded({required this.stories});
+  UserStoryStoriesLoaded({required this.userId, required this.stories});
 }
 
-// class UserStoryStoriesViewsLoaded extends UserStoryState {
-//   final List<UserView> userViews; // List of Views for the selected story
+class UserStoryNewStoryReceived extends UserStoryState {
+  final Story story;
 
-//   UserStoryStoriesViewsLoaded({required this.userViews});
-// }
+  UserStoryNewStoryReceived({required this.story});
+}
+
+class UserStoryLikeUpdated extends UserStoryState {
+  final int storyId;
+  final bool liked;
+
+  UserStoryLikeUpdated({required this.storyId, required this.liked});
+}
+
+class UserStoryViewed extends UserStoryState {
+  final int storyId;
+
+  UserStoryViewed({required this.storyId});
+}
+
+class UserStoryDeleted extends UserStoryState {
+  final int storyId;
+
+  UserStoryDeleted({required this.storyId});
+}
 
 class UserStoryError extends UserStoryState {
   final String message;

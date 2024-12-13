@@ -7,7 +7,7 @@ class ChatMessage {
   final int chatId;
   final Sender? sender;
   final List<dynamic>? mentions;
-  final String content;
+  String content;
   final String? media;
   DateTime? time;
   DateTime? sentAt;

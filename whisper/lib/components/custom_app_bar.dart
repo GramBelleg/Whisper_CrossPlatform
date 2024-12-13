@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/pages/forward_menu.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
@@ -11,7 +13,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final int chatId;
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
-
+  final bool isMine;
   const CustomAppBar({
     super.key,
     required this.isSelected,
@@ -20,6 +22,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.clearSelection,
     required this.chatViewModel, // Initialize ChatViewModel
     required this.chatId,
+    required this.isMine,
   });
 
   @override
@@ -46,12 +49,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
           content: Text('Are you sure you want to delete these items?'),
           actions: <Widget>[
             TextButton(
+              key: Key(CustomAppBarKeys.deleteForMeButton),
               onPressed: () {
                 _deleteForMe(context); // Handle "Delete for Me" action
               },
               child: Text('Delete for Me'),
             ),
             TextButton(
+              key: Key(CustomAppBarKeys.deleteForEveryoneButton),
               onPressed: () {
                 _deleteForEveryone(
                     context); // Handle "Delete for Everyone" action
@@ -59,6 +64,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               child: Text('Delete for Everyone'),
             ),
             TextButton(
+              key: Key(CustomAppBarKeys.cancelButton),
               onPressed: () {
                 Navigator.of(context).pop(); // Handle "Cancel" action
               },
@@ -121,14 +127,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return widget.isSelected.isNotEmpty
         ? AppBar(
-            iconTheme: const IconThemeData(
-              color: Color(0xff8D6AEE), // Color for the icons
+            iconTheme: IconThemeData(
+              color: primaryColor, // Color for the icons
             ),
-            backgroundColor: const Color(0xff0A122F),
+            backgroundColor: firstNeutralColor,
             leadingWidth: 100,
             leading: Row(
               children: [
                 IconButton(
+                  key: Key(CustomAppBarKeys.backButton),
                   icon: const Icon(
                     Icons.arrow_back,
                   ), // Back arrow icon
@@ -142,24 +149,15 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 ),
                 Text(
                   '${widget.isSelected.length}', // Display size of isSelected
-                  style:
-                      const TextStyle(color: Color(0xff8D6AEE), fontSize: 18),
+                  style: TextStyle(color: primaryColor, fontSize: 18),
                 ),
               ],
             ),
             actions: [
               if (widget.isSelected.length == 1) ...[],
               IconButton(
+                key: Key(CustomAppBarKeys.deleteIcon),
                 onPressed: () {
-                  // Add favorite action here
-                },
-                icon: const Icon(
-                  Icons.favorite,
-                ), // Favorite icon
-              ),
-              IconButton(
-                onPressed: () {
-                  // Show the delete dialog when the delete icon is pressed
                   _showDeleteDialog(context);
                 },
                 icon: const Icon(
@@ -167,6 +165,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 ), // Garbage icon
               ),
               IconButton(
+                key: Key(CustomAppBarKeys.forwardIcon),
                 onPressed: () {
                   // Add forward action here
                   showDialog(
@@ -183,46 +182,43 @@ class _CustomAppBarState extends State<CustomAppBar> {
               ),
               if (widget.isSelected.length == 1) ...[
                 PopupMenuButton<String>(
+                  key: Key(CustomAppBarKeys.popupMenu),
                   onSelected: (value) {
                     // Handle menu selection
-                    if (value == 'Info') {
-                      // Handle info action
-                    } else if (value == 'Pin') {
+                    if (value == 'Pin') {
                       // Handle pin action
                     } else if (value == 'Edit') {
-                      // Handle edit action
-                    } else if (value == 'Copy') {
-                      // Handle copy action
+                      viewModel.editMessage(
+                        widget.isSelected.first,
+                      );
+                      if (widget.clearSelection != null) {
+                        widget.clearSelection!();
+                      }
                     }
                   },
                   itemBuilder: (context) => [
                     const PopupMenuItem(
-                      value: 'Info',
-                      child: Text('Info'),
-                    ),
-                    const PopupMenuItem(
+                      key: Key(CustomAppBarKeys.popupPin),
                       value: 'Pin',
                       child: Text('Pin'),
                       //todo if messages is pin make text unpin
                     ),
-                    const PopupMenuItem(
-                      value: 'Edit',
-                      child: Text('Edit'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'Copy',
-                      child: Text('Copy'),
-                    ),
+                    if (widget.isMine)
+                      const PopupMenuItem(
+                        key: Key(CustomAppBarKeys.popupEdit),
+                        value: 'Edit',
+                        child: Text('Edit'),
+                      ),
                   ],
                 ),
               ],
             ],
           )
         : AppBar(
-            iconTheme: const IconThemeData(
-              color: Color(0xff8D6AEE), // Default color for icons
+            iconTheme: IconThemeData(
+              color: primaryColor, // Default color for icons
             ),
-            backgroundColor: const Color(0xff0A122F),
+            backgroundColor: firstNeutralColor,
             leadingWidth: 100,
             titleSpacing: 0,
             leading: Row(
@@ -265,38 +261,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
               IconButton(
                 onPressed: () {},
                 icon: const FaIcon(FontAwesomeIcons.phone),
-              ),
-              PopupMenuButton<String>(
-                onSelected: (String result) {
-                  print(result);
-                },
-                icon: const FaIcon(FontAwesomeIcons.ellipsisV),
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
-                    value: 'View Contact',
-                    child: Text('View Contact'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'Media, Links, and Docs',
-                    child: Text('Media, Links, and Docs'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'Search',
-                    child: Text('Search'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'Mute Notifications',
-                    child: Text('Mute Notifications'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'Wallpaper',
-                    child: Text('Wallpaper'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'More',
-                    child: Text('More'),
-                  ),
-                ],
               ),
             ],
           );

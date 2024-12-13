@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:whisper/constants/colors.dart'; 
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/reply_preview_keys.dart';
 
 class ReplyPreview extends StatelessWidget {
   final bool isReplying;
@@ -64,6 +65,7 @@ class ReplyPreview extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  key: Key(ReplyPreviewKeys.cancelReplyButton),
                   icon: Icon(Icons.close,
                       color: Colors.grey[600],
                       size: 22.0), // Increased size of "X" icon

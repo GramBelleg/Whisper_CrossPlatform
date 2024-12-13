@@ -118,7 +118,7 @@ class _RepliedFileMessageCardState
                         maxWidth: MediaQuery.of(context).size.width * 0.8,
                       ),
                       child: Card(
-                        color: const Color(0xFF8D6AEE),
+                        color: primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(20),

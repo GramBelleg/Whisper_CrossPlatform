@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whisper/constants/colors.dart';
 
 class IconCreationWidget extends StatelessWidget {
   final IconData icon;
@@ -28,12 +29,13 @@ class IconCreationWidget extends StatelessWidget {
             child: Icon(
               icon,
               size: 29,
-              color: Colors.white,
+              color: secondNeutralColor,
             ),
           ),
+          const SizedBox(height: 10),
           Text(
             text,
-            style: textStyle,
+            style: TextStyle(color: secondNeutralColor),
           ),
         ],
       ),

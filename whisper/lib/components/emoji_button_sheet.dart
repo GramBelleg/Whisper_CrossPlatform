@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/icon_creation_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/keys/emoji_button_sheet_keys.dart';
 import 'package:whisper/constants/colors.dart';
 
 class EmojiButtonSheet extends StatelessWidget {
@@ -29,6 +30,7 @@ class EmojiButtonSheet extends StatelessWidget {
           child: Row(
             children: [
               IconCreationWidget(
+                key: const Key(EmojiButtonSheetKeys.emojiButton),
                 icon: FontAwesomeIcons.faceSmile,
                 text: "Emojis",
                 textStyle: TextStyle(color: secondNeutralColor),
@@ -37,6 +39,7 @@ class EmojiButtonSheet extends StatelessWidget {
               ),
               Spacer(flex: 1),
               IconCreationWidget(
+                key: const Key(EmojiButtonSheetKeys.stickerButton),
                 icon: Icons.sticky_note_2,
                 text: "Stickers",
                 textStyle: TextStyle(color: secondNeutralColor),
@@ -45,6 +48,7 @@ class EmojiButtonSheet extends StatelessWidget {
               ),
               Spacer(flex: 1),
               IconCreationWidget(
+                key: const Key(EmojiButtonSheetKeys.gifButton),
                 icon: Icons.gif,
                 text: "GIFs",
                 textStyle: TextStyle(color: secondNeutralColor),

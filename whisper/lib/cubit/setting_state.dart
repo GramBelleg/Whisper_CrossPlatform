@@ -10,6 +10,7 @@ class SettingsLoading extends SettingsState {}
 class SettingsLoaded extends SettingsState {
   final UserState? userState;
   bool isEditing;
+  bool hasStory;
 
   late TextEditingController nameController;
   late TextEditingController usernameController;
@@ -22,21 +23,33 @@ class SettingsLoaded extends SettingsState {
   String emailState;
   String phoneNumberState;
   String bioState;
+  String profilePicState;
+  String nameStateUpdate;
+  String usernameStateUpdate;
+  String emailStateUpdate;
+  String phoneNumberStateUpdate;
+  String bioStateUpdate;
 
-  SettingsLoaded({
-    this.userState,
-    this.isEditing = false,
-    required this.nameController,
-    required this.usernameController,
-    required this.emailController,
-    required this.bioController,
-    required this.phoneController,
-    this.nameState = '',
-    this.usernameState = '',
-    this.emailState = '',
-    this.phoneNumberState = '',
-    this.bioState = '',
-  });
+  SettingsLoaded(
+      {required this.userState,
+      this.isEditing = false,
+      required this.nameController,
+      required this.usernameController,
+      required this.emailController,
+      required this.bioController,
+      required this.phoneController,
+      this.nameState = '',
+      this.usernameState = '',
+      this.emailState = '',
+      this.phoneNumberState = '',
+      this.bioState = '',
+      this.profilePicState = '',
+      this.nameStateUpdate = '',
+      this.usernameStateUpdate = '',
+      this.emailStateUpdate = '',
+      this.phoneNumberStateUpdate = '',
+      this.bioStateUpdate = '',
+      this.hasStory = false});
 }
 
 class SettingsSaved extends SettingsState {
