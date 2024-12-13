@@ -22,7 +22,7 @@ class ChatCard extends StatelessWidget {
   final String userName;
   final String lastMessage;
   final String time;
-  final String avatarUrl;
+  final String? avatarUrl;
   final bool isRead;
   final bool isSent;
   final bool isOnline;
@@ -30,6 +30,7 @@ class ChatCard extends StatelessWidget {
   final MessageType messageType;
   final int unreadCount;
   final bool isMuted;
+  final String type;
 
   const ChatCard({
     super.key,
@@ -45,6 +46,7 @@ class ChatCard extends StatelessWidget {
     this.messageType = MessageType.TEXT, // Updated default value
     this.unreadCount = 0,
     this.isMuted = false,
+    this.type = '',
   });
 
   // Define the custom color
@@ -94,6 +96,7 @@ class ChatCard extends StatelessWidget {
                   ChatID: chatId,
                   token: token,
                   senderId: senderId,
+                  chatType: type,
                 ),
               ),
             );
@@ -107,7 +110,7 @@ class ChatCard extends StatelessWidget {
     return Stack(
       children: [
         CircleAvatar(
-          backgroundImage: AssetImage(avatarUrl),
+          // backgroundImage: AssetImage(avatarUrl),
           radius: 25,
         ),
         if (isOnline) _buildOnlineIndicator(),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whisper/keys/settings_page_keys.dart';
 
 class FullScreenPhotoScreen extends StatelessWidget {
-  final String photoUrl;
+  final String? photoUrl;
 
   const FullScreenPhotoScreen({Key? key, required this.photoUrl})
       : super(key: key);
@@ -15,7 +15,7 @@ class FullScreenPhotoScreen extends StatelessWidget {
         children: [
           Center(
             child: Image.network(
-              photoUrl,
+              photoUrl!,
               fit: BoxFit.contain,
             ),
           ),

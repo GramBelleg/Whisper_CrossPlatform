@@ -29,9 +29,10 @@ class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
   final int ChatID;
   final String userName;
-  final String userImage;
+  final String? userImage;
   final String? token;
   final int? senderId;
+  final String? chatType;
 
   const ChatPage({
     super.key,
@@ -40,6 +41,7 @@ class ChatPage extends StatefulWidget {
     required this.ChatID,
     required this.token,
     required this.senderId,
+    required this.chatType,
   });
 
   @override
@@ -370,6 +372,7 @@ class _ChatPageState extends State<ChatPage> {
               chatMessageManager.messages.any((message) =>
                   message.id == isSelectedList.first &&
                   message.sender?.id == widget.senderId),
+          chatType: widget.chatType!,
         ),
         body: BlocProvider<MessagesCubit>.value(
           value: GlobalCubitProvider.messagesCubit,
@@ -566,8 +569,9 @@ class _ChatPageState extends State<ChatPage> {
                                       ? GifPicker(onGifSelected: handleGifSend)
                                       : showStickerPicker
                                           ? StickerPicker(
-                                              onStickerSelected: handleStickerSend)
-                                      : Container()
+                                              onStickerSelected:
+                                                  handleStickerSend)
+                                          : Container()
                             ],
                           ),
                         ),

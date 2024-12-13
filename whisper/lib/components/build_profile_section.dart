@@ -5,7 +5,7 @@ import 'package:whisper/constants/colors.dart';
 class ProfileSection extends StatelessWidget {
   final bool isEditing;
   final bool hasStory;
-  final String profilePic;
+  final String? profilePic;
   final String name;
   final String status;
 
@@ -62,21 +62,32 @@ class ProfileSection extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 70,
                     backgroundColor: Colors.grey,
-                    child: ClipOval(
-                      child: ColorFiltered(
-                        colorFilter: isEditing
-                            ? const ColorFilter.mode(
-                                Colors.grey, BlendMode.saturation)
-                            : const ColorFilter.mode(
-                                Colors.transparent, BlendMode.saturation),
-                        child: Image.network(
-                          profilePic,
-                          fit: BoxFit.cover,
-                          width: 140,
-                          height: 140,
-                        ),
-                      ),
-                    ),
+                    child: profilePic == null
+                        ? Text(
+                            name.length >= 2
+                                ? name.substring(0, 2).toUpperCase()
+                                : name.toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : ClipOval(
+                            child: ColorFiltered(
+                              colorFilter: isEditing
+                                  ? const ColorFilter.mode(
+                                      Colors.grey, BlendMode.saturation)
+                                  : const ColorFilter.mode(
+                                      Colors.transparent, BlendMode.saturation),
+                              child: Image.network(
+                                profilePic!,
+                                fit: BoxFit.cover,
+                                width: 140,
+                                height: 140,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
               ),

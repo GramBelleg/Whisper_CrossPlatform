@@ -22,7 +22,7 @@ bool isValidUrl(String str) {
   return result;
 }
 
-void viewProfilePhoto(BuildContext context, String photoUrl) {
+void viewProfilePhoto(BuildContext context, String? photoUrl) {
   Navigator.push(
     context,
     MaterialPageRoute(

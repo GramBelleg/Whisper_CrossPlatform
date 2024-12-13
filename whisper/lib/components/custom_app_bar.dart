@@ -3,17 +3,19 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/pages/forward_menu.dart';
+import 'package:whisper/pages/group_info.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
-  final String userImage;
+  final String? userImage;
   final String userName;
   final int chatId;
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
   final bool isMine;
+  final String chatType;
   const CustomAppBar({
     super.key,
     required this.isSelected,
@@ -23,6 +25,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.chatViewModel, // Initialize ChatViewModel
     required this.chatId,
     required this.isMine,
+    required this.chatType,
   });
 
   @override
@@ -171,8 +174,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => ForwardMenu(
+                      text: "Forward",
                       onClearSelection: widget.clearSelection!,
                       selectedMessageIds: widget.isSelected,
+                      isForward: true,
                     ),
                   );
                 },
@@ -233,12 +238,30 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.blueGrey,
-                  backgroundImage: AssetImage(widget.userImage),
+                  backgroundImage: widget.userImage != null
+                      ? NetworkImage(widget.userImage!)
+                      : null,
+                  child: widget.userImage == null
+                      ? const Icon(Icons.person)
+                      : null,
                 ),
               ],
             ),
             title: InkWell(
-              onTap: () {},
+              onTap: () {
+                if (widget.chatType == 'GROUP') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GroupInfo(
+                        groupName: widget.userName,
+                        profilePicture: widget.userImage,
+                        groupId: widget.chatId,
+                      ), // Replace with your actual GroupInfo widget
+                    ),
+                  );
+                }
+              },
               child: Container(
                 margin: const EdgeInsets.all(5),
                 child: Column(

@@ -410,6 +410,7 @@ class _MainChatsState extends State<MainChats> {
         messageType: chat['messageType'],
         isPinned: chat['isPinned'],
         isMuted: chat['isMuted'],
+        type: chat['type'],
       ),
     );
   }

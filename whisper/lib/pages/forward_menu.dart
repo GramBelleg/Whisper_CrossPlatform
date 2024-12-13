@@ -12,12 +12,17 @@ import 'package:whisper/components/select_friends_chip.dart';
 import '../models/friend.dart';
 
 class ForwardMenu extends StatefulWidget {
-  final VoidCallback onClearSelection;
-  final List<int> selectedMessageIds;
-
+  final VoidCallback? onClearSelection;
+  final List<int>? selectedMessageIds;
+  final bool isForward;
+  final String? text;
+  final int? groupId;
   const ForwardMenu({
     required this.onClearSelection,
     required this.selectedMessageIds,
+    required this.text,
+    required this.isForward,
+    this.groupId,
     Key? key,
   }) : super(key: key);
 
@@ -78,7 +83,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
         // Forward all selected messages to the current friend
         await _forwardMessagesToFriend(
           friend: friend,
-          selectedMessageIds: widget.selectedMessageIds,
+          selectedMessageIds: widget.selectedMessageIds!,
           senderId: senderId!,
         );
       }
@@ -86,9 +91,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
       // Navigate appropriately after forwarding
       _navigateAfterForwarding(token, senderId);
     } catch (e) {
-      debugPrint('Error forwarding messages: $e');
+      debugPrint('Error ${widget.text}ing messages: $e');
     } finally {
-      widget.onClearSelection();
+      widget.onClearSelection!();
     }
   }
 
@@ -112,10 +117,10 @@ class _ForwardMenuState extends State<ForwardMenu> {
             media: message.media,
             type: message.type,
             extension: message.extension);
-        debugPrint("Message forwarded to: ${friend.name}");
+        debugPrint("Message ${widget.text}ed to: ${friend.name}");
       } catch (e) {
         debugPrint(
-            'Failed to forward message $messageId to ${friend.name}: $e');
+            'Failed to ${widget.text} message $messageId to ${friend.name}: $e');
       }
     }
   }
@@ -124,6 +129,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
     if (_selectedFriendIndexes.length == 1 && _friends.length != 1) {
       final friend = _friends[_selectedFriendIndexes.first];
       Navigator.pop(context);
+      //i think it should be twice
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -133,6 +139,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
             ChatID: friend.id,
             token: token,
             senderId: senderId,
+            chatType: friend.chatType,
           ),
         ),
       );
@@ -158,7 +165,8 @@ class _ForwardMenuState extends State<ForwardMenu> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const ForwardMenuHeader(),
+            ForwardMenuHeader(
+                text: widget.isForward ? "Forward to..." : "ADD members"),
             _buildSearchBar(),
             SelectedFriendsChip(
                 key: ForwardMenuKeys.selectedFriendChip,
@@ -217,12 +225,12 @@ class _ForwardMenuState extends State<ForwardMenu> {
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
         key: ForwardMenuKeys.forwardButton,
-        onPressed: _forwardMessages,
+        onPressed: widget.isForward ? _forwardMessages : () {},
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 50),
           backgroundColor: primaryColor,
         ),
-        child: const Text("Forward"),
+        child: Text("${widget.text}"),
       ),
     );
   }

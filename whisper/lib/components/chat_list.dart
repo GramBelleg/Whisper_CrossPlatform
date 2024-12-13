@@ -30,7 +30,7 @@ class ChatList {
       'userName': chat['name'] ?? 'User ${chat['id']}',
       'lastMessage': chat['lastMessage']?['content'] ?? '',
       'time': formattedTime,
-      'avatarUrl': chat['other']?['profilePic'] ?? 'assets/images/el-gayar.jpg',
+      'avatarUrl': chat['picture'] ?? null,
       'isRead': chat['unreadMessageCount'] == 0,
       'isOnline': //chat['other']?['lastSeen'] !=
           false,
@@ -39,6 +39,7 @@ class ChatList {
       'isArchived': chat['isArchived'] ?? false,
       'isPinned': chat['isPinned'] ?? false,
       'isMuted': chat['other']?['isMuted'] ?? false,
+      'type': chat['type'],
     };
   }
 

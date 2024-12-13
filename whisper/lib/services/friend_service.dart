@@ -10,6 +10,7 @@ class FriendService {
         id: chat['id'],
         name: chat['name'] ?? 'User${chat['id']}',
         icon: chat['picture'] ?? 'assets/images/el-gayar.jpg',
+        chatType: chat['type'],
       );
     }).toList();
   }
