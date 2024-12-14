@@ -7,14 +7,13 @@ import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/user_story_cubit.dart';
 import 'package:whisper/cubit/user_story_state.dart';
 import 'package:whisper/keys/main_chats_keys.dart';
+import 'package:whisper/models/chat.dart';
 import 'package:whisper/models/user.dart';
 import 'package:whisper/pages/story_page.dart';
 import 'package:whisper/components/buttons_sheet_for_add_story.dart';
 import 'package:whisper/pages/my_stories_screen.dart';
-import '../components/archived_chats_button.dart';
 import '../components/chat_card.dart';
 import '../components/chat_list.dart';
-import 'archived_chats_page.dart';
 import 'search_page.dart';
 
 class MainChats extends StatefulWidget {
@@ -309,30 +308,31 @@ class _MainChatsState extends State<MainChats> {
 
   Future<Widget> _getChatBody() async {
     await chatList.initializeChats();
-    print("fetch chats");
+    print("here we go");
     return Column(
       children: [
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: chatList.activeChats.length,
+          itemCount: chatList.chats.length,
           itemBuilder: (context, index) {
-            return _buildSlidableChatCard(chatList.activeChats[index], index);
+            print("create chat ${chatList.chats[index].userName}");
+            return _buildSlidableChatCard(chatList.chats[index], index);
           },
         ),
       ],
     );
   }
 
-  Widget _buildSlidableChatCard(Map<String, dynamic> chat, int index) {
+  Widget _buildSlidableChatCard(Chat chat, int index) {
     return Slidable(
-      key: ValueKey(chat['userName']),
+      key: ValueKey(chat.userName),
       endActionPane: ActionPane(
-        motion: const ScrollMotion(),
+        motion: const DrawerMotion(),
         dismissible: DismissiblePane(
           onDismissed: () {
             setState(() {
-              chatList.archiveChat(chat);
+              //chatList.archiveChat(chat);
             });
           },
         ),
@@ -341,24 +341,13 @@ class _MainChatsState extends State<MainChats> {
             key: MainChatsKeys.deleteButton,
             onPressed: (_) {
               setState(() {
-                chatList.deleteChat(chat);
+                // chatList.deleteChat(chat);
               });
             },
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
             icon: Icons.delete,
             label: 'Delete',
-          ),
-          SlidableAction(
-            onPressed: (_) {
-              setState(() {
-                chatList.archiveChat(chat);
-              });
-            },
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            icon: Icons.archive,
-            label: 'Archive',
           ),
         ],
       ),
@@ -368,58 +357,42 @@ class _MainChatsState extends State<MainChats> {
           SlidableAction(
             key: MainChatsKeys.muteButton,
             onPressed: (_) {
-              print('Muted ${chat['userName']}');
+              print('Muted ${chat.userName}');
             },
             backgroundColor: Colors.grey,
             foregroundColor: Colors.white,
             icon: Icons.volume_off,
             label: 'Mute',
           ),
-          SlidableAction(
-            key: MainChatsKeys.pinButton,
-            onPressed: (_) {
-              setState(() {
-                if (chat['isPinned']) {
-                  chatList.unpinChat(chat);
-                } else {
-                  chatList.pinChat(chat);
-                }
-              });
-            },
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-            icon: chat['isPinned'] ? Icons.push_pin : Icons.push_pin_outlined,
-            label: chat['isPinned'] ? 'Unpin' : 'Pin',
-          ),
+          // SlidableAction(
+          //   key: MainChatsKeys.pinButton,
+          //   onPressed: (_) {
+          //     setState(() {});
+          //   },
+          //   backgroundColor: Colors.orange,
+          //   foregroundColor: Colors.white,
+          //   icon: chat['isPinned'] ? Icons.push_pin : Icons.push_pin_outlined,
+          //   label: chat['isPinned'] ? 'Unpin' : 'Pin',
+          // ),
         ],
       ),
       child: ChatCard(
-        chatId: chat['chatid'],
-        userName: chat['userName'],
-        lastMessage: chat['lastMessage'],
-        time: chat['time'],
-        avatarUrl: chat['avatarUrl'],
-        isRead: chat['isRead'],
-        isOnline: chat['isOnline'],
-        isSent: chat['isSent'],
-        messageType: chat['messageType'],
-        isPinned: chat['isPinned'],
-        isMuted: chat['isMuted'],
+        chat: chat,
       ),
     );
   }
 
-  void _deleteChat(Map<String, dynamic> chat) {
-    chatList.deleteChat(chat);
-    setState(() {});
-  }
+  // void _deleteChat(Map<String, dynamic> chat) {
+  //   chatList.deleteChat(chat);
+  //   setState(() {});
+  // }
 
-  void _muteChat(Map<String, dynamic> chat) {
-    // to do
-    //chatList.toggleMute(chat);
+  // void _muteChat(Map<String, dynamic> chat) {
+  //   // to do
+  //   //chatList.toggleMute(chat);
 
-    setState(() {});
-  }
+  //   setState(() {});
+  // }
 
   Widget _buildSearchBar() {
     return Container(
