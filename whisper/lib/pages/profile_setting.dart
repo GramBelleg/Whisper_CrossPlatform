@@ -171,6 +171,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   ),
                 ),
                 IconButton(
+                  key: SettingsPageKeys.addStoryInProfile,
                   icon: SizedBox(
                     width: 23.0,
                     height: 23.0,
@@ -340,7 +341,7 @@ class _SettingsContentState extends State<SettingsContent> {
       context: context,
       type: QuickAlertType.custom,
       barrierDismissible: true,
-      confirmBtnText: 'Submit',
+      confirmBtnText: 'Submit', // need to key but this package
       confirmBtnColor: primaryColor,
       customAsset: 'assets/images/whisper-logo.png',
       widget: TextFormField(
@@ -496,6 +497,7 @@ class _SettingsContentState extends State<SettingsContent> {
               const Divider(), // Divider for separation
               // Options
               ListTile(
+                key: SettingsPageKeys.showProfilePic,
                 leading: Icon(Icons.photo, color: secondNeutralColor),
                 title: Text(
                   'View Profile Photo',
@@ -509,6 +511,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
+                key: SettingsPageKeys.viewMyStories,
                 leading: Icon(Icons.visibility, color: secondNeutralColor),
                 title: Text(
                   'View Status',

@@ -92,6 +92,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     if (!toRemove) {
       socket?.emit('pfp', {'profilePic': blobName});
     } else {
+      print("remove my photo");
       socket?.emit('pfp', {'profilePic': null});
     }
   }

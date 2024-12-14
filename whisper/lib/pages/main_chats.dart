@@ -6,6 +6,7 @@ import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/user_story_cubit.dart';
 import 'package:whisper/cubit/user_story_state.dart';
+import 'package:whisper/keys/main_chats_keys.dart';
 import 'package:whisper/models/user.dart';
 import 'package:whisper/pages/story_page.dart';
 import 'package:whisper/components/buttons_sheet_for_add_story.dart';
@@ -48,7 +49,7 @@ class _MainChatsState extends State<MainChats> {
 
   Widget _buildDraggableHome() {
     return DraggableHome(
-      leading: const Icon(Icons.arrow_back_ios),
+      leading: const Icon(Icons.arrow_back_ios), //icon button "add key"
       title: _buildTitle(),
       actions: _buildActions(),
       curvedBodyRadius: 18,
@@ -79,6 +80,7 @@ class _MainChatsState extends State<MainChats> {
   List<Widget> _buildActions() {
     return [
       GestureDetector(
+        key: MainChatsKeys.editButton,
         onTap: () {
           print('Edit tapped');
         },
@@ -91,6 +93,7 @@ class _MainChatsState extends State<MainChats> {
         ),
       ),
       IconButton(
+        key: MainChatsKeys.addStoryInActionsButton,
         icon: SizedBox(
           width: 23.0,
           height: 23.0,
@@ -152,6 +155,7 @@ class _MainChatsState extends State<MainChats> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
+        key: Key("${myUser?.userName}_story"),
         onTap: () {
           if (myUser?.stories.isEmpty ?? true) {
             // Add story logic
@@ -200,6 +204,7 @@ class _MainChatsState extends State<MainChats> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
+        key: Key("${user.userName}_story"),
         onTap: () {
           Navigator.push(
             context,
@@ -253,6 +258,7 @@ class _MainChatsState extends State<MainChats> {
         Expanded(
           flex: 9,
           child: GestureDetector(
+            key: MainChatsKeys.searchGestureDetector,
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const SearchPage()));
@@ -261,6 +267,7 @@ class _MainChatsState extends State<MainChats> {
           ),
         ),
         IconButton(
+          key: MainChatsKeys.addStoryInHeaderButton,
           icon: SizedBox(
             width: 23.0,
             height: 23.0,
@@ -302,24 +309,9 @@ class _MainChatsState extends State<MainChats> {
 
   Future<Widget> _getChatBody() async {
     await chatList.initializeChats();
+    print("fetch chats");
     return Column(
       children: [
-        if (chatList.archivedChats.isNotEmpty)
-          ArchivedChatsButton(
-            archivedChats: chatList.archivedChats,
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ArchivedChatsPage(
-                    archivedChats: chatList.archivedChats,
-                    chatList: chatList,
-                  ),
-                ),
-              );
-            },
-          ),
-        const SizedBox(height: 45),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -346,6 +338,7 @@ class _MainChatsState extends State<MainChats> {
         ),
         children: [
           SlidableAction(
+            key: MainChatsKeys.deleteButton,
             onPressed: (_) {
               setState(() {
                 chatList.deleteChat(chat);
@@ -373,6 +366,7 @@ class _MainChatsState extends State<MainChats> {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
+            key: MainChatsKeys.muteButton,
             onPressed: (_) {
               print('Muted ${chat['userName']}');
             },
@@ -382,6 +376,7 @@ class _MainChatsState extends State<MainChats> {
             label: 'Mute',
           ),
           SlidableAction(
+            key: MainChatsKeys.pinButton,
             onPressed: (_) {
               setState(() {
                 if (chat['isPinned']) {

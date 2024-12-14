@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whisper/components/list_views_story.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/story_page_keys.dart';
 import 'package:whisper/models/user.dart';
 import 'package:whisper/models/user_view.dart';
 import 'package:whisper/socket.dart';
@@ -216,6 +217,7 @@ class _StoryPageState extends State<StoryPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 32),
                     child: IconButton(
+                      key: storyPageKeys.closeButton,
                       padding: EdgeInsets.zero,
                       color: Colors.white,
                       icon: const Icon(Icons.close),
@@ -235,6 +237,7 @@ class _StoryPageState extends State<StoryPage> {
                       children: [
                         if (widget.isMyStory) ...[
                           IconButton(
+                            key: storyPageKeys.showViewsLikesButton,
                             onPressed: () {
                               _showUserViewModal(currentStory.storyViews);
                             },
@@ -250,6 +253,7 @@ class _StoryPageState extends State<StoryPage> {
                             style: const TextStyle(color: Colors.white),
                           ),
                           IconButton(
+                            key: storyPageKeys.showViewsViewsButton,
                             onPressed: () {
                               _showUserViewModal(currentStory.storyViews);
                             },
@@ -264,6 +268,7 @@ class _StoryPageState extends State<StoryPage> {
                           ),
                           const Spacer(),
                           IconButton(
+                            key: storyPageKeys.deleteStoryButton,
                             icon: const Icon(
                               Icons.delete,
                               color: Colors.white70,
@@ -281,6 +286,7 @@ class _StoryPageState extends State<StoryPage> {
                         ] else ...[
                           const Spacer(),
                           IconButton(
+                            key: storyPageKeys.likeButton,
                             icon: Icon(
                               Icons.favorite,
                               color:

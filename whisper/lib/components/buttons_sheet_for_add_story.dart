@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
+import 'package:whisper/keys/file_button_sheet_add_story_keys.dart';
 import 'package:whisper/pages/selected_image_captioning.dart';
 import 'package:whisper/components/icon_creation_widget.dart';
 import 'package:whisper/services/upload_file.dart';
@@ -84,6 +85,7 @@ class ImagePickerButtonSheetForStory extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconCreationWidget(
+                key: FileButtonSheetAddStoryKeys.cameraIcon,
                 textStyle: TextStyle(),
                 icon: Icons.camera_alt,
                 text: "Camera",
@@ -91,6 +93,7 @@ class ImagePickerButtonSheetForStory extends StatelessWidget {
                 onTap: () => _pickImageFromCamera(context),
               ),
               IconCreationWidget(
+                key: FileButtonSheetAddStoryKeys.galleryIcon,
                 textStyle: TextStyle(),
                 icon: Icons.photo,
                 text: "Gallery",
