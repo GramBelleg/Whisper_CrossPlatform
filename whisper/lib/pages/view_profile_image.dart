@@ -23,7 +23,7 @@ class FullScreenPhotoScreen extends StatelessWidget {
             top: 40,
             left: 20,
             child: IconButton(
-              key: SettingsPageKeys.backFromViewProfilePicture,
+              key: Key(SettingsPageKeys.backFromViewProfilePicture),
               icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
               onPressed: () {
                 Navigator.pop(context);

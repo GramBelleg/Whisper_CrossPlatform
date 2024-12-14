@@ -186,7 +186,7 @@ class SelectedImageCaptioningState extends State<SelectedImageCaptioning> {
                             Navigator.of(context).pop();
                           },
                           icon: Icon(
-                            key: SelectImageCaptioningKeys.sendFileButton,
+                            key: Key(SelectImageCaptioningKeys.sendFileButton),
                             Icons.send,
                             color: primaryColor,
                           ),

@@ -80,7 +80,7 @@ class _MainChatsState extends State<MainChats> {
   List<Widget> _buildActions() {
     return [
       GestureDetector(
-        key: MainChatsKeys.editButton,
+        key: Key(MainChatsKeys.editButton),
         onTap: () {
           print('Edit tapped');
         },
@@ -93,7 +93,7 @@ class _MainChatsState extends State<MainChats> {
         ),
       ),
       IconButton(
-        key: MainChatsKeys.addStoryInActionsButton,
+        key: Key(MainChatsKeys.addStoryInActionsButton),
         icon: SizedBox(
           width: 23.0,
           height: 23.0,
@@ -258,7 +258,7 @@ class _MainChatsState extends State<MainChats> {
         Expanded(
           flex: 9,
           child: GestureDetector(
-            key: MainChatsKeys.searchGestureDetector,
+            key: Key(MainChatsKeys.searchGestureDetector),
             onTap: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const SearchPage()));
@@ -267,7 +267,7 @@ class _MainChatsState extends State<MainChats> {
           ),
         ),
         IconButton(
-          key: MainChatsKeys.addStoryInHeaderButton,
+          key: Key(MainChatsKeys.addStoryInHeaderButton),
           icon: SizedBox(
             width: 23.0,
             height: 23.0,
@@ -338,7 +338,7 @@ class _MainChatsState extends State<MainChats> {
         ),
         children: [
           SlidableAction(
-            key: MainChatsKeys.deleteButton,
+            key: Key(MainChatsKeys.deleteButton),
             onPressed: (_) {
               setState(() {
                 chatList.deleteChat(chat);
@@ -366,7 +366,7 @@ class _MainChatsState extends State<MainChats> {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            key: MainChatsKeys.muteButton,
+            key: Key(MainChatsKeys.muteButton),
             onPressed: (_) {
               print('Muted ${chat['userName']}');
             },
@@ -376,7 +376,7 @@ class _MainChatsState extends State<MainChats> {
             label: 'Mute',
           ),
           SlidableAction(
-            key: MainChatsKeys.pinButton,
+            key: Key(MainChatsKeys.pinButton),
             onPressed: (_) {
               setState(() {
                 if (chat['isPinned']) {

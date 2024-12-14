@@ -141,7 +141,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextButton(
-                    key: SettingsPageKeys.doneButton,
+                    key: Key(SettingsPageKeys.doneButton),
                     onPressed: () {
                       _saveChanges(context);
                     },
@@ -171,7 +171,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   ),
                 ),
                 IconButton(
-                  key: SettingsPageKeys.addStoryInProfile,
+                  key: Key(SettingsPageKeys.addStoryInProfile),
                   icon: SizedBox(
                     width: 23.0,
                     height: 23.0,
@@ -190,7 +190,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    key: SettingsPageKeys.cancelButton,
+                    key: Key(SettingsPageKeys.cancelButton),
                     onPressed: () {
                       context.read<SettingsCubit>().toggleEditing();
                       context.read<SettingsCubit>().resetStateMessages();
@@ -280,12 +280,12 @@ class _SettingsContentState extends State<SettingsContent> {
                     setting: 'Visibility Settings',
                     icon: FontAwesomeIcons.eye,
                     targetPage: const VisibilitySettingsPage(),
-                    key: VisibilitySettingsKeys.visibilitySettingsTile),
+                    key: Key(VisibilitySettingsKeys.visibilitySettingsTile)),
                 PrivacyCard(
                     setting: 'Blocked Users',
                     icon: FontAwesomeIcons.userSlash,
                     targetPage: const BlockedUsersPage(),
-                    key: VisibilitySettingsKeys.blockedUsersTile),
+                    key: Key(VisibilitySettingsKeys.blockedUsersTile)),
                 SizedBox(
                   height: 6,
                 ),
@@ -463,7 +463,7 @@ class _SettingsContentState extends State<SettingsContent> {
       backgroundColor: firstSecondaryColor,
       builder: (BuildContext context) {
         return SafeArea(
-          key: SettingsPageKeys.showPhotoOrStory,
+          key: Key(SettingsPageKeys.showPhotoOrStory),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -497,7 +497,7 @@ class _SettingsContentState extends State<SettingsContent> {
               const Divider(), // Divider for separation
               // Options
               ListTile(
-                key: SettingsPageKeys.showProfilePic,
+                key: Key(SettingsPageKeys.showProfilePic),
                 leading: Icon(Icons.photo, color: secondNeutralColor),
                 title: Text(
                   'View Profile Photo',
@@ -511,7 +511,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
-                key: SettingsPageKeys.viewMyStories,
+                key: Key(SettingsPageKeys.viewMyStories),
                 leading: Icon(Icons.visibility, color: secondNeutralColor),
                 title: Text(
                   'View Status',
@@ -561,7 +561,7 @@ class _SettingsContentState extends State<SettingsContent> {
             children: [
               ListTile(
                 title: Center(
-                  key: SettingsPageKeys.takePhotoListTile,
+                  key: Key(SettingsPageKeys.takePhotoListTile),
                   child: Text(
                     'Take Photo',
                     style: TextStyle(color: secondNeutralColor),
@@ -574,7 +574,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
-                key: SettingsPageKeys.selectPhotoListTile,
+                key: Key(SettingsPageKeys.selectPhotoListTile),
                 title: Center(
                   child: Text(
                     'Select from Gallery',
@@ -588,7 +588,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 },
               ),
               ListTile(
-                key: SettingsPageKeys.removePhotoListTile,
+                key: Key(SettingsPageKeys.removePhotoListTile),
                 title: Center(
                   child: Text(
                     'Remove Photo',

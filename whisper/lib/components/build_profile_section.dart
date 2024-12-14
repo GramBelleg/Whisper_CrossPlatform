@@ -47,7 +47,7 @@ class ProfileSection extends StatelessWidget {
                       : null,
                 ),
                 child: InkWell(
-                  key: SettingsPageKeys.onTapProfilePic,
+                  key: Key(SettingsPageKeys.onTapProfilePic),
                   onTap: () {
                     if (isEditing) {
                       showImageSourceDialog!();

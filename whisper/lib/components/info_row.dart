@@ -18,7 +18,7 @@ class InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      key: SettingsPageKeys.copyRow,
+      key: Key(SettingsPageKeys.copyRow),
       onTap: () => _copyToClipboard(value, context),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 13.0),

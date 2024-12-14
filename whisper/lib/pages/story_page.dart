@@ -217,7 +217,7 @@ class _StoryPageState extends State<StoryPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 32),
                     child: IconButton(
-                      key: storyPageKeys.closeButton,
+                      key: Key(storyPageKeys.closeButton),
                       padding: EdgeInsets.zero,
                       color: Colors.white,
                       icon: const Icon(Icons.close),
@@ -237,7 +237,7 @@ class _StoryPageState extends State<StoryPage> {
                       children: [
                         if (widget.isMyStory) ...[
                           IconButton(
-                            key: storyPageKeys.showViewsLikesButton,
+                            key: Key(storyPageKeys.showViewsLikesButton),
                             onPressed: () {
                               _showUserViewModal(currentStory.storyViews);
                             },
@@ -253,7 +253,7 @@ class _StoryPageState extends State<StoryPage> {
                             style: const TextStyle(color: Colors.white),
                           ),
                           IconButton(
-                            key: storyPageKeys.showViewsViewsButton,
+                            key: Key(storyPageKeys.showViewsViewsButton),
                             onPressed: () {
                               _showUserViewModal(currentStory.storyViews);
                             },
@@ -268,7 +268,7 @@ class _StoryPageState extends State<StoryPage> {
                           ),
                           const Spacer(),
                           IconButton(
-                            key: storyPageKeys.deleteStoryButton,
+                            key: Key(storyPageKeys.deleteStoryButton),
                             icon: const Icon(
                               Icons.delete,
                               color: Colors.white70,
@@ -286,7 +286,7 @@ class _StoryPageState extends State<StoryPage> {
                         ] else ...[
                           const Spacer(),
                           IconButton(
-                            key: storyPageKeys.likeButton,
+                            key: Key(storyPageKeys.likeButton),
                             icon: Icon(
                               Icons.favorite,
                               color:

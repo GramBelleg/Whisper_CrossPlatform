@@ -1,9 +1,7 @@
-import 'package:flutter/widgets.dart';
-
 class storyPageKeys {
-  static const closeButton = Key('closeButton');
-  static const likeButton = Key('likeButton');
-  static const deleteStoryButton = Key('deleteStoryButton');
-  static const showViewsViewsButton = Key('showViewsViewsButton');
-  static const showViewsLikesButton = Key('showViewsLikesButton');
+  static const String closeButton = 'closeButton';
+  static const String likeButton = 'likeButton';
+  static const String deleteStoryButton = 'deleteStoryButton';
+  static const String showViewsViewsButton = 'showViewsViewsButton';
+  static const String showViewsLikesButton = 'showViewsLikesButton';
 }

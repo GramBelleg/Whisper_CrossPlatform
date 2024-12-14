@@ -1,20 +1,20 @@
-import 'package:flutter/widgets.dart';
-
 class SettingsPageKeys {
-  static const editButton = Key('editButton');
-  static const doneButton = Key('doneButton');
-  static const cancelButton = Key('cancelButton');
-  static const profilePicture = Key('profilePicture');
-  static const sendCodeButton = Key('sendCodeButton');
-  static const iconUpdatePicInkWell = Key('iconUpdatePicInkWell');
-  static const takePhotoListTile = Key('takePhotoListTile');
-  static const removePhotoListTile = Key('removePhotoListTile');
-  static const selectPhotoListTile = Key('selectPhotoListTile');
-  static const showPhotoOrStory = Key('showPhotoOrStory');
-  static const showProfilePic = Key('showProfilePic');
-  static const viewMyStories = Key('viewMyStories');
-  static const backFromViewProfilePicture = Key('backFromViewProfilePicture');
-  static const addStoryInProfile = Key('addStoryInProfile');
-  static const copyRow = Key('copyRow');
-  static const onTapProfilePic = Key('onTapProfilePic');
+  static const String textField = 'textField';
+
+  static const String editButton = 'editButton';
+  static const String doneButton = 'doneButton';
+  static const String cancelButton = 'cancelButton';
+  static const String profilePicture = 'profilePicture';
+  static const String sendCodeButton = 'sendCodeButton';
+  static const String iconUpdatePicInkWell = 'iconUpdatePicInkWell';
+  static const String takePhotoListTile = 'takePhotoListTile';
+  static const String removePhotoListTile = 'removePhotoListTile';
+  static const String selectPhotoListTile = 'selectPhotoListTile';
+  static const String showPhotoOrStory = 'showPhotoOrStory';
+  static const String showProfilePic = 'showProfilePic';
+  static const String viewMyStories = 'viewMyStories';
+  static const String backFromViewProfilePicture = 'backFromViewProfilePicture';
+  static const String addStoryInProfile = 'addStoryInProfile';
+  static const String copyRow = 'copyRow';
+  static const String onTapProfilePic = 'onTapProfilePic';
 }

@@ -100,7 +100,7 @@ class EditFields extends StatelessWidget {
               ),
               if (needCode)
                 TextButton(
-                  key: SettingsPageKeys.sendCodeButton,
+                  key: Key(SettingsPageKeys.sendCodeButton),
                   onPressed: () {
                     confirmCodeFunction(
                         controller.text); // Call the passed function

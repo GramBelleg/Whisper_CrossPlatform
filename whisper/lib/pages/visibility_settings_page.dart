@@ -44,7 +44,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
           return ListView(
             children: [
               ListTile(
-                key: VisibilitySettingsKeys.profilePictureTile,
+                key: Key(VisibilitySettingsKeys.profilePictureTile),
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -73,7 +73,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 },
               ),
               ListTile(
-                key: VisibilitySettingsKeys.storiesTile,
+                key: Key(VisibilitySettingsKeys.storiesTile),
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -102,7 +102,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 },
               ),
               ListTile(
-                key: VisibilitySettingsKeys.lastSeenTile,
+                key: Key(VisibilitySettingsKeys.lastSeenTile),
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -118,8 +118,9 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                 ),
                 onTap: () {
                   if (kDebugMode) print("last seen visibility");
-                  showVisibilityOptions(context, "Who can see my last seen?",
-                      lastSeenVisibility, (value) {
+                  showVisibilityOptions(
+                      context, "Who can see my last seen?", lastSeenVisibility,
+                      (value) {
                     context
                         .read<VisibilityCubit>()
                         .updateLastSeenVisibility(value);
@@ -135,7 +136,7 @@ class _VisibilitySettingsPageState extends State<VisibilitySettingsPage> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     Switch(
-                      key: VisibilitySettingsKeys.readReceiptsSwitch,
+                      key: Key(VisibilitySettingsKeys.readReceiptsSwitch),
                       value: readReceipts,
                       onChanged: (bool value) {
                         if (kDebugMode) print("read receipts");
