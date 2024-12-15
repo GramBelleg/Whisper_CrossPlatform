@@ -173,7 +173,7 @@ class _FileRepliedReceivedMessageCardState
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    widget.blobName,
+                                    widget.message,
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
