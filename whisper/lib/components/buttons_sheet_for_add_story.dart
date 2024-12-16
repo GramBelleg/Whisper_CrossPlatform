@@ -39,7 +39,7 @@ class ImagePickerButtonSheetForStory extends StatelessWidget {
       GlobalUserStoryCubitProvider.userStoryCubit
           .sendStory(content, uploadResult, type);
       if (uploadResult != 'Failed') {
-        print("File uploaded successfullyy: $uploadResult");
+        print("File uploaded successfully: $uploadResult");
       } else {
         print("Failed to upload file: $filePath");
       }

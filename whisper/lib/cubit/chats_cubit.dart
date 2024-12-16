@@ -69,12 +69,10 @@ class ChatListCubit extends Cubit<List<Chat>> {
 
   /// Delete a chat group/channel
   void deleteChat(Chat chat) {
-    List<Chat> updatedChats = List.from(state)..remove(chat);
     SocketService.instance.socket?.emit('deleteChat', {
       'chatId':
           chat.chatId, // The identifier for the group/channel to be deleted
     });
-    emit(updatedChats);
   }
 
   // to de leave group/channel
@@ -82,13 +80,11 @@ class ChatListCubit extends Cubit<List<Chat>> {
   /// leave a chat group/channel
   void leaveChat(Chat chat) {
     print("leave chat ${chat.chatId} ");
-    List<Chat> updatedChats = List.from(state)..remove(chat);
 
     SocketService.instance.socket?.emit('leaveChat', {
       'chatId':
           chat.chatId, // The identifier for the group/channel to be deleted
     });
-    emit(updatedChats);
   }
 
   /// Mute a chat
@@ -124,9 +120,19 @@ class ChatListCubit extends Cubit<List<Chat>> {
   }
 
   /// Receive delete chat
-  Future<void> receiveDeleteChat(int chatId) async {
-    List<Chat> updatedChats = state.where((c) => c.chatId != chatId).toList();
-    emit(updatedChats);
+  void receiveDeleteChat(int chatId) {
+    try {
+      print(
+          "All chat IDs before: ${state.map((user) => user..chatId).toList()}");
+
+      List<Chat> updatedChats = state.where((c) => c.chatId != chatId).toList();
+      print(
+          "All chat IDs after: ${state.map((user) => user..chatId).toList()}");
+
+      emit(updatedChats);
+    } catch (e) {
+      throw Exception('Failed to delete chat');
+    }
   }
 
   /// Receive Leave chat
@@ -187,15 +193,18 @@ class ChatListCubit extends Cubit<List<Chat>> {
     // Listen for chatsList updates via socket
     SocketService.instance.socket?.on('deleteChat', (data) {
       print("receive deleteChat $data");
-      receiveDeleteChat(data);
+      receiveDeleteChat(data["chatId"]);
     });
     SocketService.instance.socket?.on('unmuteChat', (data) {
       print("receive unmuteChat $data");
-      receiveUnmuteChat(data);
+      receiveUnmuteChat(data["chatId"]);
     });
     SocketService.instance.socket?.on('leaveChat', (data) {
       print("receive unmuteChat $data");
-      receiveLeaveChat(data);
+      receiveLeaveChat(data["chatId"]);
+    });
+    SocketService.instance.socket?.on('createChat', (data) {
+      loadChats();
     });
   }
 }

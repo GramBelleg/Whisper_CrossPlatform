@@ -35,7 +35,7 @@ class IconCreationWidget extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             text,
-            style: TextStyle(color: secondNeutralColor),
+            style: TextStyle(color: primaryColor),
           ),
         ],
       ),

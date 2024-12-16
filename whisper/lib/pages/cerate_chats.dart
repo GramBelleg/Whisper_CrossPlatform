@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whisper/components/dialog_create_group_channel.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/global_cubits/global_chats_cubit.dart';
 import 'package:whisper/models/contact.dart';
@@ -11,21 +12,34 @@ class ModalBottomSheetContent extends StatefulWidget {
 }
 
 class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
-  late Future<List<Contact>> _contactsFuture; // Future to hold contacts
-
+  late Future<List<Contact>> _contactsFuture;
   final Set<Contact> selectedContacts = {};
-  bool isSelecting = false; // Flag to enable/disable selecting contacts
+  bool isSelecting = false;
 
   @override
   void initState() {
     super.initState();
-    _contactsFuture = fetchUserContacts(); // Fetch contacts on init
+    _contactsFuture = fetchUserContacts();
+  }
+
+  void showCreateDialog(String type) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CreateGroupOrChannelDialog(
+            type: type,
+            onCreate: () {
+              Navigator.of(context).pop();
+            },
+            contacts: selectedContacts);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height * 0.92,
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,15 +55,12 @@ class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
                   style: TextStyle(color: primaryColor, fontSize: 18),
                 ),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'New Message',
-                  style: TextStyle(
-                    color: secondNeutralColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const Text(
+                'New Message',
+                style: TextStyle(
+                  color: secondNeutralColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               IconButton(
@@ -104,7 +115,9 @@ class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
                 title: const Text('New Group',
                     style: TextStyle(color: secondNeutralColor)),
                 onTap: () {
-                  // Handle new group creation logic here
+                  if (isSelecting && selectedContacts.isNotEmpty) {
+                    showCreateDialog('Group');
+                  }
                 },
               ),
               ListTile(
@@ -112,14 +125,16 @@ class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
                 title: const Text('New Channel',
                     style: TextStyle(color: secondNeutralColor)),
                 onTap: () {
-                  // Handle new channel creation logic here
+                  if (isSelecting && selectedContacts.isNotEmpty) {
+                    showCreateDialog('Channel');
+                  }
                 },
               ),
             ],
           ),
           const Divider(color: Colors.grey),
 
-          // Contacts Section (Now inside a scrollable ListView)
+          // Contacts Section
           Expanded(
             child: FutureBuilder<List<Contact>>(
               future: _contactsFuture,
@@ -153,8 +168,7 @@ class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
                                   GlobalChatsCubitProvider.chatListCubit
                                       .createChat("DM", null, null, null,
                                           [contacts[index].userId]);
-                                  GlobalChatsCubitProvider.chatListCubit
-                                      .loadChats();
+                                  Navigator.of(context).pop();
                                 },
                           leading: CircleAvatar(
                             backgroundImage:
@@ -180,22 +194,6 @@ class _ModalBottomSheetContentState extends State<ModalBottomSheetContent> {
               },
             ),
           ),
-
-          // Only show the "Next" button when isSelecting is true
-          if (isSelecting)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: selectedContacts.isNotEmpty
-                    ? () {
-                        // Proceed with selected contacts (e.g., create group)
-                        print('Selected Contacts: $selectedContacts');
-                        Navigator.pop(context); // Close the modal sheet
-                      }
-                    : null,
-                child: const Text('Next'),
-              ),
-            ),
         ],
       ),
     );

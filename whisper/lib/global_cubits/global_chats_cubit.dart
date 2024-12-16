@@ -1,4 +1,4 @@
-import 'package:whisper/components/chat_list.dart';
+import 'package:whisper/cubit/chats_cubit.dart';
 
 class GlobalChatsCubitProvider {
   static ChatListCubit? _chatListCubit;

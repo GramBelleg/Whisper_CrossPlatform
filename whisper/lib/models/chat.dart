@@ -50,11 +50,12 @@ class Chat {
       status: json['status'] ?? '',
       lastSeen: json['lastSeen'] ?? '',
       isOnline: isOnline,
-      time: lastMessage.time, // Handle if lastMessage is null
+      time: lastMessage.time,
       type: json['type'] ?? '',
       lastMessage: lastMessage,
       isRead: json['unreadMessageCount'] == 0,
-      isSent: json['lastMessage']?['sender']?['id'] == json['othersId'],
+      isSent: (json['lastMessage'] == null) ||
+          (json['lastMessage']?['sender']?['id'] == json['othersId']),
       unreadMessageCount: json['unreadMessageCount'] ?? 0,
     );
   }
@@ -113,8 +114,7 @@ class Chat {
       'isOnline': isOnline,
       'time': time,
       'type': type,
-      'lastMessage':
-          lastMessage.toJson(), // assuming LastMessage has a toJson method
+      'lastMessage': lastMessage.toJson(),
       'isRead': isRead,
       'isSent': isSent,
       'unreadMessageCount': unreadMessageCount,

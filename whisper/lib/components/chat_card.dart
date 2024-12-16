@@ -209,7 +209,7 @@ class ChatCard extends StatelessWidget {
 
     return Text(
       chat.type == "GROUP"
-          ? "${chat.lastMessage.senderName == chat.userName ? "Me" : chat.userName}: $messageText"
+          ? "${chat.lastMessage.senderName == chat.userName ? "Me" : chat.lastMessage.senderName == "Unknown" ? '' : chat.lastMessage.senderName}: $messageText"
           : messageText,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

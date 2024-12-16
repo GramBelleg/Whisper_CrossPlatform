@@ -76,7 +76,6 @@ Future<Tuple2<List<User>, User?>> fetchUsersWithStories() async {
         print("After fetchUserById, myUser: $myUser");
         print("myUser toJson: ${myUser?.toJson()}");
         print("other stories ${users.map((user) => user.toJson()).toList()}");
-        print("All User IDs: ${users.map((user) => user.id).toList()}");
 
         return Tuple2(users, myUser);
       } else {

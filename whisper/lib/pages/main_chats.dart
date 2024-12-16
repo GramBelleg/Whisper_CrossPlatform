@@ -14,9 +14,9 @@ import 'package:whisper/models/user.dart';
 import 'package:whisper/pages/story_page.dart';
 import 'package:whisper/components/buttons_sheet_for_add_story.dart';
 import 'package:whisper/pages/my_stories_screen.dart';
-import 'package:whisper/pages/test.dart';
+import 'package:whisper/pages/cerate_chats.dart';
 import '../components/chat_card.dart';
-import '../components/chat_list.dart';
+import '../cubit/chats_cubit.dart';
 import 'search_page.dart';
 
 class MainChats extends StatefulWidget {
@@ -314,13 +314,8 @@ class _MainChatsState extends State<MainChats> {
   }
 
   Future<Widget> _getChatBody(BuildContext context) async {
-    // Trigger the initialization of chats
-    // await context.read<ChatListCubit>().loadChats();
-    // print("Chats initialized");
-
     return BlocBuilder<ChatListCubit, List<Chat>>(
       builder: (context, chatList) {
-        print("Rebuilding chat list");
         return Column(
           children: [
             ListView.builder(
@@ -328,7 +323,6 @@ class _MainChatsState extends State<MainChats> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: chatList.length,
               itemBuilder: (context, index) {
-                print("show chat: ${chatList[index].userName}");
                 return _buildSlidableChatCard(chatList[index], index);
               },
             ),
@@ -339,7 +333,7 @@ class _MainChatsState extends State<MainChats> {
   }
 
   Widget _buildSlidableChatCard(Chat chat, int index) {
-    print("chat in main chat$chat");
+    print("chat main chats ${chat.toJson()}");
     return Slidable(
       key: ValueKey(chat.userName),
       endActionPane: chat.type != "DM"

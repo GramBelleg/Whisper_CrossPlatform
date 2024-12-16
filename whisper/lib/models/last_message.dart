@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class LastMessage {
   final int id;
   final int senderId;
@@ -40,13 +42,16 @@ class LastMessage {
 
   // Initialization function for when `lastMessage` is null
   factory LastMessage.initLastMessage() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    print(formattedDate); // Example output: 2024-12-15 14:30:45
     return LastMessage(
       id: 0,
-      senderId: 999,
+      senderId: 0,
       senderName: 'Unknown',
       drafted: false,
       content: 'No messages',
-      time: '9999-99-99T99:99:99.999Z',
+      time: formattedDate,
       read: false,
       delivered: false,
       media: '',
