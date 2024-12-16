@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/components/group_member_card.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/group_user_permissions_cubit.dart';
 
 class GroupUserPermissionsPage extends StatefulWidget {
   final int chatId;
   final int userId;
+  final String userName;
+  final String? profilePic;
+  final String lastSeen;
 
   const GroupUserPermissionsPage({
     super.key,
     required this.chatId,
     required this.userId,
+    required this.userName,
+    required this.profilePic,
+    required this.lastSeen,
   });
 
   @override
@@ -19,12 +26,10 @@ class GroupUserPermissionsPage extends StatefulWidget {
 }
 
 class _GroupUserPermissionsPageState extends State<GroupUserPermissionsPage> {
-
-  bool isLoaded = false;
-
   @override
   void initState() {
     super.initState();
+    // Load user permissions on page initialization
     context
         .read<GroupUserPermissionsCubit>()
         .loadUserPermissions(widget.chatId, widget.userId);
@@ -36,86 +41,113 @@ class _GroupUserPermissionsPageState extends State<GroupUserPermissionsPage> {
       backgroundColor: firstNeutralColor,
       appBar: AppBar(
         title: Text(
-          "User ${widget.userId} Permissions in group ${widget.chatId}",
+          "Change User Permissions",
           style: TextStyle(color: primaryColor),
         ),
         backgroundColor: firstNeutralColor,
         iconTheme: IconThemeData(color: primaryColor),
       ),
-      body: BlocBuilder<GroupUserPermissionsCubit, Map<String, bool>>(
-        builder: (context, permissionsState) {
-          return ListView(
-            children: [
-              ListTile(
-                title: Text(
+      body: BlocBuilder<GroupUserPermissionsCubit, GroupUserPermissionsState>(
+        builder: (context, state) {
+          if (state is PermissionsLoading) {
+            // Show a loading indicator while data is being fetched
+            return Center(
+              child: CircularProgressIndicator(color: primaryColor),
+            );
+          } else if (state is PermissionsError) {
+            // Show an error message if something went wrong
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error, color: Colors.red, size: 50),
+                  SizedBox(height: 10),
+                  Text(
+                    state.errorMessage,
+                    style: TextStyle(color: Colors.red, fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Retry loading permissions
+                      context
+                          .read<GroupUserPermissionsCubit>()
+                          .loadUserPermissions(widget.chatId, widget.userId);
+                    },
+                    child: Text("Retry"),
+                  ),
+                ],
+              ),
+            );
+          } else if (state is PermissionsLoaded) {
+            // Show the permissions as a list of switches
+            final permissions = state.permissions;
+            return ListView(
+              children: [
+                GroupMemberCard(
+                  id: widget.userId,
+                  userName: widget.userName,
+                  profilePic: widget.profilePic,
+                  lastSeen: widget.lastSeen,
+                ),
+                _buildPermissionTile(
+                  context,
                   "Can post",
-                  style: TextStyle(color: secondNeutralColor),
+                  'canPost',
+                  permissions['canPost'] ?? false,
                 ),
-                trailing: Switch(
-                  value: permissionsState['canPost'] ?? false,
-                  onChanged: (value) {
-                    context.read<GroupUserPermissionsCubit>().updatePermissions(
-                          widget.chatId,
-                          widget.userId,
-                          'canPost',
-                          value,
-                        );
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(
+                _buildPermissionTile(
+                  context,
                   "Can edit messages",
-                  style: TextStyle(color: secondNeutralColor),
+                  'canEdit',
+                  permissions['canEdit'] ?? false,
                 ),
-                trailing: Switch(
-                  value: permissionsState['canEdit'] ?? false,
-                  onChanged: (value) {
-                    context.read<GroupUserPermissionsCubit>().updatePermissions(
-                          widget.chatId,
-                          widget.userId,
-                          'canEdit',
-                          value,
-                        );
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(
+                _buildPermissionTile(
+                  context,
                   "Can delete messages",
-                  style: TextStyle(color: secondNeutralColor),
+                  'canDelete',
+                  permissions['canDelete'] ?? false,
                 ),
-                trailing: Switch(
-                  value: permissionsState['canDelete'] ?? false,
-                  onChanged: (value) {
-                    context.read<GroupUserPermissionsCubit>().updatePermissions(
-                          widget.chatId,
-                          widget.userId,
-                          'canDelete',
-                          value,
-                        );
-                  },
-                ),
-              ),
-              ListTile(
-                title: Text(
+                _buildPermissionTile(
+                  context,
                   "Can download media",
-                  style: TextStyle(color: secondNeutralColor),
+                  'canDownload',
+                  permissions['canDownload'] ?? false,
                 ),
-                trailing: Switch(
-                  value: permissionsState['canDownload'] ?? false,
-                  onChanged: (value) {
-                    context.read<GroupUserPermissionsCubit>().updatePermissions(
-                          widget.chatId,
-                          widget.userId,
-                          'canDownload',
-                          value,
-                        );
-                  },
-                ),
+              ],
+            );
+          } else {
+            // Default fallback (unlikely to be reached)
+            return Center(
+              child: Text(
+                "Unknown state",
+                style: TextStyle(color: secondNeutralColor),
               ),
-            ],
-          );
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  // Helper method to build a permission tile with a switch
+  Widget _buildPermissionTile(BuildContext context, String title,
+      String permissionKey, bool currentValue) {
+    return ListTile(
+      title: Text(
+        title,
+        style: TextStyle(color: secondNeutralColor),
+      ),
+      trailing: Switch(
+        value: currentValue,
+        onChanged: (value) {
+          context.read<GroupUserPermissionsCubit>().updatePermission(
+                widget.chatId,
+                widget.userId,
+                permissionKey,
+                value,
+              );
         },
       ),
     );

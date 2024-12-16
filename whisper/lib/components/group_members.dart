@@ -107,14 +107,32 @@ class _GroupMembersState extends State<GroupMembers> {
             // Implement logic for changing permissions
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => GroupUserPermissionsPage(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    GroupUserPermissionsPage(
                   chatId: widget.chatId,
                   userId: member.id,
+                  userName: member.userName,
+                  profilePic: member.profilePic,
+                  lastSeen: _formatLastSeen(member.lastSeen),
                 ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0); // Start from bottom
+                  const end = Offset.zero; // End at original position
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
               ),
             );
-            print("Change Permissions");
           },
         ),
         PopupMenuItem(

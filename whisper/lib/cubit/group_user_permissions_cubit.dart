@@ -1,51 +1,61 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/services/group_management_service.dart';
 
-class GroupUserPermissionsCubit extends Cubit<Map<String, bool>> {
+abstract class GroupUserPermissionsState {}
+
+class PermissionsLoading extends GroupUserPermissionsState {}
+
+class PermissionsLoaded extends GroupUserPermissionsState {
+  final Map<String, bool> permissions;
+  PermissionsLoaded(this.permissions);
+}
+
+class PermissionsError extends GroupUserPermissionsState {
+  final String errorMessage;
+  PermissionsError(this.errorMessage);
+}
+
+class GroupUserPermissionsCubit extends Cubit<GroupUserPermissionsState> {
   final GroupManagementService _groupManagementService;
 
-  GroupUserPermissionsCubit(this._groupManagementService) : super({}) {
-    //   _permissions = {
-    //   "canPost": true,
-    //   "canEdit": true,
-    //   "canDelete": true,
-    //   "canDownload": true
-    // };
-  }
+  GroupUserPermissionsCubit(this._groupManagementService)
+      : super(PermissionsLoading());
 
-  Future<bool> loadUserPermissions(int chatId, int userId) async {
+  Future<void> loadUserPermissions(int chatId, int userId) async {
+    emit(PermissionsLoading());
     try {
       final permissions =
           await _groupManagementService.getUserPermissions(chatId, userId);
-      emit(permissions);
-      return true;
+      emit(PermissionsLoaded(permissions));
     } catch (e) {
-      print("FAILED TO LOAD USER PERMISSIONS: $e");
-      return false;
+      emit(PermissionsError('Failed to load permissions: $e'));
     }
   }
 
-  Future<void> updateUserPermissions(
-      int chatId, int userId, Map<String, bool> permissions) async {
-    try {
-      await _groupManagementService.setUserPermissions(
-          chatId, userId, permissions);
+  Future<void> updatePermission(
+      int chatId, int userId, String permissionKey, bool newValue) async {
+    if (state is PermissionsLoaded) {
+      final currentPermissions = Map<String, bool>.from(
+          (state as PermissionsLoaded).permissions);
+      currentPermissions[permissionKey] = newValue;
 
-      // this second  get request may be unnecessary, 
-      // I can check for the return status of the first request
+      emit(PermissionsLoaded(currentPermissions));
 
-      final updatedPermissions =
-          await _groupManagementService.getUserPermissions(chatId, userId);
-      emit(updatedPermissions);
-    } catch (e) {
-      print("FAILED TO UPDATE USER PERMISSIONS: $e");
+      try {
+        final isSuccess = await _groupManagementService.setUserPermissions(
+          chatId,
+          userId,
+          currentPermissions,
+        );
+        if (!isSuccess) {
+          throw Exception("Failed to update permission.");
+        }
+      } catch (e) {
+        emit(PermissionsError('Failed to update permission: $e'));
+        // Revert the optimistic update
+        currentPermissions[permissionKey] = !newValue;
+        emit(PermissionsLoaded(currentPermissions));
+      }
     }
-  }
-
-  Future<void> updatePermissions(
-      int chatId, int userId, String permission, bool value) async {
-    final permissions = Map<String, bool>.from(state);
-    permissions[permission] = value;
-    await updateUserPermissions(chatId, userId, permissions);
   }
 }
