@@ -83,6 +83,8 @@ class _CreateGroupOrChannelDialogState
             }
             if (widget.type == 'Group' && uploadResult != 'Failed') {
               // Handle group creation logic
+              print(
+                  "create ${widget.type} by ${widget.contacts.map((contact) => contact.userName).join('-')}");
               GlobalChatsCubitProvider.chatListCubit.createChat(
                   "GROUP",
                   groupNameController.text.isNotEmpty

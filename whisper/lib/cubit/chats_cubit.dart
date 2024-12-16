@@ -69,6 +69,7 @@ class ChatListCubit extends Cubit<List<Chat>> {
 
   /// Delete a chat group/channel
   void deleteChat(Chat chat) {
+    print("delete chat ${chat.chatId}");
     SocketService.instance.socket?.emit('deleteChat', {
       'chatId':
           chat.chatId, // The identifier for the group/channel to be deleted

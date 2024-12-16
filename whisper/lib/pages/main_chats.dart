@@ -333,7 +333,6 @@ class _MainChatsState extends State<MainChats> {
   }
 
   Widget _buildSlidableChatCard(Chat chat, int index) {
-    print("chat main chats ${chat.toJson()}");
     return Slidable(
       key: ValueKey(chat.userName),
       endActionPane: chat.type != "DM"
