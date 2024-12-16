@@ -26,7 +26,7 @@ void viewProfilePhoto(BuildContext context, String? photoUrl) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => FullScreenPhotoScreen(photoUrl: photoUrl),
+      builder: (context) => FullScreenPhotoScreen(photoUrl: photoUrl!),
     ),
   );
 }

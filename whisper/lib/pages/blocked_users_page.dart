@@ -63,7 +63,7 @@ class _BlockedUsersPageState extends State<BlockedUsersPage> {
                     style: TextStyle(color: secondNeutralColor),
                   ),
                   trailing: IconButton(
-                    key: Key('unblockButton_${user['userId']}'),
+                    key: Key('UnblockButton_${index.toString()}'),
                     icon: Icon(Icons.close, color: secondNeutralColor),
                     onPressed: () =>
                         context.read<BlockedUsersCubit>().unblockUser(index),

@@ -12,8 +12,8 @@ abstract class ReceivedMessage extends StatelessWidget {
     required this.time,
     required this.isSelected,
     required this.status,
-    required this.senderName,
     Key? key,
+    required this.senderName,
   }) : super(key: key);
 
   String formatTime(DateTime dateTime) {

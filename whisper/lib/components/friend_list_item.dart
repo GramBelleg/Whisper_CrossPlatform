@@ -17,9 +17,14 @@ class FriendListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: friend.icon.startsWith('assets/')
-            ? AssetImage(friend.icon)
-            : NetworkImage(friend.icon) as ImageProvider,
+        backgroundImage: friend.icon == null || friend.icon!.isEmpty
+            ? null 
+            : (friend.icon!.startsWith('assets/')
+                ? AssetImage(friend.icon!)
+                : NetworkImage(friend.icon!) as ImageProvider),
+        child: friend.icon == null || friend.icon!.isEmpty
+            ? Icon(Icons.person) 
+            : null, 
       ),
       title: Text(
         friend.name,

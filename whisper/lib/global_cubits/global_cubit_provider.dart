@@ -11,7 +11,7 @@ class GlobalCubitProvider {
   }
 
   static void disposeMessagesCubit() {
-    _messagesCubit?.disconnectSocket();
+    // _messagesCubit?.disconnectSocket();
     _messagesCubit = null;
   }
 }

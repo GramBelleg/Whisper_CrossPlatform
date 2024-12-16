@@ -66,7 +66,7 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
   VideoPlayerController? _videoController;
   bool _isInitialized = false;
   String? videoUrl = "";
-
+  bool _hasError = false;
   @override
   void initState() {
     super.initState();
@@ -90,11 +90,13 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
             if (mounted) {
               setState(() {
                 _isInitialized = false;
+                _hasError = true;
               });
             }
           });
       } catch (e) {
         print("Error fetching video URL: $e");
+        _hasError = true;
       }
     }
   }
@@ -109,7 +111,7 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: !_isInitialized
+      child: !_isInitialized && !_hasError
           ? const CircularProgressIndicator()
           : Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -136,29 +138,44 @@ class _VideoMessageCardState extends State<_VideoMessageCardStateful> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FullScreenVideoPage(
-                                      videoUrl: videoUrl!,
+                                if (!_hasError) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FullScreenVideoPage(
+                                        videoUrl: videoUrl!,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               },
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
                                   AspectRatio(
-                                    aspectRatio:
-                                        _videoController?.value.aspectRatio ??
-                                            1.0,
-                                    child: VideoPlayer(_videoController!),
-                                  ),
-                                  const Icon(
-                                    Icons.play_circle_filled,
-                                    size: 64,
-                                    color: Colors.white,
-                                  ),
+                                      aspectRatio:
+                                          _videoController?.value.aspectRatio ??
+                                              1.0,
+                                      child: !_isInitialized && _hasError
+                                          ? Container(
+                                              height: 200,
+                                              color: firstSecondaryColor,
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.videocam_off,
+                                                  color: Colors.white,
+                                                  size: 50,
+                                                ),
+                                              ),
+                                            )
+                                          : VideoPlayer(_videoController!)),
+                                  !(!_isInitialized && _hasError)
+                                      ? Icon(
+                                          Icons.play_circle_filled,
+                                          size: 64,
+                                          color: Colors.white,
+                                        )
+                                      : Container(),
                                 ],
                               ),
                             ),

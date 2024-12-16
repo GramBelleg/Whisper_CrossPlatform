@@ -22,12 +22,13 @@ Future<List<GroupMember>> fetchChatMembers(int chatId) async {
   );
 
   if (response.statusCode == 200) {
-    print("aaaaaaaaaaaaaaa");
+    print("jsonDataaaaa: ${response.body}");
     List<dynamic> jsonData = json.decode(response.body);
+
     List<GroupMember> members =
         jsonData.map((data) => GroupMember.fromJson(data)).toList();
     for (var member in members) {
-      print(member);
+      print("member: $member");
     }
     return members;
   } else {

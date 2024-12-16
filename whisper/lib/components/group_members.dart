@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/cubit/groups_cubit.dart';
+import 'package:whisper/cubit/groups_cubit_state.dart';
+import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/models/group_member.dart';
 import 'package:whisper/services/fetch_chat_members.dart';
 import 'package:whisper/models/user.dart'; // Ensure this import points to your User model
+import 'package:whisper/services/shared_preferences.dart';
 import 'group_member_card.dart'; // Import the GroupMemberCard widget
 
 class GroupMembers extends StatefulWidget {
@@ -17,18 +22,25 @@ class GroupMembers extends StatefulWidget {
 }
 
 class _GroupMembersState extends State<GroupMembers> {
-  late Future<List<GroupMember>> _members;
   bool _isLoading = true;
   List<GroupMember> _membersList = [];
   String _errorMessage = '';
+  bool _isAdmin = false;
 
   // Async function to load members
   Future<void> _loadMembers() async {
     try {
-      List<GroupMember> members = await fetchChatMembers(widget.chatId);
+      _membersList = await fetchChatMembers(widget.chatId);
+      print("_membersList: $_membersList");
+      int? id = await getId();
       setState(() {
-        _membersList = members;
         _isLoading = false;
+        for (var member in _membersList) {
+          if (member.id == id && member.isAdmin == true) {
+            _isAdmin = true;
+            break;
+          }
+        }
       });
     } catch (error) {
       setState(() {
@@ -102,13 +114,26 @@ class _GroupMembersState extends State<GroupMembers> {
             ],
           ),
           onTap: () {
-            // Implement logic for removing member from group
-            print("Remove from Group");
+            GlobalGroupsProvider.groupsCubit
+                .removeUserFromGroup(groupId: widget.chatId, user: member);
+            print("Remove from Group${member.id}");
           },
         ),
       ],
       elevation: 8.0,
     );
+  }
+
+  void handleMembersState(GroupsState state) {
+    print("anything");
+    if (state is UserAddedToGroup) {
+      print("aaaaaaaaaaaaaaadd");
+      _membersList.add(state.member);
+    } else if (state is UserRemovedFromGroup) {
+      print("aaaaaaaaaaaaaaaaaaaa:  ${state.user.id}");
+      _membersList.removeWhere((member) => member.id == state.user.id);
+    }
+    setState(() {});
   }
 
   @override
@@ -126,66 +151,81 @@ class _GroupMembersState extends State<GroupMembers> {
                     child: Text(
                         'No members found.')) // Show if no members are found
                 : Expanded(
-                    child: ListView.builder(
-                      itemCount: _membersList.length,
-                      itemBuilder: (context, index) {
-                        final member = _membersList[index];
-                        final GlobalKey key = GlobalKey();
-                        return GestureDetector(
-                          onLongPress: () {
-                            if (!member.isAdmin) {
-                              _showPopupMenu(context, member,
-                                  key); // Show menu if not an admin
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
+                    child: BlocProvider<GroupsCubit>.value(
+                      value: GlobalGroupsProvider.groupsCubit,
+                      child: BlocListener<GroupsCubit, GroupsState>(
+                        listener: (context, state) {
+                          setState(() {
+                            print("received state: $state");
+                            handleMembersState(state);
+                          });
+                        },
+                        child: ListView.builder(
+                          itemCount: _membersList.length,
+                          itemBuilder: (context, index) {
+                            final member = _membersList[index];
+                            final GlobalKey key = GlobalKey();
+                            return GestureDetector(
+                              onLongPress: () {
+                                if (!member.isAdmin && _isAdmin) {
+                                  _showPopupMenu(context, member,
+                                      key); // Show menu if not an admin
+                                }
+                              },
+                              child: Column(
                                 children: [
-                                  Expanded(
-                                    child: Column(
-                                      children: [
-                                        GroupMemberCard(
-                                          key: key,
-                                          id: member.id,
-                                          userName: member.userName,
-                                          profilePic: member.profilePic,
-                                          hasStory: member.hasStory,
-                                          lastSeen: _formatLastSeen(member
-                                              .lastSeen), // Format lastSeen here
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            GroupMemberCard(
+                                              key: key,
+                                              id: member.id,
+                                              userName: member.userName,
+                                              profilePic: member.profilePic,
+                                              hasStory: member.hasStory,
+                                              lastSeen: _formatLastSeen(member
+                                                  .lastSeen), // Format lastSeen here
+                                            ),
+                                            // Add a Divider after each member card
+                                          ],
                                         ),
-                                        // Add a Divider after each member card
-                                      ],
-                                    ),
+                                      ),
+                                      // Show isAdmin at the end of the line
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 16.0,
+                                            left: 16.0,
+                                            bottom: 8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              member.isAdmin ? 'Admin' : '',
+                                              style: TextStyle(
+                                                color:
+                                                    Colors.blue, // Make it blue
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  // Show isAdmin at the end of the line
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        right: 16.0, left: 16.0, bottom: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          member.isAdmin ? 'Admin' : '',
-                                          style: TextStyle(
-                                            color: Colors.blue, // Make it blue
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  Divider(
+                                    color: Colors.grey.shade300,
+                                    thickness: .25,
                                   ),
                                 ],
                               ),
-                              Divider(
-                                color: Colors.grey.shade300,
-                                thickness: .25,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   );
   }

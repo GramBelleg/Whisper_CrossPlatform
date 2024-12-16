@@ -2,7 +2,7 @@
 class Friend {
   final int id;
   final String name;
-  final String icon;
+  String? icon;
   final String chatType;
 
   Friend({

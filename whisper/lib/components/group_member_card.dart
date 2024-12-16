@@ -43,16 +43,17 @@ class GroupMemberCard extends StatelessWidget {
         CircleAvatar(
           radius: 25,
           backgroundImage: profilePic != null
-              ? NetworkImage(profilePic!) // Load profile picture
-              : null,
+              ? NetworkImage(
+                  profilePic!) // Load profile picture from URL if available
+              : null, // If profilePic is null, don't set backgroundImage
           backgroundColor: Colors.grey.shade300,
           child: profilePic == null
               ? Icon(
                   Icons.person,
                   size: 25,
                   color: Colors.grey.shade600,
-                )
-              : null,
+                ) // Show an icon if profilePic is null
+              : null, // No icon if profilePic is not null
         ),
         if (hasStory) // Add border or overlay for story
           Positioned(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
+import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/keys/forward_menu_keys.dart';
 import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/fetch_message_by_id.dart';
@@ -46,7 +47,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
 
   Future<void> _loadFriends() async {
     try {
-      final friends = await _friendService.fetchFriends();
+      final friends = widget.isForward
+          ? await _friendService.fetchFriends()
+          : await _friendService.fetchMembers(widget.groupId!);
       setState(() {
         _friends = friends;
       });
@@ -155,6 +158,26 @@ class _ForwardMenuState extends State<ForwardMenu> {
         .toList();
   }
 
+  Future<void> addMembersToGroup() async {
+    try {
+      print("selectedFriendIndexes: ${_selectedFriendIndexes.length}");
+      for (final friendIndex in _selectedFriendIndexes) {
+        final friend = _friends[friendIndex];
+        print("friend: $friend");
+        GlobalGroupsProvider.groupsCubit.addUserToGroup(
+          groupId: widget.groupId!,
+          userId: friend.id,
+          userName: friend.name,
+          profilePic: friend.icon,
+        );
+      }
+
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('Error adding members to group: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -225,7 +248,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
         key: ForwardMenuKeys.forwardButton,
-        onPressed: widget.isForward ? _forwardMessages : () {},
+        onPressed: widget.isForward ? _forwardMessages : addMembersToGroup,
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(double.infinity, 50),
           backgroundColor: primaryColor,

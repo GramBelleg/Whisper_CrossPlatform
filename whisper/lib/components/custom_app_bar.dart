@@ -14,7 +14,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final int chatId;
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
-  final bool isMine;
+  final bool editable;
   final String chatType;
   const CustomAppBar({
     super.key,
@@ -24,7 +24,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.clearSelection,
     required this.chatViewModel, // Initialize ChatViewModel
     required this.chatId,
-    required this.isMine,
+    required this.editable,
     required this.chatType,
   });
 
@@ -208,7 +208,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       child: Text('Pin'),
                       //todo if messages is pin make text unpin
                     ),
-                    if (widget.isMine)
+                    if (widget.editable)
                       const PopupMenuItem(
                         key: Key(CustomAppBarKeys.popupEdit),
                         value: 'Edit',

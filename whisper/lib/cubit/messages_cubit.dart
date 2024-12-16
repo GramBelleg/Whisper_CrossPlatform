@@ -117,25 +117,17 @@ class MessagesCubit extends Cubit<MessagesState> {
   }
 
   ChatMessage _parseMessage(Map<String, dynamic> data) {
-    final parentMessage = data['parentMessage'] != null
-        ? ParentMessage.fromJson(data['parentMessage'])
-        : null;
-    final forwardedFrom = data['forwardedFrom'] != null
-        ? ForwardedFrom.fromJson(data['forwardedFrom'])
-        : null;
+    final parentMessage = ParentMessage.fromJson(data['parentMessage']);
+    final forwardedFrom = ForwardedFrom.fromJson(data['forwardedFrom']);
     return ChatMessage(
       id: data['id'],
       chatId: data['chatId'],
-      sender: data['sender'] != null ? Sender.fromJson(data['sender']) : null,
+      sender: Sender.fromJson(data['sender']),
       content: data['content'],
-      mentions:
-          data['mentions'] != null ? List<int>.from(data['mentions']) : null,
+      mentions: List<int>.from(data['mentions']),
       media: data['media'],
-      time:
-          data['time'] != null ? DateTime.parse(data['time']).toLocal() : null,
-      sentAt: data['sentAt'] != null
-          ? DateTime.parse(data['sentAt']).toLocal()
-          : null,
+      time: DateTime.parse(data['time']).toLocal(),
+      sentAt: DateTime.parse(data['sentAt']).toLocal(),
       read: data['read'] ?? false,
       delivered: data['delivered'] ?? false,
       forwarded: data['forwarded'] ?? false,

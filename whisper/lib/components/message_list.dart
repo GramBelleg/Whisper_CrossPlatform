@@ -121,8 +121,8 @@ class _MessageListState extends State<MessageList> {
             key: ValueKey('${MessageListKeys.tapKeyPrefix}${messageData.id}'),
             onLongPress: () => widget.onLongPress(messageData),
             onTap: () {
-              widget.onTap(messageData);
-              if (messageData.parentMessage?.id != null) {
+              if (messageData.parentMessage?.id != null &&
+                  widget.isSelectedList.isEmpty) {
                 int parentIndex = widget.messages.indexWhere(
                   (message) => message.id == messageData.parentMessage?.id,
                 );
@@ -135,6 +135,7 @@ class _MessageListState extends State<MessageList> {
                   );
                 }
               }
+              widget.onTap(messageData);
             },
             child: messageData.sender!.id == widget.senderId
                 ? _buildSenderMessage(messageData)

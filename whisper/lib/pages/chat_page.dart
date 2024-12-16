@@ -250,7 +250,7 @@ class _ChatPageState extends State<ChatPage> {
     GlobalCubitProvider.messagesCubit.emitEditMessage(
       _editingMessageId,
       widget.ChatID,
-      _controller.text,
+      _controller.text.trim(),
     );
     handleCancelEditing();
   }
@@ -367,11 +367,15 @@ class _ChatPageState extends State<ChatPage> {
           clearSelection: clearIsSelected,
           chatId: widget.ChatID,
           chatViewModel: ChatViewModel(),
-          isMine: isSelectedList.length == 1 &&
+          editable: isSelectedList.length == 1 &&
               isSelectedList.first != null &&
               chatMessageManager.messages.any((message) =>
                   message.id == isSelectedList.first &&
-                  message.sender?.id == widget.senderId),
+                  message.sender?.id == widget.senderId &&
+                  chatMessageManager.messages
+                          .firstWhere((msg) => msg.id == message.id)
+                          .type ==
+                      "TEXT"),
           chatType: widget.chatType!,
         ),
         body: BlocProvider<MessagesCubit>.value(
