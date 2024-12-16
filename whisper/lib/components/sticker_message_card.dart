@@ -109,7 +109,7 @@ class _StickerMessageCardState extends State<StickerMessageCard> {
                     : const CircularProgressIndicator(),
             const SizedBox(height: 5),
             Container(
-              width: 85,
+              width: 90,
               decoration: BoxDecoration(
                 color: widget.isSelected
                     ? selectColor
