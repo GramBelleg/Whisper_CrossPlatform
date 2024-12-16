@@ -8,6 +8,7 @@ import 'package:path/path.dart';
 import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/cubit/groups_cubit.dart';
+import 'package:whisper/cubit/group_user_permissions_cubit.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
@@ -29,6 +30,7 @@ import 'package:whisper/services/blocked_users_service.dart';
 import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/chat_deletion_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
+import 'package:whisper/services/group_management_service.dart';
 import 'package:whisper/services/visibility_service.dart';
 import 'dart:io';
 import 'firebase_options.dart';
@@ -62,6 +64,9 @@ void main() async {
     BlocProvider(
         create: (context) => GlobalUserStoryCubitProvider.userStoryCubit),
     BlocProvider(create: (context) => GlobalChatsCubitProvider.chatListCubit),
+    BlocProvider(
+        create: (context) =>
+            GroupUserPermissionsCubit(GroupManagementService())),
   ], child: Whisper()));
 }
 

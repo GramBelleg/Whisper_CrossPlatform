@@ -4,6 +4,7 @@ import 'package:whisper/cubit/groups_cubit.dart';
 import 'package:whisper/cubit/groups_cubit_state.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/models/group_member.dart';
+import 'package:whisper/pages/group_user_permissions_page.dart';
 import 'package:whisper/services/fetch_chat_members.dart';
 import 'package:whisper/models/user.dart'; // Ensure this import points to your User model
 import 'package:whisper/services/shared_preferences.dart';
@@ -104,6 +105,15 @@ class _GroupMembersState extends State<GroupMembers> {
           ),
           onTap: () {
             // Implement logic for changing permissions
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GroupUserPermissionsPage(
+                  chatId: widget.chatId,
+                  userId: member.id,
+                ),
+              ),
+            );
             print("Change Permissions");
           },
         ),
