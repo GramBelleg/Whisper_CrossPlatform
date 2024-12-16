@@ -1,15 +1,3 @@
-enum MessageType {
-  TEXT,
-  VM,
-  AUDIO,
-  IMAGE,
-  FILE,
-  DELETED,
-  STICKER,
-  GIF,
-  VIDEO,
-}
-
 class LastMessage {
   final int id;
   final int senderId;
@@ -20,7 +8,7 @@ class LastMessage {
   final bool read;
   final bool delivered;
   final String media;
-  final MessageType messageType;
+  final String messageType;
 
   LastMessage({
     required this.id,
@@ -38,43 +26,49 @@ class LastMessage {
   factory LastMessage.fromJson(Map<String, dynamic> json) {
     return LastMessage(
       id: json['id'] ?? 0,
-      senderId: json['sender']?['id'] ?? 0, // Accessing 'sender.id'
-      senderName: json['sender']?['userName'] ??
-          'Unknown', // Accessing 'sender.userName'
+      senderId: json['sender']?['id'] ?? 0,
+      senderName: json['sender']?['userName'] ?? 'Unknown',
       drafted: json['drafted'] ?? false,
       content: json['content'] ?? '',
-      time: json['time'] ?? '', // 'time' is directly available in lastMessage
+      time: json['time'] ?? '',
       read: json['read'] ?? false,
       delivered: json['delivered'] ?? false,
       media: json['media'] ?? '',
-      messageType: _getMessageType(
-          json['type']), // Adjusted to 'type' key for message type
+      messageType: json['type'] ?? 'TEXT', // Default type in case of null
     );
   }
 
-  // Change this to a static method
-  static MessageType _getMessageType(String? type) {
-    switch (type?.toUpperCase()) {
-      case 'TEXT':
-        return MessageType.TEXT;
-      case 'IMAGE':
-        return MessageType.IMAGE;
-      case 'VIDEO':
-        return MessageType.VIDEO;
-      case 'AUDIO':
-        return MessageType.AUDIO;
-      case 'GIF':
-        return MessageType.GIF;
-      case 'STICKER':
-        return MessageType.STICKER;
-      case 'FILE':
-        return MessageType.FILE;
-      case 'DELETED':
-        return MessageType.DELETED;
-      case 'VM':
-        return MessageType.VM;
-      default:
-        return MessageType.TEXT;
-    }
+  // Initialization function for when `lastMessage` is null
+  factory LastMessage.initLastMessage() {
+    return LastMessage(
+      id: 0,
+      senderId: 999,
+      senderName: 'Unknown',
+      drafted: false,
+      content: 'No messages',
+      time: '9999-99-99T99:99:99.999Z',
+      read: false,
+      delivered: false,
+      media: '',
+      messageType: "TEXT", // Default message type
+    );
+  }
+
+  // Convert LastMessage object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sender': {
+        'id': senderId,
+        'userName': senderName,
+      },
+      'drafted': drafted,
+      'content': content,
+      'time': time,
+      'read': read,
+      'delivered': delivered,
+      'media': media,
+      'type': messageType,
+    };
   }
 }

@@ -1,11 +1,13 @@
-import 'package:flutter/widgets.dart';
-
 class MainChatsKeys {
-  static const editButton = Key('editButton');
-  static const addStoryInActionsButton = Key('addStoryInActionsButton');
-  static const addStoryInHeaderButton = Key('addStoryInHeaderButton');
-  static const deleteButton = Key('deleteButton');
-  static const muteButton = Key('muteButton');
-  static const pinButton = Key('pinButton');
-  static const searchGestureDetector = Key('searchGestureDetector');
+  static const editButton = 'editButton';
+  static const addStoryInActionsButton = 'addStoryInActionsButton';
+  static const addStoryInHeaderButton = 'addStoryInHeaderButton';
+  static const deleteButton = 'deleteButton';
+  static const leaveButton = 'leaveButton';
+  static const muteButton = 'muteButton';
+  static const createChatButton = 'createChatButton';
+  static const searchGestureDetector = 'searchGestureDetector';
+  static const weekDuration = 'weekDuration';
+  static const alwaysDuration = 'alwaysDuration';
+  static const hoursDuration = 'hoursDuration';
 }

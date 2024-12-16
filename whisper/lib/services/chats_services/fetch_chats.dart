@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
-import '../constants/ip_for_services.dart';
+import '../../constants/ip_for_services.dart';
 
 Future<List<dynamic>> fetchChats() async {
   final String url = 'http://$ip:5000/api/chats';
@@ -22,11 +22,12 @@ Future<List<dynamic>> fetchChats() async {
       List<dynamic> chats = jsonDecode(response.body);
 
       for (var chat in chats) {
-        chat['Picture'] = chat['Picture'] != null
-            ? await generatePresignedUrl(chat['Picture'])
-            : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(chat['name'])}';
-        //print("make url");
+        chat['picture'] = chat['picture'] != null
+            ? await generatePresignedUrl(chat['picture'])
+            : 'https://ui-avatars.com/api/?background=8d6aee&size=100&color=fff&name=${formatName(chat['name'])}';
+        print("chat aaa$chat");
       }
+      print("chats here $chats");
       return chats;
     } else {
       throw Exception('Failed to load chats');

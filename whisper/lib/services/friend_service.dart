@@ -1,5 +1,5 @@
 // services/friend_service.dart
-import 'package:whisper/services/fetch_chats.dart';
+import 'package:whisper/services/chats_services/fetch_chats.dart';
 import '../models/friend.dart';
 
 class FriendService {

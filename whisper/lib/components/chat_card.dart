@@ -3,9 +3,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/models/chat.dart';
-import 'package:whisper/models/last_message.dart';
 import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/shared_preferences.dart';
+
+enum MessageType {
+  TEXT,
+  VM,
+  AUDIO,
+  IMAGE,
+  FILE,
+  DELETED,
+  STICKER,
+  GIF,
+  VIDEO,
+}
 
 class ChatCard extends StatelessWidget {
   final Chat chat;
@@ -43,7 +54,6 @@ class ChatCard extends StatelessWidget {
             children: [
               _buildTime(),
               const SizedBox(height: 8), // Add more space between time and pin
-              // if (chat.isPinned) _buildPinIcon(),
             ],
           ),
           onTap: () async {
@@ -123,7 +133,8 @@ class ChatCard extends StatelessWidget {
         Expanded(child: _buildLastMessage()),
         const SizedBox(width: 4),
         if (chat.unreadMessageCount > 0 &&
-            chat.lastMessage.messageType != MessageType.DELETED)
+            _getMessageType(chat.lastMessage.messageType) !=
+                MessageType.DELETED)
           _buildUnreadCount(),
       ],
     );
@@ -145,7 +156,7 @@ class ChatCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (chat.isSent)
+        if (!chat.isSent)
           FaIcon(
             FontAwesomeIcons.checkDouble,
             size: 12,
@@ -165,7 +176,7 @@ class ChatCard extends StatelessWidget {
 
   Widget _buildLastMessage() {
     String messageText;
-    switch (chat.lastMessage.messageType) {
+    switch (_getMessageType(chat.lastMessage.messageType)) {
       case MessageType.IMAGE:
         messageText = "📷 Image";
         break;
@@ -197,11 +208,38 @@ class ChatCard extends StatelessWidget {
     }
 
     return Text(
-      messageText,
+      chat.type == "GROUP"
+          ? "${chat.lastMessage.senderName == chat.userName ? "Me" : chat.userName}: $messageText"
+          : messageText,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(color: highlightColor),
+      style: TextStyle(color: Color.fromRGBO(141, 150, 163, 1)),
     );
+  }
+
+  MessageType _getMessageType(String? type) {
+    switch (type?.toUpperCase()) {
+      case 'TEXT':
+        return MessageType.TEXT;
+      case 'IMAGE':
+        return MessageType.IMAGE;
+      case 'VIDEO':
+        return MessageType.VIDEO;
+      case 'AUDIO':
+        return MessageType.AUDIO;
+      case 'GIF':
+        return MessageType.GIF;
+      case 'STICKER':
+        return MessageType.STICKER;
+      case 'FILE':
+        return MessageType.FILE;
+      case 'DELETED':
+        return MessageType.DELETED;
+      case 'VM':
+        return MessageType.VM;
+      default:
+        return MessageType.TEXT;
+    }
   }
 
   String formatMessageTime(String? isoTime) {

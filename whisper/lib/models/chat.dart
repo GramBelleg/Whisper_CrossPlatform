@@ -1,4 +1,3 @@
-import 'package:whisper/components/helpers.dart';
 import 'package:whisper/models/last_message.dart';
 
 class Chat {
@@ -38,33 +37,31 @@ class Chat {
     required this.unreadMessageCount,
   });
 
-  factory Chat.fromJson(Map<String, dynamic> json, bool isOnline) {
+  factory Chat.fromJson(
+      Map<String, dynamic> json, bool isOnline, LastMessage lastMessage) {
     return Chat(
-      chatId: json['id'] ?? 0, // 'id' instead of 'chatid'
+      chatId: json['id'] ?? 0,
       othersId: json['othersId'] ?? 0,
-      userName: json['name'] ?? 'Unknown User', // 'name' instead of 'userName'
-      avatarUrl: json['picture'] ??
-          "https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(json['name'] ?? 'Unknown User')}", // 'picture' instead of 'avatarUrl'
+      userName: json['name'] ?? 'Unknown User',
+      avatarUrl: json['picture'] ?? '',
       hasStory: json['hasStory'] ?? false,
       isMuted: json['isMuted'] ?? false,
       isAdmin: json['isAdmin'] ?? false,
       status: json['status'] ?? '',
       lastSeen: json['lastSeen'] ?? '',
       isOnline: isOnline,
-      time: json['lastMessage'][
-          'time'], // You may want to use this or parse the 'lastMessage.time' here
+      time: lastMessage.time, // Handle if lastMessage is null
       type: json['type'] ?? '',
-      lastMessage: LastMessage.fromJson(json['lastMessage']),
+      lastMessage: lastMessage,
       isRead: json['unreadMessageCount'] == 0,
-      isSent: json['lastMessage']?['sender']?['id'] ==
-          json['othersId'], // Adjusting to access sender's id
+      isSent: json['lastMessage']?['sender']?['id'] == json['othersId'],
       unreadMessageCount: json['unreadMessageCount'] ?? 0,
     );
   }
 
   // CopyWith method
   Chat copyWith({
-    int? chatid,
+    int? chatId,
     int? othersId,
     String? userName,
     String? avatarUrl,
@@ -82,7 +79,7 @@ class Chat {
     int? unreadMessageCount,
   }) {
     return Chat(
-      chatId: chatid ?? this.chatId,
+      chatId: chatId ?? this.chatId,
       othersId: othersId ?? this.othersId,
       userName: userName ?? this.userName,
       avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -99,5 +96,28 @@ class Chat {
       isSent: isSent ?? this.isSent,
       unreadMessageCount: unreadMessageCount ?? this.unreadMessageCount,
     );
+  }
+
+  // Convert Chat object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': chatId,
+      'othersId': othersId,
+      'name': userName,
+      'picture': avatarUrl,
+      'hasStory': hasStory,
+      'isMuted': isMuted,
+      'isAdmin': isAdmin,
+      'status': status,
+      'lastSeen': lastSeen,
+      'isOnline': isOnline,
+      'time': time,
+      'type': type,
+      'lastMessage':
+          lastMessage.toJson(), // assuming LastMessage has a toJson method
+      'isRead': isRead,
+      'isSent': isSent,
+      'unreadMessageCount': unreadMessageCount,
+    };
   }
 }

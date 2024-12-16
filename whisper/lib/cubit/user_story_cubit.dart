@@ -220,7 +220,6 @@ class UserStoryCubit extends Cubit<UserStoryState> {
     // Listen for story updates via socket
     SocketService.instance.socket?.on('story', (data) {
       print("receive my story $data");
-      //receiveStory(data);
     });
     SocketService.instance.socket?.on('viewStory', (data) {
       receiveViewStory(data);

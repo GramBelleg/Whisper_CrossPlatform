@@ -165,7 +165,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   child: Text(
                     "Edit",
                     style: TextStyle(
-                      color: highlightColor,
+                      color: primaryColor,
                       fontSize: 16,
                     ),
                   ),
@@ -176,7 +176,7 @@ class _SettingsContentState extends State<SettingsContent> {
                     width: 23.0,
                     height: 23.0,
                     child: Image.asset(
-                      "assets/images/addStoryFirstNeutralColor_Icon (3).png", // Change to your desired icon
+                      "assets/images/addStoryFirstNeutralColor_Icon.png", // Change to your desired icon
                       fit: BoxFit.cover,
                     ),
                   ),
