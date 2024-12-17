@@ -20,6 +20,7 @@ class UserStoryCubit extends Cubit<UserStoryState> {
 
   // Load users from SharedPreferences
   Future<void> initUsers() async {
+    print("initUsers");
     await retrieveUsersWithStories();
   }
 
