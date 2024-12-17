@@ -1,8 +1,12 @@
-// lib/widgets/edit_fields.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/keys/settings_page_keys.dart';
+import 'package:whisper/validators/form-validation/validate_email_field.dart';
+import 'package:whisper/validators/form-validation/validate_name_field.dart';
+import 'package:whisper/validators/form-validation/validate_number_field.dart';
+import 'package:whisper/validators/form-validation/validate_user_name_field.dart';
 
 class EditFields extends StatelessWidget {
   final TextEditingController bioController;
@@ -38,20 +42,62 @@ class EditFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(bioController, 'Bio', stateText: bioStateUpdate),
-        _buildTextField(nameController, 'Name', stateText: nameStateUpdate),
+        _buildTextField(bioController, 'Bio',
+            stateText: bioStateUpdate,
+            maxLength: 200,
+            validator: null, // Validate bio field
+            setUpdate:
+                GlobalSettingsCubitProvider.settingsCubit.setBioStateUpdate),
+        _buildTextField(nameController, 'Name',
+            stateText: nameStateUpdate,
+            maxLength: 50,
+            validator: (text) => validateNameField(text), // Validate name field
+            setUpdate:
+                GlobalSettingsCubitProvider.settingsCubit.setNameStateUpdate),
         _buildTextField(usernameController, 'Username',
-            stateText: usernameStateUpdate),
+            stateText: usernameStateUpdate,
+            maxLength: 20,
+            validator: (text) =>
+                validateUsernameField(text), // Validate username field
+            setUpdate: GlobalSettingsCubitProvider
+                .settingsCubit.setUsernameStateUpdate),
         _buildTextField(phoneController, 'Phone Number',
-            stateText: phoneNumberStateUpdate),
+            stateText: phoneNumberStateUpdate,
+            maxLength: 15,
+            keyboardType: TextInputType.phone,
+            validator: (text) =>
+                validateNumberFieldString(text), // Validate phone number field
+            setUpdate: GlobalSettingsCubitProvider
+                .settingsCubit.setPhoneNumberStateUpdate),
         _buildTextField(emailController, 'Email',
-            stateText: emailStateUpdate, needCode: true),
+            stateText: emailStateUpdate,
+            needCode: true,
+            maxLength: 100,
+            keyboardType: TextInputType.emailAddress,
+            validator: (text) =>
+                validateEmailField(text), // Validate email field
+            setUpdate:
+                GlobalSettingsCubitProvider.settingsCubit.setEmailStateUpdate),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText,
-      {String? stateText, bool needCode = false}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String labelText, {
+    String? stateText,
+    bool needCode = false,
+    TextInputType keyboardType =
+        TextInputType.text, // Added keyboardType parameter
+    int? maxLength, // Added maxLength parameter
+    String? Function(String?)? validator, // Validation function parameter
+    Future<void> Function(String)? setUpdate, // Validation function parameter
+  }) {
+    controller.addListener(() {
+      GlobalSettingsCubitProvider.settingsCubit
+          .setAllStateUpdate(''); // Reset state on text change
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,7 +125,6 @@ class EditFields extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Container(
-          height: 50,
           decoration: BoxDecoration(
             color: const Color(0xFF0A254A),
             borderRadius: BorderRadius.circular(25),
@@ -91,11 +136,25 @@ class EditFields extends StatelessWidget {
                   key: Key("$labelText${SettingsPageKeys.textField}"),
                   controller: controller,
                   style: TextStyle(color: secondNeutralColor),
+                  textAlign: controller.text.isEmpty
+                      ? TextAlign.center
+                      : TextAlign.start, // Center text when empty
                   decoration: const InputDecoration(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     border: InputBorder.none,
                   ),
+                  keyboardType: keyboardType,
+                  maxLength: maxLength,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  minLines: 1,
+                  maxLines: null,
+                  onChanged: (text) {
+                    final errorMessage = validator?.call(text);
+                    if (errorMessage != null) {
+                      setUpdate!(errorMessage);
+                    }
+                  },
                 ),
               ),
               if (needCode)
@@ -107,8 +166,7 @@ class EditFields extends StatelessWidget {
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: highlightColor,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12), // Button padding
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                   ),
                   child: const Text("Send Code"),
                 ),

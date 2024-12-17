@@ -630,7 +630,12 @@ class _SettingsContentState extends State<SettingsContent> {
     if (pickedFile != null) {
       String blobName = await uploadFile(pickedFile.path);
       //  await context.read<SettingsCubit>().updateProfilePic(blobName);
-      context.read<SettingsCubit>().sendProfilePhoto(blobName);
+      if (blobName != "Failed") {
+        context.read<SettingsCubit>().sendProfilePhoto(blobName);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error upload story')));
+      }
     } else {
       print('No image selected.');
     }

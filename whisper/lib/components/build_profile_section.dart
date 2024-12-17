@@ -66,11 +66,8 @@ class ProfileSection extends StatelessWidget {
                     backgroundColor: Colors.grey,
                     child: ClipOval(
                       child: ColorFiltered(
-                        colorFilter: isEditing
-                            ? const ColorFilter.mode(
-                                Colors.grey, BlendMode.saturation)
-                            : const ColorFilter.mode(
-                                Colors.transparent, BlendMode.saturation),
+                        colorFilter: const ColorFilter.mode(
+                            Colors.transparent, BlendMode.saturation),
                         child: Image.network(
                           profilePic,
                           fit: BoxFit.cover,

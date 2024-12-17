@@ -123,7 +123,6 @@ class _MainChatsState extends State<MainChats> {
         } else if (state is UserStoryLoaded) {
           final users = state.users;
           final myUser = state.me;
-
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 40.0),
             color: primaryColor,
@@ -164,7 +163,7 @@ class _MainChatsState extends State<MainChats> {
         key: Key("${myUser?.userName}_story"),
         onTap: () {
           if (myUser?.stories.isEmpty ?? true) {
-            // Add story logic
+            _addStory();
           } else {
             Navigator.push(
               context,
@@ -184,7 +183,9 @@ class _MainChatsState extends State<MainChats> {
                   backgroundColor: firstSecondaryColor,
                   radius: 28,
                   child: myUser?.stories.isEmpty ?? true
-                      ? const Text('+', style: TextStyle(fontSize: 40))
+                      ? const Text('+',
+                          style: TextStyle(
+                              fontSize: 40, color: secondNeutralColor))
                       : CircleAvatar(
                           backgroundImage: NetworkImage(
                             myUser?.profilePic ??

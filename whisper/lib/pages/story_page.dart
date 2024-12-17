@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whisper/components/list_views_story.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/keys/story_page_keys.dart';
 import 'package:whisper/models/user.dart';
 import 'package:whisper/models/user_view.dart';
-import 'package:whisper/socket.dart';
 
 class StoryPage extends StatefulWidget {
   final List<User> users;
@@ -44,6 +44,13 @@ class _StoryPageState extends State<StoryPage> {
 
   void _startStoryTimer() {
     if (_timer.isActive) _timer.cancel();
+
+    if (widget.users.isEmpty ||
+        widget.users[currentUserIndex].stories.isEmpty) {
+      Navigator.pop(context); // Exit if no stories remain
+      return;
+    }
+
     final currentUser = widget.users[currentUserIndex];
     final currentStory = currentUser.stories[currentStoryIndex];
     double storyDuration;
@@ -57,7 +64,6 @@ class _StoryPageState extends State<StoryPage> {
       storyDuration = _storyDuration;
     }
 
-    // Ensure storyDuration is valid (greater than zero)
     if (storyDuration <= 0) {
       storyDuration = _storyDuration; // fallback to default duration
     }
@@ -82,6 +88,12 @@ class _StoryPageState extends State<StoryPage> {
     _timer.cancel();
     _videoController?.dispose();
     _videoController = null;
+
+    if (widget.users[currentUserIndex].stories.isEmpty) {
+      Navigator.pop(context); // Exit if no stories remain
+      return;
+    }
+
     _startStoryTimer();
   }
 
@@ -93,34 +105,90 @@ class _StoryPageState extends State<StoryPage> {
   }
 
   void _goToNextStory() {
-    setState(() {
-      if (currentStoryIndex <
-          widget.users[currentUserIndex].stories.length - 1) {
-        currentStoryIndex++;
-      } else if (currentUserIndex < widget.users.length - 1) {
-        currentUserIndex++;
-        currentStoryIndex = 0;
-      } else {
-        Navigator.pop(context);
-      }
-      _resetStory();
-    });
+    if (widget.users.isEmpty ||
+        widget.users[currentUserIndex].stories.isEmpty) {
+      Navigator.pop(context); // Exit if no stories remain
+      return;
+    }
+    if (mounted) {
+      setState(() {
+        if (currentStoryIndex <
+            widget.users[currentUserIndex].stories.length - 1) {
+          currentStoryIndex++;
+        } else if (currentUserIndex < widget.users.length - 1) {
+          currentUserIndex++;
+          currentStoryIndex = 0;
+        } else {
+          Navigator.pop(context); // Exit if no more users with stories
+        }
+        _resetStory();
+      });
+    }
   }
 
   void _goToPreviousStory() {
-    setState(() {
-      if (currentStoryIndex > 0) {
-        currentStoryIndex--;
-      } else if (currentUserIndex > 0) {
-        currentUserIndex--;
-        currentStoryIndex = widget.users[currentUserIndex].stories.length - 1;
-      }
-      _resetStory();
-    });
+    if (mounted) {
+      setState(() {
+        if (widget.users[currentUserIndex].stories.isEmpty) {
+          Navigator.pop(context); // Exit if no stories remain
+          return;
+        }
+
+        if (currentStoryIndex > 0) {
+          currentStoryIndex--;
+        } else if (currentUserIndex > 0) {
+          currentUserIndex--;
+          currentStoryIndex = widget.users[currentUserIndex].stories.length - 1;
+        }
+        _resetStory();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.users.isEmpty ||
+        widget.users[currentUserIndex].stories.isEmpty) {
+      return Scaffold(
+        backgroundColor: primaryColor,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "No stories available",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              SizedBox(
+                  height: 16), // Adds spacing between the text and the button
+              TextButton(
+                key:
+                    const Key('popScreenButton'), // Assigns a key to the button
+                onPressed: () {
+                  Navigator.of(context).pop(); // Pops the current screen
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor:
+                      secondNeutralColor, // Sets the button text color
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  backgroundColor:
+                      firstSecondaryColor, // Sets the button background color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Go Back",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final currentUser = widget.users[currentUserIndex];
     final currentStory = currentUser.stories[currentStoryIndex];
 
@@ -275,11 +343,7 @@ class _StoryPageState extends State<StoryPage> {
                               size: 20,
                             ),
                             onPressed: () {
-                              setState(() {
-                                widget.users[widget.userIndex].stories
-                                    .removeAt(currentStoryIndex);
-                              });
-                              SocketService.instance
+                              GlobalUserStoryCubitProvider.userStoryCubit
                                   .deleteStory(currentStory.id);
                             },
                           ),
@@ -323,10 +387,10 @@ class _StoryPageState extends State<StoryPage> {
   }
 
   void _showUserViewModal(List<UserView> userViews) {
-    // Pause the video player
+    if (userViews.isEmpty) return; // Exit if no views
     _videoController?.pause();
     _timer.cancel();
-    // Show the modal bottom sheet
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -340,9 +404,8 @@ class _StoryPageState extends State<StoryPage> {
         );
       },
     ).whenComplete(() {
-      // Resume the video after modal is closed
-      _videoController?.play(); // Restart the video if it's paused
-      _startStoryTimer(); // Restart the timer to resume the story
+      _videoController?.play();
+      _startStoryTimer();
     });
   }
 }

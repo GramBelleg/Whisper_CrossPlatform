@@ -78,16 +78,6 @@ class SettingsCubit extends Cubit<SettingsState> {
     _emitUpdatedState();
   }
 
-  void sendMyStory(String content, String blobName, String type) {
-    print("send my story");
-    SocketService.instance.sendStory(content, blobName, type);
-  }
-
-  void deleteMyStory(int storyId) {
-    print("delete my story");
-    SocketService.instance.deleteStory(storyId);
-  }
-
   void sendProfilePhoto(String blobName, {bool toRemove = false}) {
     if (!toRemove) {
       socket?.emit('pfp', {'profilePic': blobName});
@@ -174,6 +164,16 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> setBioStateUpdate(String state) async {
     bioStateUpdate = state;
+    _emitUpdatedState();
+  }
+
+  Future<void> setAllStateUpdate(String state) async {
+    bioStateUpdate = state;
+    emailStateUpdate = state;
+    phoneNumberStateUpdate = state;
+    usernameStateUpdate = state;
+    nameStateUpdate = state;
+
     _emitUpdatedState();
   }
 
