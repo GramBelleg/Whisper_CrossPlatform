@@ -10,9 +10,11 @@ import 'package:whisper/constants/colors.dart';
 import 'package:whisper/components/sticker_picker.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
+import 'package:whisper/global_cubits/global_chats_cubit.dart';
 // import 'package:whisper/global_cubit_provider.dart';
 import 'package:whisper/keys/chat_page_keys.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
+import 'package:whisper/models/chat.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/models/chat_message_manager.dart';
 import 'package:whisper/models/parent_message.dart';
@@ -27,21 +29,15 @@ import 'package:vibration/vibration.dart';
 
 class ChatPage extends StatefulWidget {
   static const String id = 'chat_page'; // Define the static id here
-  final int ChatID;
-  final String userName;
-  final String? userImage;
+  Chat chat;
   final String? token;
   final int? senderId;
-  final String? chatType;
 
-  const ChatPage({
+  ChatPage({
     super.key,
-    required this.userName,
-    required this.userImage,
-    required this.ChatID,
     required this.token,
     required this.senderId,
-    required this.chatType,
+    required this.chat,
   });
 
   @override
@@ -80,7 +76,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    GlobalCubitProvider.messagesCubit.loadMessages(widget.ChatID);
+    GlobalCubitProvider.messagesCubit.loadMessages(widget.chat.chatId);
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         setState(() {
@@ -100,6 +96,7 @@ class _ChatPageState extends State<ChatPage> {
     focusNode.dispose();
     recorderController.dispose();
     globalPlayerController.dispose();
+    // GlobalChatsCubitProvider.chatListCubit.loadChats();
     super.dispose();
   }
 
@@ -226,10 +223,10 @@ class _ChatPageState extends State<ChatPage> {
     if (_isTyping) {
       GlobalCubitProvider.messagesCubit.sendMessage(
         content: _controller.text.trim(),
-        chatId: widget.ChatID,
+        chatId: widget.chat.chatId,
         senderId: widget.senderId!,
         parentMessage: _replyingTo,
-        senderName: widget.userName,
+        senderName: widget.chat.userName,
         isReplying: _isReplying,
         isForward: false,
         type: "TEXT",
@@ -249,7 +246,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     GlobalCubitProvider.messagesCubit.emitEditMessage(
       _editingMessageId,
-      widget.ChatID,
+      widget.chat.chatId,
       _controller.text.trim(),
     );
     handleCancelEditing();
@@ -298,10 +295,10 @@ class _ChatPageState extends State<ChatPage> {
         GlobalCubitProvider.messagesCubit.sendMessage(
           extension: path.split('.').last,
           content: blobName,
-          chatId: widget.ChatID,
+          chatId: widget.chat.chatId,
           senderId: widget.senderId!,
           parentMessage: _replyingTo,
-          senderName: widget.userName,
+          senderName: widget.chat.userName,
           isReplying: _isReplying,
           isForward: false,
           type: "VM",
@@ -325,10 +322,10 @@ class _ChatPageState extends State<ChatPage> {
     GlobalCubitProvider.messagesCubit.sendMessage(
       extension: "gif",
       content: gifUrl,
-      chatId: widget.ChatID,
+      chatId: widget.chat.chatId,
       senderId: widget.senderId!,
       parentMessage: _replyingTo,
-      senderName: widget.userName,
+      senderName: widget.chat.userName,
       isReplying: _isReplying,
       isForward: false,
       type: "GIF",
@@ -343,10 +340,10 @@ class _ChatPageState extends State<ChatPage> {
     GlobalCubitProvider.messagesCubit.sendMessage(
       extension: "sticker",
       content: blobName,
-      chatId: widget.ChatID,
+      chatId: widget.chat.chatId,
       senderId: widget.senderId!,
       parentMessage: _replyingTo,
-      senderName: widget.userName,
+      senderName: widget.chat.userName,
       isReplying: _isReplying,
       isForward: false,
       type: "STICKER",
@@ -361,11 +358,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(
+          chat:widget.chat,
           isSelected: isSelectedList,
-          userImage: widget.userImage,
-          userName: widget.userName,
+          //userImage: widget.chat.avatarUrl,
+          //userName: widget.chat.userName,
           clearSelection: clearIsSelected,
-          chatId: widget.ChatID,
+         // chatId: widget.chat.chatId,
           chatViewModel: ChatViewModel(),
           editable: isSelectedList.length == 1 &&
               isSelectedList.first != null &&
@@ -376,7 +374,7 @@ class _ChatPageState extends State<ChatPage> {
                           .firstWhere((msg) => msg.id == message.id)
                           .type ==
                       "TEXT"),
-          chatType: widget.chatType!,
+         // chatType: widget.chat.type,
         ),
         body: BlocProvider<MessagesCubit>.value(
           value: GlobalCubitProvider.messagesCubit,
@@ -386,8 +384,8 @@ class _ChatPageState extends State<ChatPage> {
                   chatMessageManager.handleMessagesState(
                       context,
                       state,
-                      widget.ChatID,
-                      widget.userName,
+                      widget.chat.chatId,
+                      widget.chat.userName,
                       widget.senderId!,
                       handleOncancelReply,
                       handleCancelEditing,
@@ -428,7 +426,7 @@ class _ChatPageState extends State<ChatPage> {
                             children: [
                               ReplyPreview(
                                 isReplying: _isReplying,
-                                senderName: widget.userName,
+                                senderName: widget.chat.userName,
                                 content: _replyingTo?.content ?? '',
                                 onCancelReply: () {
                                   handleOncancelReply();
@@ -481,9 +479,9 @@ class _ChatPageState extends State<ChatPage> {
                                                     _toggleGifPicker,
                                                 toggleStickerPicker:
                                                     _toggleStickerPicker,
-                                                chatId: widget.ChatID,
+                                                chatId: widget.chat.chatId,
                                                 senderId: widget.senderId!,
-                                                userName: widget.userName,
+                                                userName: widget.chat.userName,
                                                 parentMessage: _replyingTo,
                                                 isReplying: _isReplying,
                                                 handleOncancelReply:

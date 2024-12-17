@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/select_image_captioning_keys.dart';
 
 class SelectedImageCaptioning extends StatefulWidget {
   final List<String> mediaPaths; // List of image paths
@@ -84,12 +84,6 @@ class SelectedImageCaptioningState extends State<SelectedImageCaptioning> {
         color: firstSecondaryColor,
         child: Stack(
           children: [
-            SvgPicture.asset(
-              'assets/images/chat-page-back-ground-image.svg',
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.fill,
-            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -192,6 +186,7 @@ class SelectedImageCaptioningState extends State<SelectedImageCaptioning> {
                             Navigator.of(context).pop();
                           },
                           icon: Icon(
+                            key: SelectImageCaptioningKeys.sendFileButton,
                             Icons.send,
                             color: primaryColor,
                           ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:whisper/models/chat.dart';
 import '../models/friend.dart';
 
 class SelectedFriendsChip extends StatelessWidget {
   final List<int> selectedIndexes; // Indexes of selected friends
-  final List<Friend> friends; // List of all friends
+  final List<Chat> friends; // List of all friends
 
   const SelectedFriendsChip({
     required this.selectedIndexes,
@@ -22,7 +23,7 @@ class SelectedFriendsChip extends StatelessWidget {
           final friend = friends[index];
           return Chip(
             label: Text(
-              friend.name,
+              friend.userName,
               style: const TextStyle(color: Colors.white),
             ),
             backgroundColor: const Color(0xff8d6aee), // Primary color

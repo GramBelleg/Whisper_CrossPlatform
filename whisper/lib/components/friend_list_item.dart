@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:whisper/models/chat.dart';
 import '../models/friend.dart';
 
 class FriendListItem extends StatelessWidget {
-  final Friend friend;
+  final Chat friend;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -17,17 +18,17 @@ class FriendListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundImage: friend.icon == null || friend.icon!.isEmpty
-            ? null 
-            : (friend.icon!.startsWith('assets/')
-                ? AssetImage(friend.icon!)
-                : NetworkImage(friend.icon!) as ImageProvider),
-        child: friend.icon == null || friend.icon!.isEmpty
-            ? Icon(Icons.person) 
-            : null, 
+        backgroundImage: friend.avatarUrl == null || friend.avatarUrl!.isEmpty
+            ? null
+            : (friend.avatarUrl!.startsWith('assets/')
+                ? AssetImage(friend.avatarUrl!)
+                : NetworkImage(friend.avatarUrl!) as ImageProvider),
+        child: friend.avatarUrl == null || friend.avatarUrl!.isEmpty
+            ? Icon(Icons.person)
+            : null,
       ),
       title: Text(
-        friend.name,
+        friend.userName,
         style: const TextStyle(color: Colors.white),
       ),
       trailing: Icon(

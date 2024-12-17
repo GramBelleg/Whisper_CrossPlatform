@@ -3,6 +3,7 @@ import 'package:whisper/constants/colors.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/keys/forward_menu_keys.dart';
+import 'package:whisper/models/chat.dart';
 import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/fetch_message_by_id.dart';
 import 'package:whisper/services/friend_service.dart';
@@ -35,7 +36,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
   final FriendService _friendService = FriendService();
   final TextEditingController _searchController = TextEditingController();
 
-  List<Friend> _friends = [];
+  List<Chat> _friends = [];
   List<int> _selectedFriendIndexes = [];
   bool _isLoading = true;
 
@@ -101,7 +102,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
   }
 
   Future<void> _forwardMessagesToFriend({
-    required Friend friend,
+    required Chat friend,
     required List<int> selectedMessageIds,
     required int senderId,
   }) async {
@@ -110,20 +111,20 @@ class _ForwardMenuState extends State<ForwardMenu> {
         final message = await fetchMessage(messageId);
         GlobalCubitProvider.messagesCubit.sendMessage(
             content: message.content,
-            chatId: friend.id,
+            chatId: friend.chatId,
             senderId: senderId,
             parentMessage: null,
-            senderName: friend.name,
+            senderName: friend.userName,
             isReplying: false,
             isForward: true,
             forwardedFromUserId: message.sender?.id,
             media: message.media,
             type: message.type,
             extension: message.extension);
-        debugPrint("Message ${widget.text}ed to: ${friend.name}");
+        debugPrint("Message ${widget.text}ed to: ${friend.userName}");
       } catch (e) {
         debugPrint(
-            'Failed to ${widget.text} message $messageId to ${friend.name}: $e');
+            'Failed to ${widget.text} message $messageId to ${friend.userName}: $e');
       }
     }
   }
@@ -137,12 +138,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
         context,
         MaterialPageRoute(
           builder: (context) => ChatPage(
-            userName: friend.name,
-            userImage: friend.icon,
-            ChatID: friend.id,
+            chat: friend,
             token: token,
             senderId: senderId,
-            chatType: friend.chatType,
           ),
         ),
       );
@@ -151,10 +149,10 @@ class _ForwardMenuState extends State<ForwardMenu> {
     }
   }
 
-  List<Friend> get _filteredFriends {
+  List<Chat> get _filteredFriends {
     final query = _searchController.text.toLowerCase();
     return _friends
-        .where((friend) => friend.name.toLowerCase().contains(query))
+        .where((friend) => friend.userName.toLowerCase().contains(query))
         .toList();
   }
 
@@ -166,9 +164,9 @@ class _ForwardMenuState extends State<ForwardMenu> {
         print("friend: $friend");
         GlobalGroupsProvider.groupsCubit.addUserToGroup(
           groupId: widget.groupId!,
-          userId: friend.id,
-          userName: friend.name,
-          profilePic: friend.icon,
+          userId: friend.othersId,
+          userName: friend.userName,
+          profilePic: friend.avatarUrl,
         );
       }
 

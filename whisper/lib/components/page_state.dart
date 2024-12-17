@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/app_navigator.dart';
 import 'package:whisper/components/tap_bar.dart';
+import 'package:whisper/global_cubits/global_chats_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/socket.dart';
 
@@ -20,6 +21,7 @@ class _MyPageState extends State<PageState> {
     print("page state");
     SocketService.instance.connectSocket();
     GlobalUserStoryCubitProvider.userStoryCubit.initUsers();
+    GlobalChatsCubitProvider.chatListCubit.initializeChats();
     print("initUsers UserStoryCubit");
   }
 

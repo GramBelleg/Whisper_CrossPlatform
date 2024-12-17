@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/settings_page_keys.dart';
 
 class ProfileSection extends StatelessWidget {
   final bool isEditing;
@@ -46,6 +47,7 @@ class ProfileSection extends StatelessWidget {
                       : null,
                 ),
                 child: InkWell(
+                  key: SettingsPageKeys.onTapProfilePic,
                   onTap: () {
                     if (isEditing) {
                       showImageSourceDialog!();

@@ -32,7 +32,7 @@ Future<String> uploadFile(String filePath) async {
       final data = jsonDecode(response.body);
       final String presignedUrl = data['presignedUrl'];
       final String blobName = data['blobName'];
-      print("Presigned URL: $presignedUrl");
+      print("Presigned URL : $presignedUrl");
 
       // Step 2: Upload the file to the presigned URL
       final file = File(filePath);

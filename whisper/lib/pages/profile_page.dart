@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/build_profile_section.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/models/user_state.dart';
 
 class ProfilePage extends StatelessWidget {
   final bool hasStory;
@@ -13,14 +12,14 @@ class ProfilePage extends StatelessWidget {
   final Function()? showProfileOrStatusOptions;
 
   const ProfilePage({
-    Key? key,
+    super.key,
     required this.hasStory,
     required this.profilePic,
     required this.name,
     this.status = '', // defult
     this.showImageSourceDialog,
     this.showProfileOrStatusOptions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

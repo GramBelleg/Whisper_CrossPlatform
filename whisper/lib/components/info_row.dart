@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/settings_page_keys.dart';
 
 class InfoRow extends StatelessWidget {
   final String value;
@@ -17,7 +18,7 @@ class InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      key: Key(label + "_row"),
+      key: SettingsPageKeys.copyRow,
       onTap: () => _copyToClipboard(value, context),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 13.0),

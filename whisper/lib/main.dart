@@ -8,6 +8,7 @@ import 'package:whisper/cubit/groups_cubit.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
+import 'package:whisper/global_cubits/global_chats_cubit.dart';
 import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/pages/confirmation_code.dart';
@@ -33,11 +34,11 @@ void main() {
     BlocProvider(
         create: (context) =>
             MessagesCubit(ChatViewModel(), ChatDeletionService())),
-    //BlocProvider(create: (context) => UserCubit()),
     BlocProvider(create: (context) => VisibilityCubit(VisibilityService())),
     BlocProvider(create: (context) => BlockedUsersCubit(BlockedUsersService())),
     BlocProvider(
         create: (context) => GlobalUserStoryCubitProvider.userStoryCubit),
+    BlocProvider(create: (context) => GlobalChatsCubitProvider.chatListCubit),
   ], child: Whisper()));
 }
 

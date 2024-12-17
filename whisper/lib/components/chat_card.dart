@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:whisper/constants/colors.dart';
+import 'package:whisper/models/chat.dart';
+import 'package:whisper/pages/chat_page.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
-import '../pages/chat_page.dart';
-
-// Define an enum for message types
 enum MessageType {
   TEXT,
   VM,
@@ -18,39 +19,12 @@ enum MessageType {
 }
 
 class ChatCard extends StatelessWidget {
-  final int chatId;
-  final String userName;
-  final String lastMessage;
-  final String time;
-  final String? avatarUrl;
-  final bool isRead;
-  final bool isSent;
-  final bool isOnline;
-  final bool isPinned; // New property for pinned status
-  final MessageType messageType;
-  final int unreadCount;
-  final bool isMuted;
-  final String type;
+  final Chat chat;
 
   const ChatCard({
     super.key,
-    required this.chatId,
-    required this.userName,
-    required this.lastMessage,
-    required this.time,
-    required this.avatarUrl,
-    this.isRead = false,
-    this.isSent = true,
-    this.isOnline = false,
-    this.isPinned = false, // Default to not pinned
-    this.messageType = MessageType.TEXT, // Updated default value
-    this.unreadCount = 0,
-    this.isMuted = false,
-    this.type = '',
+    required this.chat,
   });
-
-  // Define the custom color
-  final Color customColor = const Color(0xFF4CB9CF);
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +54,6 @@ class ChatCard extends StatelessWidget {
             children: [
               _buildTime(),
               const SizedBox(height: 8), // Add more space between time and pin
-              if (isPinned)
-                _buildPinIcon(), // Conditionally show pin icon below
             ],
           ),
           onTap: () async {
@@ -91,12 +63,9 @@ class ChatCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ChatPage(
-                  userName: userName,
-                  userImage: avatarUrl,
-                  ChatID: chatId,
+                  chat: chat,
                   token: token,
                   senderId: senderId,
-                  chatType: type,
                 ),
               ),
             );
@@ -110,10 +79,10 @@ class ChatCard extends StatelessWidget {
     return Stack(
       children: [
         CircleAvatar(
-          // backgroundImage: AssetImage(avatarUrl),
+          backgroundImage: NetworkImage(chat.avatarUrl),
           radius: 25,
         ),
-        if (isOnline) _buildOnlineIndicator(),
+        if (chat.isOnline) _buildOnlineIndicator(),
       ],
     );
   }
@@ -126,7 +95,7 @@ class ChatCard extends StatelessWidget {
         width: 12,
         height: 12,
         decoration: BoxDecoration(
-          color: customColor, // Apply custom color
+          color: highlightColor,
           shape: BoxShape.circle,
         ),
       ),
@@ -135,23 +104,22 @@ class ChatCard extends StatelessWidget {
 
   Widget _buildUserName() {
     return Row(
-      mainAxisSize: MainAxisSize.min, // Shrink the row to its minimum width
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          userName,
+          chat.userName,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold, // Similar to your image
+            fontWeight: FontWeight.bold,
           ),
-          overflow: TextOverflow.ellipsis, // Handle overflow gracefully
+          overflow: TextOverflow.ellipsis,
         ),
-        if (isMuted) // Conditionally show the mute icon
-          const SizedBox(width: 4), // Small space between the name and icon
-        if (isMuted)
+        if (chat.isMuted) const SizedBox(width: 4),
+        if (chat.isMuted)
           Icon(
             Icons.volume_off,
-            size: 16, // Adjust size to fit next to the name
-            color: customColor, // Mute icon color as requested
+            size: 16,
+            color: highlightColor,
           ),
       ],
     );
@@ -161,8 +129,10 @@ class ChatCard extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: _buildLastMessage()),
-        const SizedBox(width: 4), // Space between message and status
-        if (unreadCount > 0 && messageType != MessageType.DELETED)
+        const SizedBox(width: 4),
+        if (chat.unreadMessageCount > 0 &&
+            _getMessageType(chat.lastMessage.messageType) !=
+                MessageType.DELETED)
           _buildUnreadCount(),
       ],
     );
@@ -173,7 +143,7 @@ class ChatCard extends StatelessWidget {
       radius: 10,
       backgroundColor: Colors.red,
       child: Text(
-        '$unreadCount',
+        '${chat.unreadMessageCount}',
         style: const TextStyle(color: Colors.white, fontSize: 12),
       ),
     );
@@ -184,17 +154,15 @@ class ChatCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (isSent) // Show the status next to the time
+        if (!chat.isSent)
           FaIcon(
             FontAwesomeIcons.checkDouble,
-            size: 12, // Adjust size to fit better with time text
-            color: isRead
-                ? customColor // Apply custom color for read status
-                : Colors.grey, // Change color based on read status
+            size: 12,
+            color: chat.isRead ? highlightColor : Colors.grey,
           ),
-        const SizedBox(width: 4), // Space between icon and time
+        const SizedBox(width: 4),
         Text(
-          time,
+          formatMessageTime(chat.time),
           style: TextStyle(
             fontSize: 12,
             color: const Color.fromRGBO(141, 150, 163, 1),
@@ -204,18 +172,9 @@ class ChatCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPinIcon() {
-    return Icon(
-      Icons.push_pin,
-      size: 16, // Adjust icon size
-      color: Colors.yellow, // Color of the pin icon
-    );
-  }
-
   Widget _buildLastMessage() {
     String messageText;
-    // Generate message text based on the message type
-    switch (messageType) {
+    switch (_getMessageType(chat.lastMessage.messageType)) {
       case MessageType.IMAGE:
         messageText = "📷 Image";
         break;
@@ -242,18 +201,52 @@ class ChatCard extends StatelessWidget {
         break;
       case MessageType.TEXT:
       default:
-        messageText = lastMessage;
+        messageText = chat.lastMessage.content;
         break;
     }
 
     return Text(
-      messageText,
-      maxLines: 1, // Limit to 1 line
-      overflow: TextOverflow
-          .ellipsis, // Add ellipsis at the end if the text is too long
-      style: TextStyle(
-        color: customColor, // Apply custom color to the message types
-      ),
+      chat.type == "GROUP"
+          ? "${chat.lastMessage.senderName == chat.userName ? "Me" : chat.lastMessage.senderName == "Unknown" ? '' : chat.lastMessage.senderName}: $messageText"
+          : messageText,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(color: Color.fromRGBO(141, 150, 163, 1)),
     );
+  }
+
+  MessageType _getMessageType(String? type) {
+    switch (type?.toUpperCase()) {
+      case 'TEXT':
+        return MessageType.TEXT;
+      case 'IMAGE':
+        return MessageType.IMAGE;
+      case 'VIDEO':
+        return MessageType.VIDEO;
+      case 'AUDIO':
+        return MessageType.AUDIO;
+      case 'GIF':
+        return MessageType.GIF;
+      case 'STICKER':
+        return MessageType.STICKER;
+      case 'FILE':
+        return MessageType.FILE;
+      case 'DELETED':
+        return MessageType.DELETED;
+      case 'VM':
+        return MessageType.VM;
+      default:
+        return MessageType.TEXT;
+    }
+  }
+
+  String formatMessageTime(String? isoTime) {
+    if (isoTime == null) return '';
+    try {
+      DateTime messageTime = DateTime.parse(isoTime).toLocal();
+      return DateFormat('hh:mm a').format(messageTime);
+    } catch (e) {
+      return '';
+    }
   }
 }

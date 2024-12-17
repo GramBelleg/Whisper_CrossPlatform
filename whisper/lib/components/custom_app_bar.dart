@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
+import 'package:whisper/models/chat.dart';
 import 'package:whisper/pages/forward_menu.dart';
 import 'package:whisper/pages/group_info.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
@@ -9,23 +10,25 @@ import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
-  final String? userImage;
-  final String userName;
-  final int chatId;
+  //final String? userImage;
+  //final String userName;
+  //final int chatId;
+  Chat chat;
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
   final bool editable;
-  final String chatType;
-  const CustomAppBar({
+  // final String chatType;
+  CustomAppBar({
     super.key,
     required this.isSelected,
-    required this.userImage,
-    required this.userName,
+    // required this.userImage,
+    // required this.userName,
     required this.clearSelection,
     required this.chatViewModel, // Initialize ChatViewModel
-    required this.chatId,
+    // required this.chatId,
     required this.editable,
-    required this.chatType,
+    required this.chat,
+    // required this.chatType,
   });
 
   @override
@@ -84,7 +87,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
       try {
         // Call the deleteMessage method from the MessagesCubit
 
-        await viewModel.deleteMessagesForMe(widget.chatId, widget.isSelected);
+        await viewModel.deleteMessagesForMe(
+            widget.chat.chatId, widget.isSelected);
 
         // Clear the selection after deletion
         if (widget.clearSelection != null) {
@@ -109,7 +113,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     if (widget.isSelected.isNotEmpty) {
       try {
         await viewModel.deleteMessagesForEveryone(
-            widget.chatId, widget.isSelected);
+            widget.chat.chatId, widget.isSelected);
         if (widget.clearSelection != null) {
           widget.clearSelection!();
         }
@@ -238,10 +242,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.blueGrey,
-                  backgroundImage: widget.userImage != null
-                      ? NetworkImage(widget.userImage!)
+                  backgroundImage: widget.chat.avatarUrl != null
+                      ? NetworkImage(widget.chat.avatarUrl!)
                       : null,
-                  child: widget.userImage == null
+                  child: widget.chat.avatarUrl == null
                       ? const Icon(Icons.person)
                       : null,
                 ),
@@ -249,14 +253,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             title: InkWell(
               onTap: () {
-                if (widget.chatType == 'GROUP') {
+                if (widget.chat.type == 'GROUP') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => GroupInfo(
-                        groupName: widget.userName,
-                        profilePicture: widget.userImage,
-                        groupId: widget.chatId,
+                        groupName: widget.chat.userName,
+                        profilePicture: widget.chat.avatarUrl,
+                        groupId: widget.chat.chatId,
                       ), // Replace with your actual GroupInfo widget
                     ),
                   );
@@ -267,10 +271,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.userName,
+                    Text(widget.chat.userName,
                         style:
                             const TextStyle(fontSize: 19, color: Colors.white)),
-                    const Text("last seen today at 12:05",
+                    Text("last seen today at ${widget.chat.lastSeen}",
                         style: TextStyle(fontSize: 13, color: Colors.white)),
                   ],
                 ),

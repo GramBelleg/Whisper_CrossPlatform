@@ -33,7 +33,7 @@ Future<UserState?> fetchUserInfo() async {
       }
       String? mediaUrl = data['profilePic'] != null
           ? await generatePresignedUrl(data['profilePic'])
-          : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(data['userName'])}';
+          : 'https://ui-avatars.com/api/?background=0a122f&size=1500&color=fff&name=${formatName(data['userName'])}';
       // Create and return a UserState object with all fields, handling null values
       return UserState(
         name: data['name'] ?? 'Unknown',

@@ -112,7 +112,7 @@ class ChatMessage {
     return 'ChatMessage('
         'id: $id, '
         'chatId: $chatId, '
-        'sender: $sender, '
+        'sender: ${sender?.toString()}, '
         'mentions: $mentions, '
         'content: $content, '
         'media: $media, '
