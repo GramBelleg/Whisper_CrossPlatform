@@ -87,11 +87,10 @@ class EditFields extends StatelessWidget {
     String labelText, {
     String? stateText,
     bool needCode = false,
-    TextInputType keyboardType =
-        TextInputType.text, // Added keyboardType parameter
-    int? maxLength, // Added maxLength parameter
-    String? Function(String?)? validator, // Validation function parameter
-    Future<void> Function(String)? setUpdate, // Validation function parameter
+    TextInputType keyboardType = TextInputType.text,
+    int? maxLength,
+    String? Function(String?)? validator,
+    Future<void> Function(String)? setUpdate,
   }) {
     controller.addListener(() {
       GlobalSettingsCubitProvider.settingsCubit
@@ -113,11 +112,18 @@ class EditFields extends StatelessWidget {
             if (stateText != null && stateText.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 8),
-                child: Text(
-                  stateText,
-                  style: TextStyle(
-                    color: stateText == "Updated" ? highlightColor : Colors.red,
-                    fontSize: 14,
+                child: Flexible(
+                  child: Text(
+                    stateText.length > 30
+                        ? '${stateText.substring(0, 30)}...' // Truncate large text
+                        : stateText,
+                    style: TextStyle(
+                      color:
+                          stateText == "Updated" ? highlightColor : Colors.red,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis, // Ensure no overflow
+                    maxLines: 1, // Prevent the text from wrapping
                   ),
                 ),
               ),

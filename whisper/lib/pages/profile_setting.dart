@@ -544,8 +544,10 @@ class _SettingsContentState extends State<SettingsContent> {
   }
 
 // Function to show dialog for image source
-  void _showImageSourceDialog() {
-    showDialog(
+  Future<bool> _showImageSourceDialog() async {
+    bool isSuccess = false;
+
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -569,8 +571,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _pickImageFromCamera();
+                  _pickImageFromCamera().then((success) => isSuccess = success);
                 },
               ),
               ListTile(
@@ -583,8 +584,8 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _pickImageFromGallery();
+                  _pickImageFromGallery()
+                      .then((success) => isSuccess = success);
                 },
               ),
               ListTile(
@@ -592,14 +593,12 @@ class _SettingsContentState extends State<SettingsContent> {
                 title: Center(
                   child: Text(
                     'Remove Photo',
-                    style: TextStyle(
-                        color: secondNeutralColor), // Set text color to white
+                    style: TextStyle(color: secondNeutralColor),
                   ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _removeImage();
+                  _removeImage().then((success) => isSuccess = success);
                 },
               ),
             ],
@@ -607,42 +606,57 @@ class _SettingsContentState extends State<SettingsContent> {
         );
       },
     );
+
+    return isSuccess;
   }
 
-  Future<void> _pickImageFromGallery() async {
+  Future<bool> _pickImageFromGallery() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       String blobName = await uploadFile(pickedFile.path);
+      // Uncomment to use your SettingsCubit
       // await context.read<SettingsCubit>().updateProfilePic(blobName);
       context.read<SettingsCubit>().sendProfilePhoto(blobName);
+      return true;
     } else {
       print('No image selected.');
+      return false;
     }
   }
 
-  // Function to take a photo using the camera
-  Future<void> _pickImageFromCamera() async {
+// Function to take a photo using the camera
+  Future<bool> _pickImageFromCamera() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       String blobName = await uploadFile(pickedFile.path);
-      //  await context.read<SettingsCubit>().updateProfilePic(blobName);
+      // Uncomment to use your SettingsCubit
+      // await context.read<SettingsCubit>().updateProfilePic(blobName);
       if (blobName != "Failed") {
         context.read<SettingsCubit>().sendProfilePhoto(blobName);
+        return true;
       } else {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error upload story')));
+            .showSnackBar(SnackBar(content: Text('Error uploading photo')));
+        return false;
       }
     } else {
       print('No image selected.');
+      return false;
     }
   }
 
-  // Function to remove a photo
-  Future<void> _removeImage() async {
-    context.read<SettingsCubit>().removeProfilePic();
+// Function to remove a photo
+  Future<bool> _removeImage() async {
+    try {
+      context.read<SettingsCubit>().removeProfilePic();
+      return true;
+    } catch (e) {
+      print('Error removing image: $e');
+      return false;
+    }
   }
 }
