@@ -143,7 +143,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey(FileButtonSheetKeys.galleryIcon)), findsOneWidget);
     });
-    testWidgets('Send Audio',(WidgetTester tester) async {
+    testWidgets('Send Audio file',(WidgetTester tester) async {
       await openChat(tester, chats_page, friendUsername);
       final file_picker = find.byKey(const ValueKey(CustomChatTextFieldKeys.filePickerButton));
       await tester.tap(file_picker);
@@ -159,6 +159,7 @@ void main() {
       final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
       await tester.tap(chat_send_button);
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 1));
       final message = find.textContaining(message_to_be_sent);
       await tester.longPress(message);
       await tester.pumpAndSettle();
@@ -179,6 +180,7 @@ void main() {
       final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
       await tester.tap(chat_send_button);
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 1));
       final message = find.textContaining(message_to_be_sent);
       await tester.longPress(message);
       await tester.pumpAndSettle();
@@ -199,6 +201,7 @@ void main() {
       final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
       await tester.tap(chat_send_button);
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 1));
       final message = find.textContaining(message_to_be_sent);
       await tester.longPress(message);
       await tester.pumpAndSettle();
@@ -283,6 +286,54 @@ void main() {
       await tester.tap(pin_icon);
       await tester.pumpAndSettle();
       expect(find.textContaining(message_to_be_sent), findsOneWidget);
+    });
+    testWidgets('Reply on a Message', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
+      String message_to_be_sent = generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent);
+      await tester.pumpAndSettle();
+      final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      final message = find.textContaining(message_to_be_sent);
+      await tester.drag(message, const Offset(300.0, 0.0));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(message_to_be_sent), findsNWidgets(2));
+      //reply to the message
+      String reply_message = generateRandomString(10);
+      await tester.enterText(chat_textbox, reply_message);
+      await tester.pumpAndSettle();
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      expect(find.textContaining(message_to_be_sent), findsNWidgets(2));
+      expect(find.textContaining(reply_message), findsOneWidget);
+    });
+    testWidgets('Select Multiple Messages', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
+      String message_to_be_sent=generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent);
+      await tester.pumpAndSettle();
+      final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      String message_to_be_sent_2=generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent_2);
+      await tester.pumpAndSettle();
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      final message = find.textContaining(message_to_be_sent);
+      await tester.longPress(message);
+      await tester.pumpAndSettle();
+      final message_2 = find.textContaining(message_to_be_sent_2);
+      await tester.tap(message_2);
+      await tester.pumpAndSettle();
+      //untag
+      await tester.tap(message_2);
+      await tester.pumpAndSettle();
+      //expect to find the delete icon as one is selected
+      expect(find.byKey(const ValueKey(CustomAppBarKeys.deleteIcon)), findsOneWidget);
     });
     // testWidgets('Forward Message', (WidgetTester tester) async {
     //   await openChat(tester, chats_page, friendUsername);
