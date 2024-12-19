@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/settings_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
+import 'package:whisper/pages/call_page.dart';
 import 'package:whisper/pages/confirmation_code.dart';
 import 'package:whisper/pages/forget_password_email.dart';
 import 'package:whisper/pages/login_with_git_hub.dart';
@@ -24,14 +26,18 @@ import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/chat_deletion_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/services/visibility_service.dart';
-
+import 'dart:io';
 import 'firebase_options.dart';
-
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await CallsService.initializeAwesomeNotifications();
-  FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
+  if(kIsWeb){}
+  else if(Platform.isAndroid) {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    await CallsService.initializeAwesomeNotifications();
+    FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
+  }
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsCubit()),
 
@@ -62,12 +68,13 @@ class _WhisperState extends State<Whisper> {
   @pragma("vm:entry-point")
   void initState() {
     super.initState();
-    CallsService.setListeners();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       initialRoute: Login.id,
       theme: ThemeData(fontFamily: 'ABeeZee'),
@@ -92,7 +99,7 @@ class _WhisperState extends State<Whisper> {
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
         Login.id: (context) => Login(),
-
+        Call.id:(context)=>Call(),
         ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
         // ChatPage.id: (context) => ChatPage(),
       },

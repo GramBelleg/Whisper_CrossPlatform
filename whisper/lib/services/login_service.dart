@@ -50,9 +50,16 @@ class LoginService {
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print("Before");
-        String? firebaseToken = await FirebaseMessaging.instance.getToken();
-        print("FIRE BASE TOKEN : $firebaseToken");
-        await registerFCMToken(firebaseToken,data['userToken'], context);
+        try
+        {
+          String? firebaseToken = await FirebaseMessaging.instance.getToken();
+          print("FIRE BASE TOKEN : $firebaseToken");
+          await registerFCMToken(firebaseToken,data['userToken'], context);
+        } catch(e){
+          print("ERROR FIRE BASE");
+          print(e);
+        }
+
         await saveToken(data['userToken']);
         await saveId(data['user']['id']);
         print('Response: $data');

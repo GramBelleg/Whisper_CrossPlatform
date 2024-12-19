@@ -7,6 +7,8 @@ import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 
+import '../pages/call_page.dart';
+
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
   final String userImage;
@@ -15,6 +17,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? clearSelection;
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
   final bool isMine;
+
   const CustomAppBar({
     super.key,
     required this.isSelected,
@@ -35,6 +38,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _CustomAppBarState extends State<CustomAppBar> {
   late CustomAppBarViewModel viewModel;
+
   @override
   void initState() {
     super.initState();
@@ -260,9 +264,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
               ),
               IconButton(
-                onPressed: () async{
-                  print("HE7777");
-                  await CallsService.makeACall(context, widget.chatId);
+                onPressed: () async {
+                  String callToken =
+                      await CallsService.makeACall(context, widget.chatId);
+                  print(callToken);
+                  Navigator.pushNamed(
+                    context,
+                    Call.id,
+                    arguments: {
+                      'token': callToken,
+                      'chatId': "chat-${widget.chatId}",
+                    },
+                  );
                 },
                 icon: const FaIcon(FontAwesomeIcons.phone),
               ),

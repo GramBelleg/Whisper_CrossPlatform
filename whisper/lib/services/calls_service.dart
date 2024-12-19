@@ -4,10 +4,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/pages/call_page.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/show_loading_dialog.dart';
 import 'package:whisper/socket.dart';
+
+import '../main.dart';
 
 class CallsService {
   static Future<void> backGroundHandler(RemoteMessage message) async {
@@ -17,8 +20,8 @@ class CallsService {
           id: 123,
           channelKey: "call_channel",
           color: Colors.white,
-          title: message.notification?.title??"Empty",
-          body: message.notification?.body??"Empty",
+          title: message.notification?.title ?? "Empty",
+          body: message.notification?.body ?? "Empty",
           category: NotificationCategory.Call,
           wakeUpScreen: true,
           fullScreenIntent: true,
@@ -39,9 +42,21 @@ class CallsService {
         ),
       ],
     );
+    if (message.data['action'] == 'accept') {
+      navigatorKey.currentState!.push(
+        MaterialPageRoute(
+            builder: (context) => Call(),
+            settings: RouteSettings(arguments: {
+              'token': message.data['action'].payload!['token'],
+              'chatId': message.data['action'].payload!['channelName'],
+            },)
+        ),
+      );
+    }
   }
-  static Future<void> initializeAwesomeNotifications() async{
-      await AwesomeNotifications().initialize(
+
+  static Future<void> initializeAwesomeNotifications() async {
+    await AwesomeNotifications().initialize(
       null,
       [
         NotificationChannel(
@@ -57,34 +72,54 @@ class CallsService {
       ],
     );
   }
+
   @pragma("vm:entry-point")
   static Future<void> onActionNotificationMethod(ReceivedAction action) async {
+    print("payload : ${action.payload}");
     if (action.buttonKeyPressed == 'Reject') {
       print("Call Rejected");
       await AwesomeNotifications().cancel(123);
     } else if (action.buttonKeyPressed == 'Accept') {
       print("Call Accepted");
+      print(action.payload!['token']);
+      print(action.payload!['channelName']!);
+      navigatorKey.currentState!.push(
+        MaterialPageRoute(
+          builder: (context) => Call(),
+          settings: RouteSettings(arguments: {
+            'token': action.payload!['token'],
+            'chatId': action.payload!['channelName'],
+          },)
+        ),
+      );
+
     }
   }
+
   static Future<void> setListeners() async {
     FirebaseMessaging.onMessage.listen(
-          (RemoteMessage message) {
+      (RemoteMessage message) {
         print("AYHAGA");
-        print(message.data['token']);
-        String? title ="${message.notification!.title}+AYHAGA" ;
+        print(message.data);
+        String? title = "${message.notification!.title}+AYHAGA";
         String? body = message.notification!.body;
         AwesomeNotifications().createNotification(
           content: NotificationContent(
-              id: 123,
-              channelKey: "call_channel",
-              color: Colors.white,
-              title: title,
-              body: body,
-              category: NotificationCategory.Call,
-              wakeUpScreen: true,
-              fullScreenIntent: true,
-              autoDismissible: false,
-              backgroundColor: Colors.orange),
+            id: 123,
+            channelKey: "call_channel",
+            color: Colors.white,
+            title: title,
+            body: body,
+            category: NotificationCategory.Call,
+            wakeUpScreen: true,
+            fullScreenIntent: true,
+            autoDismissible: false,
+            backgroundColor: Colors.orange,
+            payload: {
+              "token": message.data['token'] ?? "unknown",
+              "channelName": message.data['channelName'] ?? "default",
+            },
+          ),
           actionButtons: [
             NotificationActionButton(
               key: "Accept",
@@ -106,12 +141,13 @@ class CallsService {
       },
     );
   }
-  static Future<void> makeACall(BuildContext context,int id) async {
+
+  static Future<String> makeACall(BuildContext context, int id) async {
     final url = Uri.parse('http://$ip:5000/api/call/$id');
     final token = await getToken();
     print("BEFORE");
     showLoadingDialog(context);
-    try{
+    try {
       final response = await http.get(
         url,
         headers: {
@@ -123,10 +159,13 @@ class CallsService {
       print("INSIDE FCM TOKEN");
       print(data);
       Navigator.pop(context);
-    }
-
-    catch (e){
+      if (data['status'] == 'success')
+        return data['token'];
+      else
+        return 'error';
+    } catch (e) {
       print(e);
+      return 'error';
     }
   }
 }

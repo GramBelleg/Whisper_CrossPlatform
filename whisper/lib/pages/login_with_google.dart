@@ -80,8 +80,14 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                   if (data['status'] == 'success') {
                     await saveToken(data['userToken']);
                     await saveId(data['user']['id']);
-                    String? firebaseToken = await FirebaseMessaging.instance.getToken();
-                    await LoginService.registerFCMToken(firebaseToken, data['userToken'], context);
+                    try {
+                      String? firebaseToken =
+                          await FirebaseMessaging.instance.getToken();
+                      await LoginService.registerFCMToken(
+                          firebaseToken, data['userToken'], context);
+                    } catch (e) {
+                      print(e);
+                    }
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       PageState.id,
