@@ -3,6 +3,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 class Call extends StatefulWidget {
@@ -18,6 +19,7 @@ class _CallState extends State<Call> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isMuted = false;
+  bool someoneElseJoined=false;
   late RtcEngine _engine;
 
   @override
@@ -70,6 +72,7 @@ class _CallState extends State<Call> {
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           debugPrint("remote user $remoteUid joined");
           setState(() {
+             someoneElseJoined=true;
             _remoteUid = remoteUid;
           });
         },
@@ -170,6 +173,15 @@ class _CallState extends State<Call> {
   }
   Future<void> _endCall() async {
     await _dispose();
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    RegExp regex = RegExp(r'-(\d+)');
+    Match? match = regex.firstMatch(args['chatId']);
+    int chatId = int.parse(match!.group(1)!);
+    if(someoneElseJoined) {
+      await CallsService.leaveCall(chatId, "JOINED", context);
+    } else {
+      await CallsService.leaveCall(chatId, "CANCELED", context);
+    }
     setState(() {
       _localUserJoined = false;
       _remoteUid = null;

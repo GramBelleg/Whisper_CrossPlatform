@@ -83,6 +83,11 @@ class CallsService {
       print("Call Accepted");
       print(action.payload!['token']);
       print(action.payload!['channelName']!);
+      RegExp regex = RegExp(r'-(\d+)');
+      Match? match = regex.firstMatch(action.payload!['channelName']!);
+      int chatId = int.parse(match!.group(1)!);
+      print("CHAT IDDDD : ${chatId}");
+      await CallsService.joinCall(chatId);
       navigatorKey.currentState!.push(
         MaterialPageRoute(
           builder: (context) => Call(),
@@ -96,6 +101,48 @@ class CallsService {
     }
   }
 
+  static Future<void> leaveCall(int? chatId,String? endStatus, BuildContext context) async {
+    final url = Uri.parse('http://$ip:5000/api/call/leave/$chatId');
+    final token = await getToken();
+    print("BEFORE");
+    try{
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'endStatus':endStatus
+        })
+      );
+      var data = jsonDecode(response.body);
+      print(data);
+    }
+    catch (e){
+      print(e);
+    }
+  }
+  static Future<void> joinCall(int? chatId) async {
+    final url = Uri.parse('http://$ip:5000/api/call/join/$chatId');
+    final token = await getToken();
+    print("BEFORE");
+
+    try{
+      final response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+      );
+      var data = jsonDecode(response.body);
+      print(data);
+    }
+    catch (e){
+      print(e);
+    }
+  }
   static Future<void> setListeners() async {
     FirebaseMessaging.onMessage.listen(
       (RemoteMessage message) {
@@ -103,6 +150,7 @@ class CallsService {
         print(message.data);
         String? title = "${message.notification!.title}+AYHAGA";
         String? body = message.notification!.body;
+        String? chatId=message.data['channelName'];
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: 123,

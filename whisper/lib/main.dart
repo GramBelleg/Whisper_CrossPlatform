@@ -36,7 +36,9 @@ void main() async{
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
     await CallsService.initializeAwesomeNotifications();
+    await CallsService.setListeners();
     FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
+    print("ANDROID");
   }
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsCubit()),
