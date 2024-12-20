@@ -151,38 +151,40 @@ class CallsService {
         String? title = "${message.notification!.title}";
         String? body = message.notification!.body;
         String? chatId=message.data['channelName'];
-        AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: 123,
-            channelKey: "call_channel",
-            color: Colors.white,
-            title: title,
-            body: body,
-            category: NotificationCategory.Call,
-            wakeUpScreen: true,
-            fullScreenIntent: true,
-            autoDismissible: false,
-            backgroundColor: Colors.orange,
-            payload: {
-              "token": message.data['token'] ?? "unknown",
-              "channelName": message.data['channelName'] ?? "default",
-            },
-          ),
-          actionButtons: [
-            NotificationActionButton(
-              key: "Accept",
-              label: "Accept Call",
-              color: Colors.green,
-              autoDismissible: true,
+        if(message.data!['type']=="voice_call") {
+          AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: 123,
+              channelKey: "call_channel",
+              color: Colors.white,
+              title: title,
+              body: body,
+              category: NotificationCategory.Call,
+              wakeUpScreen: true,
+              fullScreenIntent: true,
+              autoDismissible: false,
+              backgroundColor: Colors.orange,
+              payload: {
+                "token": message.data['token'] ?? "unknown",
+                "channelName": message.data['channelName'] ?? "default",
+              },
             ),
-            NotificationActionButton(
-              key: "Reject",
-              label: "Reject Call",
-              color: Colors.red,
-              autoDismissible: true,
-            ),
-          ],
-        );
+            actionButtons: [
+              NotificationActionButton(
+                key: "Accept",
+                label: "Accept Call",
+                color: Colors.green,
+                autoDismissible: true,
+              ),
+              NotificationActionButton(
+                key: "Reject",
+                label: "Reject Call",
+                color: Colors.red,
+                autoDismissible: true,
+              ),
+            ],
+          );
+        }
         AwesomeNotifications().setListeners(
           onActionReceivedMethod: onActionNotificationMethod,
         );
