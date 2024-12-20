@@ -18,6 +18,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
   final bool editable;
   // final String chatType;
+  // final bool isAdmin;
+  final bool deleteDisable;
   CustomAppBar({
     super.key,
     required this.isSelected,
@@ -29,6 +31,9 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.editable,
     required this.chat,
     // required this.chatType,
+    // required this.chatType,
+    // required this.isAdmin,
+    required this.deleteDisable,
   });
 
   @override
@@ -162,15 +167,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             actions: [
               if (widget.isSelected.length == 1) ...[],
-              IconButton(
-                key: Key(CustomAppBarKeys.deleteIcon),
-                onPressed: () {
-                  _showDeleteDialog(context);
-                },
-                icon: const Icon(
-                  Icons.delete,
-                ), // Garbage icon
-              ),
+              !widget.deleteDisable
+                  ? IconButton(
+                      key: Key(CustomAppBarKeys.deleteIcon),
+                      onPressed: () {
+                        _showDeleteDialog(context);
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                      ), // Garbage icon
+                    )
+                  : Container(),
               IconButton(
                 key: Key(CustomAppBarKeys.forwardIcon),
                 onPressed: () {
@@ -189,7 +196,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   Icons.forward,
                 ), // Forward icon
               ),
-              if (widget.isSelected.length == 1) ...[
+              if (widget.isSelected.length == 1 &&
+                  !(!widget.editable && widget.deleteDisable)) ...[
                 PopupMenuButton<String>(
                   key: Key(CustomAppBarKeys.popupMenu),
                   onSelected: (value) {
@@ -253,11 +261,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             title: InkWell(
               onTap: () {
-                if (widget.chat.type == 'GROUP') {
+                // print("aaaaaaaa ${widget.chat.t},,${widget.isAdmin}");
+                if (widget.chat.type == 'GROUP' ||
+                    widget.chat.type == 'CHANNEL') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => GroupInfo(
+                        isChannel: widget.chat.type == 'CHANNEL',
+                        isChannelAdmin: widget.chat.isAdmin &&
+                            widget.chat.type == 'CHANNEL',
                         groupName: widget.chat.userName,
                         profilePicture: widget.chat.avatarUrl,
                         groupId: widget.chat.chatId,

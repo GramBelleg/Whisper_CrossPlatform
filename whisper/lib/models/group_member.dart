@@ -2,7 +2,7 @@ class GroupMember {
   final int id;
   final String userName;
   final String? profilePic;
-  final bool isAdmin;
+  bool isAdmin;
   final bool hasStory;
   final DateTime lastSeen;
 

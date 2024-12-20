@@ -77,22 +77,19 @@ class GroupMemberCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          userName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+        Flexible(
+          child: Text(
+            userName,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
-          overflow: TextOverflow.ellipsis,
         ),
         if (isAdmin) // Display admin badge
           const SizedBox(width: 4),
-        if (isAdmin)
-          Icon(
-            Icons.star,
-            size: 16,
-            color: Colors.yellow,
-          ),
       ],
     );
   }

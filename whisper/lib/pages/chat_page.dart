@@ -365,6 +365,8 @@ class _ChatPageState extends State<ChatPage> {
           clearSelection: clearIsSelected,
          // chatId: widget.chat.chatId,
           chatViewModel: ChatViewModel(),
+          deleteDisable:
+              widget.chat.type == "CHANNEL" && widget.chat.isAdmin == false,
           editable: isSelectedList.length == 1 &&
               isSelectedList.first != null &&
               chatMessageManager.messages.any((message) =>
@@ -417,6 +419,7 @@ class _ChatPageState extends State<ChatPage> {
                                 senderId: widget.senderId!,
                                 playerController: globalPlayerController,
                                 onPlay: onPlay,
+                                isChannel: widget.chat.type == "CHANNEL",
                               )),
                         ),
                         Align(
@@ -432,131 +435,148 @@ class _ChatPageState extends State<ChatPage> {
                                   handleOncancelReply();
                                 },
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 55,
-                                    child: Card(
-                                        margin: const EdgeInsets.only(
-                                            left: 5, right: 5, bottom: 8),
-                                        child: _isRecording
-                                            ? AudioWaveforms(
-                                                recorderController:
-                                                    recorderController,
-                                                size: Size(
-                                                    MediaQuery.of(context)
-                                                        .size
-                                                        .width,
-                                                    50.0),
-                                                decoration: BoxDecoration(
-                                                  color: firstNeutralColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                waveStyle: WaveStyle(
-                                                  waveColor: primaryColor,
-                                                  extendWaveform: true,
-                                                  showMiddleLine: false,
-                                                ),
-                                              )
-                                            : CustomChatTextField(
-                                                key:
-                                                    Key(ChatPageKeys.textField),
-                                                scrollController:
-                                                    _scrollController,
-                                                focusNode: focusNode,
-                                                controller: _controller,
-                                                onChanged:
-                                                    _updateTextProperties,
-                                                textAlign: _textAlign,
-                                                textDirection: _textDirection,
-                                                toggleEmojiPicker:
-                                                    _toggleEmojiPicker,
-                                                toggleGifPicker:
-                                                    _toggleGifPicker,
-                                                toggleStickerPicker:
-                                                    _toggleStickerPicker,
-                                                chatId: widget.chat.chatId,
-                                                senderId: widget.senderId!,
-                                                userName: widget.chat.userName,
-                                                parentMessage: _replyingTo,
-                                                isReplying: _isReplying,
-                                                handleOncancelReply:
-                                                    handleOncancelReply,
-                                                isEditing: _isEditing,
-                                                editingMessage: _editingMessage,
-                                                handleCancelEditing:
-                                                    handleCancelEditing,
-                                              )),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 5),
-                                    child: CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor: firstNeutralColor,
-                                      child: _isRecording && !_isTyping
-                                          ? IconButton(
-                                              key: Key(ChatPageKeys
-                                                  .stopRecordButton),
-                                              onPressed: () {
-                                                setState(() {
-                                                  stopRecording();
-                                                  _isRecording = false;
-                                                });
-                                              },
-                                              icon: FaIcon(
-                                                FontAwesomeIcons.stop,
-                                                color: primaryColor,
-                                              ),
-                                            )
-                                          : _isEditing
-                                              ? IconButton(
-                                                  key: Key(ChatPageKeys
-                                                      .editMessageButton),
-                                                  onPressed: () {
-                                                    handleEditMessage();
-                                                  },
-                                                  icon: FaIcon(
-                                                    FontAwesomeIcons.check,
-                                                    color: primaryColor,
-                                                  ),
-                                                )
-                                              : _isTyping
-                                                  ? IconButton(
-                                                      key: Key(ChatPageKeys
-                                                          .sendButton),
-                                                      onPressed: () {
-                                                        handleSendMessage();
-                                                      },
-                                                      icon: FaIcon(
-                                                        FontAwesomeIcons
-                                                            .paperPlane,
-                                                        color: primaryColor,
+                              (!widget.chat.isAdmin && widget.chat.type == "CHANNEL")
+                                  ? Container()
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              55,
+                                          child: Card(
+                                              margin: const EdgeInsets.only(
+                                                  left: 5, right: 5, bottom: 8),
+                                              child: _isRecording
+                                                  ? AudioWaveforms(
+                                                      recorderController:
+                                                          recorderController,
+                                                      size: Size(
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                          50.0),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            firstNeutralColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      waveStyle: WaveStyle(
+                                                        waveColor: primaryColor,
+                                                        extendWaveform: true,
+                                                        showMiddleLine: false,
                                                       ),
                                                     )
-                                                  : IconButton(
+                                                  : CustomChatTextField(
                                                       key: Key(ChatPageKeys
-                                                          .recordButton),
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          startRecording();
-                                                          _isRecording = true;
-                                                          _isTyping = false;
-                                                        });
-                                                      },
-                                                      icon: FaIcon(
-                                                        FontAwesomeIcons
-                                                            .microphone,
-                                                        color: primaryColor,
-                                                      ),
+                                                          .textField),
+                                                      scrollController:
+                                                          _scrollController,
+                                                      focusNode: focusNode,
+                                                      controller: _controller,
+                                                      onChanged:
+                                                          _updateTextProperties,
+                                                      textAlign: _textAlign,
+                                                      textDirection:
+                                                          _textDirection,
+                                                      toggleEmojiPicker:
+                                                          _toggleEmojiPicker,
+                                                      toggleGifPicker:
+                                                          _toggleGifPicker,
+                                                      toggleStickerPicker:
+                                                          _toggleStickerPicker,
+                                                      chatId: widget.chat.chatId,
+                                                      senderId:
+                                                          widget.senderId!,
+                                                      userName: widget.chat.userName,
+                                                      parentMessage:
+                                                          _replyingTo,
+                                                      isReplying: _isReplying,
+                                                      handleOncancelReply:
+                                                          handleOncancelReply,
+                                                      isEditing: _isEditing,
+                                                      editingMessage:
+                                                          _editingMessage,
+                                                      handleCancelEditing:
+                                                          handleCancelEditing,
+                                                    )),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(bottom: 5),
+                                          child: CircleAvatar(
+                                            radius: 24,
+                                            backgroundColor: firstNeutralColor,
+                                            child: _isRecording && !_isTyping
+                                                ? IconButton(
+                                                    key: Key(ChatPageKeys
+                                                        .stopRecordButton),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        stopRecording();
+                                                        _isRecording = false;
+                                                      });
+                                                    },
+                                                    icon: FaIcon(
+                                                      FontAwesomeIcons.stop,
+                                                      color: primaryColor,
                                                     ),
+                                                  )
+                                                : _isEditing
+                                                    ? IconButton(
+                                                        key: Key(ChatPageKeys
+                                                            .editMessageButton),
+                                                        onPressed: () {
+                                                          handleEditMessage();
+                                                        },
+                                                        icon: FaIcon(
+                                                          FontAwesomeIcons
+                                                              .check,
+                                                          color: primaryColor,
+                                                        ),
+                                                      )
+                                                    : _isTyping
+                                                        ? IconButton(
+                                                            key: Key(ChatPageKeys
+                                                                .sendButton),
+                                                            onPressed: () {
+                                                              handleSendMessage();
+                                                            },
+                                                            icon: FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .paperPlane,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          )
+                                                        : IconButton(
+                                                            key: Key(ChatPageKeys
+                                                                .recordButton),
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                startRecording();
+                                                                _isRecording =
+                                                                    true;
+                                                                _isTyping =
+                                                                    false;
+                                                              });
+                                                            },
+                                                            icon: FaIcon(
+                                                              FontAwesomeIcons
+                                                                  .microphone,
+                                                              color:
+                                                                  primaryColor,
+                                                            ),
+                                                          ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
                               showEmojiPicker
                                   ? EmojiSelect(
                                       key: Key(ChatPageKeys.emojiPicker),

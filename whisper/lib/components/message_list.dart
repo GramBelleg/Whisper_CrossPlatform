@@ -59,7 +59,7 @@ class MessageList extends StatefulWidget {
   final int senderId;
   final PlayerController playerController;
   final Function(String) onPlay;
-
+  final bool isChannel ;
   const MessageList({
     required this.messages,
     required this.onLongPress,
@@ -69,6 +69,7 @@ class MessageList extends StatefulWidget {
     required this.onRightSwipe,
     required this.playerController,
     required this.onPlay,
+    required this.isChannel,
   });
 
   @override
@@ -137,7 +138,7 @@ class _MessageListState extends State<MessageList> {
               }
               widget.onTap(messageData);
             },
-            child: messageData.sender!.id == widget.senderId
+            child: messageData.sender!.id == widget.senderId&& !widget.isChannel
                 ? _buildSenderMessage(messageData)
                 : _buildReceiverMessage(messageData),
           ),
