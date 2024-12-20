@@ -86,6 +86,10 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   audio_waveforms: ^1.1.0
   font_awesome_flutter: ^10.7.0
+  firebase_messaging: ^15.1.6
+  firebase_core: ^3.8.1
+  awesome_notifications: ^0.10.0
+  agora_rtc_engine: ^6.5.0
 
 
 dev_dependencies:

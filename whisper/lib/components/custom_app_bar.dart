@@ -4,10 +4,11 @@ import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/models/chat.dart';
 import 'package:whisper/pages/forward_menu.dart';
+import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/pages/group_info.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
-
+import '../pages/call_page.dart';
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
   //final String? userImage;
@@ -299,7 +300,19 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () async {
+                  String callToken =
+                      await CallsService.makeACall(context, widget.chatId);
+                  print(callToken);
+                  Navigator.pushNamed(
+                    context,
+                    Call.id,
+                    arguments: {
+                      'token': callToken,
+                      'chatId': "chat-${widget.chatId}",
+                    },
+                  );
+                },
                 icon: const FaIcon(FontAwesomeIcons.phone),
               ),
             ],

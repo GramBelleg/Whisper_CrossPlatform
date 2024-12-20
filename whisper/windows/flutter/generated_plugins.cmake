@@ -3,12 +3,16 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  agora_rtc_engine
   app_links
+  awesome_notifications
   connectivity_plus
   emoji_picker_flutter
   file_selector_windows
+  firebase_core
   flutter_inappwebview_windows
   flutter_secure_storage_windows
+  iris_method_channel
   permission_handler_windows
   url_launcher_windows
 )

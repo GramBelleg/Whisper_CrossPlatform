@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "746981175271",
+    "project_id": "pushcalls",
+    "storage_bucket": "pushcalls.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746981175271:android:2b4426d9685e7372301742",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSHCAAqsC-NEKs9cwDfCqgxcPCc1-Lp-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746981175271:android:c73bde9d5e491452301742",
+        "android_client_info": {
+          "package_name": "com.example.whisper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSHCAAqsC-NEKs9cwDfCqgxcPCc1-Lp-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
