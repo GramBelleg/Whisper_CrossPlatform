@@ -302,14 +302,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
               IconButton(
                 onPressed: () async {
                   String callToken =
-                      await CallsService.makeACall(context, widget.chatId);
+                      await CallsService.makeACall(context, widget.chat.chatId);
                   print(callToken);
                   Navigator.pushNamed(
                     context,
                     Call.id,
                     arguments: {
                       'token': callToken,
-                      'chatId': "chat-${widget.chatId}",
+                      'chatId': "chat-${widget.chat.chatId}",
                     },
                   );
                 },

@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart'; // Import for date formatting
-import '../services/fetch_chats.dart';
+import 'package:whisper/services/chats_services/fetch_chats.dart';
 import 'chat_card.dart'; // Assuming this imports MessageType and other relevant definitions
 
 class ChatList {
