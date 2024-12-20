@@ -148,7 +148,7 @@ class CallsService {
       (RemoteMessage message) {
         print("AYHAGA");
         print(message.data);
-        String? title = "${message.notification!.title}+AYHAGA";
+        String? title = "${message.notification!.title}";
         String? body = message.notification!.body;
         String? chatId=message.data['channelName'];
         AwesomeNotifications().createNotification(
