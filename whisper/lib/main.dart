@@ -76,9 +76,6 @@ class _WhisperState extends State<Whisper> {
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
         Login.id: (context) => Login(),
-
-        ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
-        // ChatPage.id: (context) => ChatPage(),
       },
     );
   }

@@ -80,6 +80,8 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   void sendProfilePhoto(String blobName, {bool toRemove = false}) {
     if (!toRemove) {
+      print("send my photo");
+
       socket?.emit('pfp', {'profilePic': blobName});
     } else {
       print("remove my photo");
