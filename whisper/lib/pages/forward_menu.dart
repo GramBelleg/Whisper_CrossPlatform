@@ -143,6 +143,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
             token: token,
             senderId: senderId,
             chatType: friend.chatType,
+            isAdmin: friend.isAdmin,
           ),
         ),
       );

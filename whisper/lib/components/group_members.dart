@@ -86,7 +86,10 @@ class _GroupMembersState extends State<GroupMembers> {
             ],
           ),
           onTap: () {
-            // Implement logic for making a member an admin
+            GlobalGroupsProvider.groupsCubit.addAdminToGroup(
+              groupId: widget.chatId,
+              userId: member.id,
+            );
             print("Make Admin");
           },
         ),
@@ -127,11 +130,11 @@ class _GroupMembersState extends State<GroupMembers> {
   void handleMembersState(GroupsState state) {
     print("anything");
     if (state is UserAddedToGroup) {
-      print("aaaaaaaaaaaaaaadd");
       _membersList.add(state.member);
     } else if (state is UserRemovedFromGroup) {
-      print("aaaaaaaaaaaaaaaaaaaa:  ${state.user.id}");
       _membersList.removeWhere((member) => member.id == state.user.id);
+    }else if (state is AdminAdded) {
+      _membersList.firstWhere((member) => member.id == state.userId).isAdmin = true;
     }
     setState(() {});
   }

@@ -7,12 +7,15 @@ import 'package:whisper/pages/forward_menu.dart';
 class GroupInfo extends StatelessWidget {
   final String? profilePicture;
   final String groupName;
+  final bool isChannel;
   final int groupId;
-
+  final bool isChannelAdmin;
   GroupInfo(
       {required this.profilePicture,
       required this.groupName,
-      required this.groupId});
+      required this.groupId,
+      required this.isChannelAdmin,
+      required this.isChannel});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +27,8 @@ class GroupInfo extends StatelessWidget {
             Navigator.pop(context); // Return to the previous screen
           },
         ),
-        title: Text('Group Info', style: TextStyle(color: Colors.white)),
+        title: Text(isChannel ? 'Channel Info' : 'Group Info',
+            style: TextStyle(color: Colors.white)),
       ),
       body: Container(
           color:
@@ -42,47 +46,49 @@ class GroupInfo extends StatelessWidget {
                   status: "6",
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => ForwardMenu(
-                      text: "ADD MEMBERS",
-                      onClearSelection: () {},
-                      selectedMessageIds: [],
-                      isForward: false,
-                      groupId: groupId,
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                  width: double.infinity, // Full width
-                  color: Colors.transparent, // Background color
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.person_add, color: primaryColor, size: 24),
-                      SizedBox(width: 15),
-                      Text(
-                        'Add Members',
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+              if (isChannelAdmin || !isChannel) ...[
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => ForwardMenu(
+                        text: "ADD MEMBERS",
+                        onClearSelection: () {},
+                        selectedMessageIds: [],
+                        isForward: false,
+                        groupId: groupId,
                       ),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    width: double.infinity, // Full width
+                    color: Colors.transparent, // Background color
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.person_add, color: primaryColor, size: 24),
+                        SizedBox(width: 15),
+                        Text(
+                          'Add Members',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Divider(
-                color: Colors.grey.shade300,
-                thickness: .25,
-                indent: 20,
-                endIndent: 20,
-              ),
-              GroupMembers(chatId: groupId)
+                Divider(
+                  color: Colors.grey.shade300,
+                  thickness: .25,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                GroupMembers(chatId: groupId)
+              ],
             ],
           )),
     );

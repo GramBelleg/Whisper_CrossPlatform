@@ -40,6 +40,7 @@ class ChatList {
       'isPinned': chat['isPinned'] ?? false,
       'isMuted': chat['other']?['isMuted'] ?? false,
       'type': chat['type'],
+      'isAdmin': chat['isAdmin'],
     };
   }
 

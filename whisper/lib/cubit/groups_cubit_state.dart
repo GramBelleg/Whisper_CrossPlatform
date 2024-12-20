@@ -26,3 +26,16 @@ class UserRemoveError extends GroupsState {
   final String errorMessage;
   UserRemoveError(this.errorMessage);
 }
+
+class AdminAdded extends GroupsState {
+  final int userId;
+  final int chatId;
+
+  AdminAdded({required this.userId, required this.chatId});
+}
+
+class AdminAddError extends GroupsState {
+  final String error;
+
+  AdminAddError(this.error);
+}

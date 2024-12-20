@@ -5,13 +5,18 @@ import '../models/friend.dart';
 
 class FriendService {
   Future<List<Friend>> fetchFriends() async {
-    final chats = await fetchChats(); // Existing function
-    return chats.map((chat) {
+    final chats = await fetchChats();
+
+    return chats.where((chat) {
+      return chat['type'] != 'CHANNEL' ||
+          (chat['isAdmin'] == true && chat['type'] == 'CHANNEL');
+    }).map((chat) {
       return Friend(
         id: chat['id'],
         name: chat['name'] ?? 'User${chat['id']}',
         icon: chat['picture'] ?? 'assets/images/el-gayar.jpg',
         chatType: chat['type'],
+        isAdmin: chat['isAdmin'] ?? false,
       );
     }).toList();
   }
@@ -24,6 +29,7 @@ class FriendService {
         name: chat['userName'] ?? 'User${chat['id']}',
         icon: chat['profilePic'],
         chatType: "DM",
+        isAdmin: false,
       );
     }).toList();
   }

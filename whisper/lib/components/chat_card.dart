@@ -31,7 +31,7 @@ class ChatCard extends StatelessWidget {
   final int unreadCount;
   final bool isMuted;
   final String type;
-
+  final bool isAdmin;
   const ChatCard({
     super.key,
     required this.chatId,
@@ -47,6 +47,7 @@ class ChatCard extends StatelessWidget {
     this.unreadCount = 0,
     this.isMuted = false,
     this.type = '',
+    required this.isAdmin,
   });
 
   // Define the custom color
@@ -91,6 +92,7 @@ class ChatCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ChatPage(
+                  isAdmin: isAdmin,
                   userName: userName,
                   userImage: avatarUrl,
                   ChatID: chatId,

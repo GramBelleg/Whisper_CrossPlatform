@@ -16,6 +16,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ChatViewModel chatViewModel; // Add ChatViewModel to the constructor
   final bool editable;
   final String chatType;
+  final bool isAdmin;
+  final bool deleteDisable;
   const CustomAppBar({
     super.key,
     required this.isSelected,
@@ -26,6 +28,8 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     required this.chatId,
     required this.editable,
     required this.chatType,
+    required this.isAdmin,
+    required this.deleteDisable,
   });
 
   @override
@@ -158,15 +162,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             actions: [
               if (widget.isSelected.length == 1) ...[],
-              IconButton(
-                key: Key(CustomAppBarKeys.deleteIcon),
-                onPressed: () {
-                  _showDeleteDialog(context);
-                },
-                icon: const Icon(
-                  Icons.delete,
-                ), // Garbage icon
-              ),
+              !widget.deleteDisable
+                  ? IconButton(
+                      key: Key(CustomAppBarKeys.deleteIcon),
+                      onPressed: () {
+                        _showDeleteDialog(context);
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                      ), // Garbage icon
+                    )
+                  : Container(),
               IconButton(
                 key: Key(CustomAppBarKeys.forwardIcon),
                 onPressed: () {
@@ -249,11 +255,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             title: InkWell(
               onTap: () {
-                if (widget.chatType == 'GROUP') {
+                print("aaaaaaaa ${widget.chatType},,${widget.isAdmin}");
+                if (widget.chatType == 'GROUP' ||
+                    widget.chatType == 'CHANNEL') {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => GroupInfo(
+                        isChannel: widget.chatType == 'CHANNEL',
+                        isChannelAdmin:
+                            widget.isAdmin && widget.chatType == 'CHANNEL',
                         groupName: widget.userName,
                         profilePicture: widget.userImage,
                         groupId: widget.chatId,

@@ -7,7 +7,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisper/socket.dart';
 
 class GroupsCubit extends Cubit<GroupsState> {
-  final socket = SocketService.instance.socket;
+  var socket = SocketService.instance.socket;
 
   GroupsCubit() : super(GroupsInitial());
 
@@ -18,6 +18,9 @@ class GroupsCubit extends Cubit<GroupsState> {
     socket?.on('removeUser', (data) {
       print("remove user");
       _handleUserRemoved(data);
+    });
+    socket?.on('addAdmin', (data) {
+      _handleAdminAdded(data);
     });
   }
 
@@ -35,7 +38,6 @@ class GroupsCubit extends Cubit<GroupsState> {
       },
       'chatId': groupId,
     };
-    print("aaaaaaaaaaaaaaaaddddddffff");
     try {
       socket?.emit('addUser', userData);
     } catch (e) {
@@ -62,16 +64,31 @@ class GroupsCubit extends Cubit<GroupsState> {
     }
   }
 
+  void addAdminToGroup({
+    required int groupId,
+    required int userId,
+  }) {
+    final adminData = {
+      'userId': userId,
+      'chatId': groupId,
+    };
+
+    try {
+      socket?.emit('addAdmin', adminData);
+    } catch (e) {
+      emit(AdminAddError(e.toString()));
+    }
+  }
+
   void _handleUserAdded(Map<String, dynamic> data) {
     try {
-      print("4444444444$data");
       final user = GroupMember(
         id: data['user']['id'] as int,
         userName: data['user']['userName'] as String,
         profilePic: data['user']['profilePic'],
         isAdmin: false,
         hasStory: false,
-        lastSeen: DateTime.now(),
+        lastSeen: data['lastSeen'] as DateTime ?? DateTime.now(),
       );
       emit(UserAddedToGroup(user));
     } catch (e) {
@@ -81,7 +98,6 @@ class GroupsCubit extends Cubit<GroupsState> {
 
   void _handleUserRemoved(Map<String, dynamic> data) {
     try {
-      print("aaaaaaaaaaaaaddddddddddd$data");
       final user = GroupMember(
         id: data['user']['id'] as int,
         userName: data['user']['userName'] as String,
@@ -90,11 +106,20 @@ class GroupsCubit extends Cubit<GroupsState> {
         hasStory: false,
         lastSeen: DateTime.now(),
       );
-      print("aaaaaaaaaaaaaddddddddddd${user.toString()}");
       emit(UserRemovedFromGroup(user));
     } catch (e) {
       emit(UserRemoveError(
           'Error processing user removal data: ${e.toString()}'));
+    }
+  }
+
+  void _handleAdminAdded(Map<String, dynamic> data) {
+    try {
+      final userId = data['userId'] as int;
+      final chatId = data['chatId'] as int;
+      emit(AdminAdded(userId: userId, chatId: chatId));
+    } catch (e) {
+      emit(AdminAddError('Error processing admin added data: ${e.toString()}'));
     }
   }
 }

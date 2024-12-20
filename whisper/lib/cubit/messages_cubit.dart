@@ -111,23 +111,32 @@ class MessagesCubit extends Cubit<MessagesState> {
     emit(MessageSent(newMessage));
   }
 
-  void _handleReceivedMessage(Map<String, dynamic> data) {
-    final newMessage = _parseMessage(data);
+  void _handleReceivedMessage(Map<String, dynamic>? data) {
+    print("receeeeeeived message:${data}");
+    final newMessage = _parseMessage(data!);
     emit(MessageReceived(newMessage));
   }
 
   ChatMessage _parseMessage(Map<String, dynamic> data) {
-    final parentMessage = ParentMessage.fromJson(data['parentMessage']);
-    final forwardedFrom = ForwardedFrom.fromJson(data['forwardedFrom']);
+    final parentMessage = data['parentMessage'] != null
+        ? ParentMessage.fromJson(data['parentMessage'])
+        : null;
+    final forwardedFrom = data['forwardedFrom'] != null
+        ? ForwardedFrom.fromJson(data['forwardedFrom'])
+        : null;
     return ChatMessage(
       id: data['id'],
       chatId: data['chatId'],
-      sender: Sender.fromJson(data['sender']),
+      sender: data['sender'] != null ? Sender.fromJson(data['sender']) : null,
       content: data['content'],
-      mentions: List<int>.from(data['mentions']),
+      mentions:
+          data['mentions'] != null ? List<int>.from(data['mentions']) : null,
       media: data['media'],
-      time: DateTime.parse(data['time']).toLocal(),
-      sentAt: DateTime.parse(data['sentAt']).toLocal(),
+      time:
+          data['time'] != null ? DateTime.parse(data['time']).toLocal() : null,
+      sentAt: data['sentAt'] != null
+          ? DateTime.parse(data['sentAt']).toLocal()
+          : null,
       read: data['read'] ?? false,
       delivered: data['delivered'] ?? false,
       forwarded: data['forwarded'] ?? false,
@@ -136,7 +145,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       selfDestruct: data['selfDestruct'] ?? false,
       isAnnouncement: data['isAnnouncement'] ?? false,
       isSecret: data['isSecret'] ?? false,
-      expiresAfter: data['expiresAfter'],
+      expiresAfter: data['expiresAfter'] ?? 0,
       type: data['type'],
       parentMessage: parentMessage,
       forwardedFrom: forwardedFrom,

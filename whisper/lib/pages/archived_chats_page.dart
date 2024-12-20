@@ -99,6 +99,7 @@ class _ArchivedChatsPageState extends State<ArchivedChatsPage> {
         isOnline: chat['isOnline'],
         isSent: chat['isSent'],
         messageType: chat['messageType'],
+        isAdmin: chat['isAdmin']??false,
         //isPinned: chat['isPinned'], // Pass the pinned status to ChatCard
       ),
     );

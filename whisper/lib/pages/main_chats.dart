@@ -411,6 +411,7 @@ class _MainChatsState extends State<MainChats> {
         isPinned: chat['isPinned'],
         isMuted: chat['isMuted'],
         type: chat['type'],
+        isAdmin: chat['isAdmin'] ??false,
       ),
     );
   }
