@@ -17,9 +17,9 @@ class CustomAccessButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // constraints: BoxConstraints(
-      //   maxWidth: 400,
-      // ),
+      constraints: BoxConstraints(
+        maxWidth: 400,
+      ),
       child: ElevatedButton(
         onPressed: onPressed, // Use the passed onPressed function
         style: ButtonStyle(

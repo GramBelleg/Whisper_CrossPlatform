@@ -3,6 +3,8 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:whisper/components/custom_access_button.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
@@ -19,7 +21,7 @@ class _CallState extends State<Call> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isMuted = false;
-  bool someoneElseJoined=false;
+  bool someoneElseJoined = false;
   late RtcEngine _engine;
 
   @override
@@ -29,9 +31,10 @@ class _CallState extends State<Call> {
   }
 
   @override
-  void didChangeDependencies() async{
+  void didChangeDependencies() async {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     print("args: $args");
     await initAgora(args['token'], args['chatId']);
   }
@@ -50,7 +53,7 @@ class _CallState extends State<Call> {
   Future<void> initAgora(String token, String chatId) async {
     print("TOKEN: $token");
     print("chat ID: $chatId");
-    int? userId=await getId();
+    int? userId = await getId();
     // Retrieve microphone permission
     await [Permission.microphone].request();
 
@@ -72,7 +75,7 @@ class _CallState extends State<Call> {
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
           debugPrint("remote user $remoteUid joined");
           setState(() {
-             someoneElseJoined=true;
+            someoneElseJoined = true;
             _remoteUid = remoteUid;
           });
         },
@@ -108,23 +111,35 @@ class _CallState extends State<Call> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Agora Audio Call'),
-      ),
+      backgroundColor: firstNeutralColor,
+
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _remoteAudio(),
-            ElevatedButton(
-              onPressed: _toggleMute,
-              child: Text(_isMuted ? 'Unmute' : 'Mute'),
+            SizedBox(
+              height: 20,
             ),
-            ElevatedButton(
-              onPressed: _endCall,
-              child: const Text('End Call'),
-
+            CustomAccessButton(
+              label: _isMuted ? 'Unmute' : 'Mute',
+              onPressed: () {
+                _toggleMute();
+              },
             ),
+            SizedBox(
+              height: 20,
+            ),
+            CustomAccessButton(
+              label: "End Call",
+              onPressed: () async {
+                await _endCall();
+              },
+            ),
+            // ElevatedButton(
+            //   onPressed: _endCall,
+            //   child: const Text('End Call'),
+            // ),
           ],
         ),
       ),
@@ -136,23 +151,25 @@ class _CallState extends State<Call> {
       return Text(
         'Remote user $_remoteUid is speaking...',
         textAlign: TextAlign.center,
+        style: TextStyle(color: secondNeutralColor),
       );
     } else if (_localUserJoined) {
       return const Text(
         'Waiting for remote user to join...',
         textAlign: TextAlign.center,
+        style: TextStyle(color: secondNeutralColor),
       );
     } else {
       return const Text(
         'Click "Join Call" to start',
         textAlign: TextAlign.center,
+        style: TextStyle(color: secondNeutralColor),
       );
     }
   }
 
-
   @pragma("vm:entry-point")
-   static Future<void> onActionNotificationMethod(ReceivedAction action) async {
+  static Future<void> onActionNotificationMethod(ReceivedAction action) async {
     if (action.buttonKeyPressed == 'Reject') {
       print("Call Rejected");
       await AwesomeNotifications().cancel(123);
@@ -160,6 +177,7 @@ class _CallState extends State<Call> {
       print("Call Accepted");
     }
   }
+
   void _toggleMute() async {
     setState(() {
       _isMuted = !_isMuted;
@@ -171,13 +189,15 @@ class _CallState extends State<Call> {
       await _engine.muteLocalAudioStream(false);
     }
   }
+
   Future<void> _endCall() async {
     await _dispose();
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     RegExp regex = RegExp(r'-(\d+)');
     Match? match = regex.firstMatch(args['chatId']);
     int chatId = int.parse(match!.group(1)!);
-    if(someoneElseJoined) {
+    if (someoneElseJoined) {
       await CallsService.leaveCall(chatId, "JOINED", context);
     } else {
       await CallsService.leaveCall(chatId, "CANCELED", context);

@@ -303,7 +303,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 onPressed: () async {
                   String callToken =
                       await CallsService.makeACall(context, widget.chat.chatId);
-                  print(callToken);
+                  print("CHAT ID : ${widget.chat.chatId}");
+                  print("CALL TOKEEN : $callToken");
                   Navigator.pushNamed(
                     context,
                     Call.id,
