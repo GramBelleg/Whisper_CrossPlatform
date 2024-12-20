@@ -32,17 +32,23 @@ import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/services/visibility_service.dart';
 import 'dart:io';
 import 'firebase_options.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-void main() async{
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if(kIsWeb){}
-  else if(Platform.isAndroid) {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    await CallsService.initializeAwesomeNotifications();
-    await CallsService.setListeners();
-    FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
-    print("ANDROID");
+  if (kIsWeb) {
+  } else if (Platform.isAndroid) {
+    try {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+      await CallsService.initializeAwesomeNotifications();
+      await CallsService.setListeners();
+      FirebaseMessaging.onBackgroundMessage(CallsService.backGroundHandler);
+      print("ANDROID");
+    } catch (e) {
+      print(e);
+    }
   }
   runApp(MultiBlocProvider(providers: [
     BlocProvider(
@@ -70,12 +76,10 @@ class Whisper extends StatefulWidget {
 }
 
 class _WhisperState extends State<Whisper> {
-
   @override
   @pragma("vm:entry-point")
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -106,7 +110,8 @@ class _WhisperState extends State<Whisper> {
             ),
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
         Login.id: (context) => Login(),
-        Call.id:(context)=>Call(),
+        Call.id: (context) => Call(),
+
         ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
         // ChatPage.id: (context) => ChatPage(),
       },
