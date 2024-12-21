@@ -17,6 +17,18 @@ Future<void> saveRobotToken(String robotToken) async {
   print('robotToken saved: $robotToken');
 }
 
+Future<void> saveRole(String role) async {
+  await _secureStorage.write(key: 'role', value: role);
+  print('robotToken saved: $role');
+}
+
+
+Future<String?> getRole() async {
+  String? role = await _secureStorage.read(key: 'role');
+  print('Loaded email: $role');
+  return role;
+}
+
 Future<String?> getEmail() async {
   String? email = await _secureStorage.read(key: 'user_email');
   print('Loaded email: $email');

@@ -14,6 +14,7 @@ import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/global_cubits/global_chats_cubit.dart';
 import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
+import 'package:whisper/pages/admin_dashboard.dart';
 import 'package:whisper/pages/call_page.dart';
 import 'package:whisper/pages/confirmation_code.dart';
 import 'package:whisper/pages/forget_password_email.dart';
@@ -111,6 +112,7 @@ class _WhisperState extends State<Whisper> {
         LoginWithGoogle.id: (context) => LoginWithGoogle(),
         Login.id: (context) => Login(),
         Call.id: (context) => Call(),
+        AdminDashboard.id: (context) => AdminDashboard(),
 
         ///ConfirmationCodeEmail.id: (context) => ConfirmationCodeEmail()
         // ChatPage.id: (context) => ChatPage(),
