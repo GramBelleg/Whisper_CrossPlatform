@@ -7,6 +7,19 @@ import 'package:whisper/components/custom_access_button.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/shared_preferences.dart';
+class CallStateManager {
+  static final CallStateManager _instance = CallStateManager._internal();
+
+  bool isInCall = false;
+
+  factory CallStateManager() {
+    return _instance;
+  }
+
+  CallStateManager._internal();
+}
+
+
 
 class Call extends StatefulWidget {
   Call();
@@ -36,7 +49,9 @@ class _CallState extends State<Call> {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     print("args: $args");
+
     await initAgora(args['token'], args['chatId']);
+    CallStateManager().isInCall = true;
   }
 
   @override
@@ -161,7 +176,7 @@ class _CallState extends State<Call> {
       );
     } else {
       return const Text(
-        'Click "Join Call" to start',
+        'Wait while connecting you',
         textAlign: TextAlign.center,
         style: TextStyle(color: secondNeutralColor),
       );
@@ -206,6 +221,7 @@ class _CallState extends State<Call> {
       _localUserJoined = false;
       _remoteUid = null;
     });
+    CallStateManager().isInCall = false;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Call ended")),

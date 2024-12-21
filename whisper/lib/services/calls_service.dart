@@ -76,6 +76,7 @@ class CallsService {
   @pragma("vm:entry-point")
   static Future<void> onActionNotificationMethod(ReceivedAction action) async {
     print("payload : ${action.payload}");
+
     if (action.buttonKeyPressed == 'Reject') {
       print("Call Rejected");
       await AwesomeNotifications().cancel(123);
@@ -87,6 +88,16 @@ class CallsService {
       Match? match = regex.firstMatch(action.payload!['channelName']!);
       int chatId = int.parse(match!.group(1)!);
       print("CHAT IDDDD : ${chatId}");
+      if (CallStateManager().isInCall) {
+        print("INCALL");
+        scaffoldKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text("End your current call first"),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
       await CallsService.joinCall(chatId);
       navigatorKey.currentState!.push(
         MaterialPageRoute(
@@ -148,9 +159,9 @@ class CallsService {
       (RemoteMessage message) {
         print("AYHAGA");
         print(message.data);
-        String? title = "${message.notification!.title}";
+        print(message.notification);
+        String? title = "${message.data['userName']}";
         String? body = message.notification!.body;
-        String? chatId=message.data['channelName'];
         if(message.data!['type']=="voice_call") {
           AwesomeNotifications().createNotification(
             content: NotificationContent(
