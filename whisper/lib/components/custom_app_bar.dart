@@ -262,7 +262,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             title: InkWell(
               onTap: () {
-                // print("aaaaaaaa ${widget.chat.t},,${widget.isAdmin}");
                 if (widget.chat.type == 'GROUP' ||
                     widget.chat.type == 'CHANNEL') {
                   Navigator.push(
@@ -300,6 +299,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
               ),
               IconButton(
+                key: Key(CustomAppBarKeys.phoneIcon),
                 onPressed: () async {
                   String callToken =
                       await CallsService.makeACall(context, widget.chat.chatId);

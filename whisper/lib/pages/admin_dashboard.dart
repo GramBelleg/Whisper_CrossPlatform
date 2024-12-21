@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/page_state.dart';
+import 'package:whisper/keys/admin_dash_board_keys.dart';
 import 'package:whisper/keys/login_keys.dart';
 import 'package:whisper/models/login_credentials.dart';
 import 'package:whisper/pages/forget_password_email.dart';
@@ -78,6 +79,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         title: Text(showUsers ? "Users List" : "Groups List"),
         actions: [
           IconButton(
+            key: Key(AdminDashboardKeys.toggleUsersGroupsButton),
             icon: Icon(showUsers ? Icons.group : Icons.person),
             onPressed: () {
               setState(() {
@@ -111,6 +113,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     trailing: ElevatedButton(
+                      key: Key(AdminDashboardKeys.banButton),
                       onPressed: () => _banUser(true, user['id']),
                       child: Text("Ban",
                           style: TextStyle(color: secondNeutralColor)),
@@ -133,6 +136,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     title: Text(user['userName'],
                         style: TextStyle(color: secondNeutralColor)),
                     trailing: ElevatedButton(
+                      key: Key(AdminDashboardKeys.unbanButton),
                       onPressed: () => _banUser(false, user['id']),
                       child: Text("Unban",
                           style: TextStyle(color: secondNeutralColor)),
@@ -158,6 +162,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       style: TextStyle(color: secondNeutralColor),
                     ),
                     trailing: ElevatedButton(
+                      key: Key(AdminDashboardKeys.filterButton),
                       onPressed: () => _filterGroup(true, group['chatId']),
                       child: Text("Filter",
                           style: TextStyle(color: secondNeutralColor)),
@@ -180,6 +185,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     title: Text(group['name'],
                         style: TextStyle(color: secondNeutralColor)),
                     trailing: ElevatedButton(
+                      key: Key(AdminDashboardKeys.unfilterButton),
                       onPressed: () => _filterGroup(false, group['chatId']),
                       child: Text("unfilter",
                           style: TextStyle(color: secondNeutralColor)),
