@@ -89,7 +89,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                           BlendMode.saturation,
                         ),
                         child: Image.network(
-                          widget.profilePic,
+                          widget.profilePic!,
                           fit: BoxFit.cover,
                           width: 140,
                           height: 140,

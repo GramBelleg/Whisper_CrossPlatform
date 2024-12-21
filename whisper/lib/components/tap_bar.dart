@@ -13,12 +13,11 @@ FlashyTabBar buildBottomNavigationBar(
     items: [
       FlashyTabBarItem(
         icon: const Icon(
-          key: Key("ContactsPageKey"),
+          key: Key(TapBarKeys.contactsButton),
           Icons.contacts,
           color: primaryColor,
         ),
         title: const Text(
-          key: Key(TapBarKeys.contactsButton),
           'Contacts',
           style: TextStyle(color: primaryColor),
         ),
@@ -41,7 +40,6 @@ FlashyTabBar buildBottomNavigationBar(
           color: primaryColor,
         ),
         title: const Text(
-          key: Key(TapBarKeys.settingsButton),
           'Settings',
           style: TextStyle(color: primaryColor),
         ),
