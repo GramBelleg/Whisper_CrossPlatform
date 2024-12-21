@@ -40,7 +40,7 @@ class GroupManagementService {
   Future<bool> setGroupPrivacy(int chatId, bool isPrivate) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/groups/$chatId/privacy');
+      final Uri url = Uri.parse('http://$ip:5000/api/chats/$chatId/privacy');
       final response = await http.post(
         url,
         headers: {
@@ -137,62 +137,5 @@ class GroupManagementService {
     } catch (e) {
       throw Exception('Failed to update user permissions: $e');
     }
-  }
-
-  Future<bool> checkMyAdminPermission(int chatId) async {
-    // this should be replaced in the future by somthing better
-
-    // now, simply get all members and look for myself
-    final List allChatMemebers;
-    final Map<String, dynamic> myInfo;
-
-    await _ensureToken();
-    try {
-      // get all members
-      final Uri url = Uri.parse('http://$ip:5000/api/chats/$chatId/getMembers');
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $_token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        allChatMemebers = jsonDecode(response.body);
-      } else {
-        throw Exception(
-            'Failed to get all members. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to check if user is admin: $e');
-    }
-    // get my info
-    try {
-      final Uri url = Uri.parse('http://$ip:5000/api/user/info');
-      final response = await http.get(
-        url,
-        headers: {
-          'Authorization': 'Bearer $_token',
-          'Content-Type': 'application/json',
-        },
-      );
-      if (response.statusCode == 200) {
-        myInfo = jsonDecode(response.body);
-      } else {
-        throw Exception(
-            'Failed to get all members. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to get my info: $e');
-    }
-
-    // check if I am admin
-    for (var member in allChatMemebers) {
-      if (member['userName'] == myInfo['userName']) {
-        return member['isAdmin'];
-      }
-    }
-    return false;
   }
 }
