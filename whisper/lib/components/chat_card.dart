@@ -79,7 +79,7 @@ class ChatCard extends StatelessWidget {
     return Stack(
       children: [
         CircleAvatar(
-          backgroundImage: NetworkImage(chat.avatarUrl),
+          backgroundImage: NetworkImage(chat.avatarUrl!),
           radius: 25,
         ),
         if (chat.isOnline) _buildOnlineIndicator(),
