@@ -97,7 +97,7 @@ class _StoryPageState extends State<StoryPage> {
     final currentStory = currentUser.stories[currentStoryIndex];
     double storyDuration;
 
-    if (currentStory.type == 'video' && _videoController != null) {
+    if (currentStory.type == 'VIDEO' && _videoController != null) {
       final videoDuration =
           _videoController!.value.duration.inSeconds.toDouble();
       storyDuration =
@@ -291,7 +291,7 @@ class _StoryPageState extends State<StoryPage> {
     final currentUser = widget.users[currentUserIndex];
     final currentStory = currentUser.stories[currentStoryIndex];
 
-    if (currentStory.type == 'video' && _videoController == null) {
+    if (currentStory.type == 'VIDEO' && _videoController == null) {
       _videoController = VideoPlayerController.network(currentStory.media)
         ..initialize().then((_) {
           if (mounted) {
