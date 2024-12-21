@@ -10,6 +10,7 @@ import 'package:whisper/components/edit_fields_profile_setting.dart';
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/components/info_row.dart';
 import 'package:whisper/components/privacy_card.dart';
+import 'package:whisper/controllers/custom_phone_controller.dart';
 import 'package:whisper/models/user_state.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/home_keys.dart';
@@ -23,6 +24,11 @@ import 'package:whisper/services/logout_confirmation_dialog.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/upload_file.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:whisper/validators/form-validation/validate_bio_field.dart';
+import 'package:whisper/validators/form-validation/validate_email_field.dart';
+import 'package:whisper/validators/form-validation/validate_name_field.dart';
+import 'package:whisper/validators/form-validation/validate_number_field.dart';
+import 'package:whisper/validators/form-validation/validate_user_name_field.dart';
 import 'package:whisper/validators/reset-password-validation/validate_confirmation_code.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -90,7 +96,7 @@ class SettingsContent extends StatefulWidget {
   final TextEditingController usernameController;
   final TextEditingController emailController;
   final TextEditingController bioController;
-  final TextEditingController phoneController;
+  final CustomPhoneController phoneController;
   final String nameState;
   final String usernameState;
   final String emailState;
@@ -157,57 +163,44 @@ class _SettingsContentState extends State<SettingsContent> {
                 )
               ]
             : [
-                GestureDetector(
-                  onTap: () {
-                    print('Edit tapped');
-                    context.read<SettingsCubit>().toggleEditing();
-                  },
-                  child: Text(
-                    "Edit",
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  key: SettingsPageKeys.addStoryInProfile,
-                  icon: SizedBox(
-                    width: 23.0,
-                    height: 23.0,
-                    child: Image.asset(
-                      "assets/images/addStoryFirstNeutralColor_Icon.png", // Change to your desired icon
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  onPressed: () {
-                    _addStory();
-                  },
-                ),
-              ],
-        title: widget.isEditing
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    key: SettingsPageKeys.cancelButton,
-                    onPressed: () {
-                      context.read<SettingsCubit>().toggleEditing();
-                      context.read<SettingsCubit>().resetStateMessages();
-                    },
-                    child: Text(
-                      "Cancel",
-                      style: TextStyle(
-                        color: secondNeutralColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        print('Edit tapped');
+                        context.read<SettingsCubit>().toggleEditing();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            right: 8.0), // Add space between Edit and Icon
+                        child: Text(
+                          "Edit",
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(width: 60), // Placeholder for alignment
-                ],
-              )
-            : null,
+                    IconButton(
+                      key: SettingsPageKeys.addStoryInProfile,
+                      icon: SizedBox(
+                        width: 23.0,
+                        height: 23.0,
+                        child: Image.asset(
+                          "assets/images/addStoryFirstNeutralColor_Icon.png",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      onPressed: () {
+                        print('Add Story tapped');
+                        _addStory();
+                      },
+                    ),
+                  ],
+                ),
+              ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -315,17 +308,28 @@ class _SettingsContentState extends State<SettingsContent> {
   }
 
   Future<bool> _confirmCode(String email) async {
-    if (email != widget.emailState) {
+    // Validate the email
+
+    final emailError = validateEmailField(email.trim());
+    if (emailError != null) {
+      // Handle email validation error (e.g., show a toast or set an error state)
+      print("Email validation error: $emailError");
+      context.read<SettingsCubit>().setEmailStateUpdate(emailError);
+      return false;
+    }
+    // Check if the email is different from the current state
+    if (email.trim() != widget.emailState.trim()) {
       final response =
           await context.read<SettingsCubit>().sendCode(email, context);
-      // Check if response was successful
+
+      // Handle the API response
       if (response['success'] == true) {
         _showCustomAlertDialogCode(email, context);
       } else {
         context.read<SettingsCubit>().setEmailStateUpdate(response['message']);
       }
     } else {
-      // Set state if email is the same as the current one
+      // Set state if the email is the same as the current one
       context.read<SettingsCubit>().setEmailStateUpdate("Same Email");
     }
 
@@ -402,8 +406,16 @@ class _SettingsContentState extends State<SettingsContent> {
 
   void _saveChanges(BuildContext context) async {
     bool success = true;
-    // Check if name is updated
-    if (widget.nameController.text.trim() != widget.nameState.trim()) {
+
+    // Validate name field
+    final nameError = validateNameField(widget.nameController.text.trim());
+    if (nameError != null) {
+      // Handle name validation error (e.g., show a toast, dialog, or set an error message)
+      print("Name validation error: $nameError");
+      context.read<SettingsCubit>().setNameStateUpdate(nameError);
+
+      success = false;
+    } else if (widget.nameController.text.trim() != widget.nameState.trim()) {
       final response = await context
           .read<SettingsCubit>()
           .updateField(widget.nameController.text, 'name');
@@ -411,8 +423,17 @@ class _SettingsContentState extends State<SettingsContent> {
       context.read<SettingsCubit>().setNameStateUpdate(response['message']);
     }
 
-    // Check if username is updated
-    if (widget.usernameController.text.trim() != widget.usernameState.trim()) {
+    // Validate username field
+    final usernameError =
+        validateUsernameField(widget.usernameController.text.trim());
+    if (usernameError != null) {
+      // Handle username validation error
+      print("Username validation error: $usernameError");
+      context.read<SettingsCubit>().setUsernameStateUpdate(usernameError);
+
+      success = false;
+    } else if (widget.usernameController.text.trim() !=
+        widget.usernameState.trim()) {
       final response = await context
           .read<SettingsCubit>()
           .updateField(widget.usernameController.text, 'userName');
@@ -420,25 +441,42 @@ class _SettingsContentState extends State<SettingsContent> {
       context.read<SettingsCubit>().setUsernameStateUpdate(response['message']);
     }
 
-    // Check if phone is updated
-    if (widget.phoneController.text.trim() != widget.phoneNumberState.trim()) {
+    // Validate phone field
+    final phoneError =
+        validateNumberFieldString(widget.phoneController.text.trim());
+    if (phoneError != null) {
+      // Handle phone validation error
+      print("Phone validation error: $phoneError");
+      context.read<SettingsCubit>().setPhoneNumberStateUpdate(phoneError);
+      success = false;
+    } else if (widget.phoneController.text.trim() !=
+        widget.phoneNumberState.trim()) {
       final response = await context
           .read<SettingsCubit>()
-          .updateField(widget.phoneController.text, 'phoneNumber');
+          .updateField("+${widget.phoneController.text}", 'phoneNumber');
       success &= response['success'];
       context
           .read<SettingsCubit>()
           .setPhoneNumberStateUpdate(response['message']);
     }
 
-    // Check if bio is updated
-    if (widget.bioController.text.trim() != widget.bioState.trim()) {
+    // Validate bio field
+    final bioError = validateBioField(widget.bioController.text.trim());
+    if (bioError != null) {
+      // Handle bio validation error
+      print("Bio validation error: $bioError");
+      context.read<SettingsCubit>().setBioStateUpdate(bioError);
+
+      success = false;
+    } else if (widget.bioController.text.trim() != widget.bioState.trim()) {
       final response = await context
           .read<SettingsCubit>()
           .updateField(widget.bioController.text, 'bio');
       success &= response['success'];
       context.read<SettingsCubit>().setBioStateUpdate(response['message']);
     }
+
+    // If all updates were successful, toggle editing and reset state messages
     if (success) {
       context.read<SettingsCubit>().toggleEditing();
       context.read<SettingsCubit>().resetStateMessages();
@@ -544,8 +582,10 @@ class _SettingsContentState extends State<SettingsContent> {
   }
 
 // Function to show dialog for image source
-  void _showImageSourceDialog() {
-    showDialog(
+  Future<bool> _showImageSourceDialog() async {
+    bool isSuccess = false;
+
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -569,8 +609,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _pickImageFromCamera();
+                  _pickImageFromCamera().then((success) => isSuccess = success);
                 },
               ),
               ListTile(
@@ -583,8 +622,8 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _pickImageFromGallery();
+                  _pickImageFromGallery()
+                      .then((success) => isSuccess = success);
                 },
               ),
               ListTile(
@@ -592,14 +631,12 @@ class _SettingsContentState extends State<SettingsContent> {
                 title: Center(
                   child: Text(
                     'Remove Photo',
-                    style: TextStyle(
-                        color: secondNeutralColor), // Set text color to white
+                    style: TextStyle(color: secondNeutralColor),
                   ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
-
-                  _removeImage();
+                  _removeImage().then((success) => isSuccess = success);
                 },
               ),
             ],
@@ -607,37 +644,86 @@ class _SettingsContentState extends State<SettingsContent> {
         );
       },
     );
+
+    return isSuccess;
   }
 
-  Future<void> _pickImageFromGallery() async {
+  Future<bool> _pickImageFromGallery() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      // Get the file extension
+      final String extension = pickedFile.path.split('.').last.toLowerCase();
+
+      // List of valid image extensions
+      final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+      if (!validExtensions.contains(extension)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a valid image file')),
+        );
+        return false;
+      }
+
       String blobName = await uploadFile(pickedFile.path);
-      // await context.read<SettingsCubit>().updateProfilePic(blobName);
-      context.read<SettingsCubit>().sendProfilePhoto(blobName);
+      if (blobName != "Failed") {
+        context.read<SettingsCubit>().sendProfilePhoto(blobName);
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error uploading photo')),
+        );
+        return false;
+      }
     } else {
       print('No image selected.');
+      return false;
     }
   }
 
-  // Function to take a photo using the camera
-  Future<void> _pickImageFromCamera() async {
+  Future<bool> _pickImageFromCamera() async {
     final XFile? pickedFile =
         await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
+      // Get the file extension
+      final String extension = pickedFile.path.split('.').last.toLowerCase();
+
+      // List of valid image extensions
+      final validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+      if (!validExtensions.contains(extension)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a valid image file')),
+        );
+        return false;
+      }
+
       String blobName = await uploadFile(pickedFile.path);
-      //  await context.read<SettingsCubit>().updateProfilePic(blobName);
-      context.read<SettingsCubit>().sendProfilePhoto(blobName);
+      if (blobName != "Failed") {
+        context.read<SettingsCubit>().sendProfilePhoto(blobName);
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error uploading photo')),
+        );
+        return false;
+      }
     } else {
       print('No image selected.');
+      return false;
     }
   }
 
-  // Function to remove a photo
-  Future<void> _removeImage() async {
-    context.read<SettingsCubit>().removeProfilePic();
+// Function to remove a photo
+  Future<bool> _removeImage() async {
+    try {
+      context.read<SettingsCubit>().removeProfilePic();
+      return true;
+    } catch (e) {
+      print('Error removing image: $e');
+      return false;
+    }
   }
 }

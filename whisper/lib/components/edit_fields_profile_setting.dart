@@ -1,6 +1,5 @@
-// lib/widgets/edit_fields.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/settings_page_keys.dart';
 
@@ -15,8 +14,7 @@ class EditFields extends StatelessWidget {
   final String usernameStateUpdate;
   final String phoneNumberStateUpdate;
   final String emailStateUpdate;
-  final Future<bool> Function(String email)
-      confirmCodeFunction; // Accept function as parameter
+  final Future<bool> Function(String email) confirmCodeFunction;
 
   const EditFields({
     super.key,
@@ -30,7 +28,7 @@ class EditFields extends StatelessWidget {
     required this.usernameStateUpdate,
     required this.phoneNumberStateUpdate,
     required this.emailStateUpdate,
-    required this.confirmCodeFunction, // Pass the function here
+    required this.confirmCodeFunction,
   });
 
   @override
@@ -38,20 +36,32 @@ class EditFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(bioController, 'Bio', stateText: bioStateUpdate),
-        _buildTextField(nameController, 'Name', stateText: nameStateUpdate),
-        _buildTextField(usernameController, 'Username',
-            stateText: usernameStateUpdate),
-        _buildTextField(phoneController, 'Phone Number',
-            stateText: phoneNumberStateUpdate),
-        _buildTextField(emailController, 'Email',
-            stateText: emailStateUpdate, needCode: true),
+        _buildTextField(SettingsPageKeys.textFieldBio, bioController, 'Bio',
+            stateText: bioStateUpdate, maxLength: 200, context: context),
+        _buildTextField(SettingsPageKeys.textFieldName, nameController, 'Name',
+            stateText: nameStateUpdate, maxLength: 50, context: context),
+        _buildTextField(
+            SettingsPageKeys.textFieldUserName, usernameController, 'Username',
+            stateText: usernameStateUpdate, maxLength: 30, context: context),
+        _buildTextField(SettingsPageKeys.textFieldPhoneNumber, phoneController,
+            'Phone Number',
+            stateText: phoneNumberStateUpdate, maxLength: 15, context: context),
+        _buildTextField(
+            SettingsPageKeys.textFieldEmail, emailController, 'Email',
+            stateText: emailStateUpdate,
+            needCode: true,
+            maxLength: 100,
+            context: context),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText,
-      {String? stateText, bool needCode = false}) {
+  Widget _buildTextField(
+      String textFieldKey, TextEditingController controller, String labelText,
+      {String? stateText,
+      bool needCode = false,
+      int? maxLength,
+      required BuildContext context}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -68,11 +78,13 @@ class EditFields extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  stateText,
+                  '*', // Show just the dot if the text is too long
                   style: TextStyle(
                     color: stateText == "Updated" ? highlightColor : Colors.red,
-                    fontSize: 14,
+                    fontSize: 20,
                   ),
+                  overflow: TextOverflow.ellipsis, // Ensure no overflow
+                  maxLines: 1, // Prevent the text from wrapping
                 ),
               ),
           ],
@@ -88,34 +100,70 @@ class EditFields extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  key: Key("$labelText${SettingsPageKeys.textField}"),
+                  key: Key(textFieldKey),
                   controller: controller,
                   style: TextStyle(color: secondNeutralColor),
-                  decoration: const InputDecoration(
+                  keyboardType: labelText == 'Phone Number'
+                      ? TextInputType.phone
+                      : TextInputType.text,
+                  inputFormatters: labelText == 'Phone Number'
+                      ? [FilteringTextInputFormatter.digitsOnly]
+                      : null,
+                  decoration: InputDecoration(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     border: InputBorder.none,
                   ),
+                  maxLength: maxLength, // Add character limit here
                 ),
               ),
               if (needCode)
                 TextButton(
                   key: SettingsPageKeys.sendCodeButton,
                   onPressed: () {
-                    confirmCodeFunction(
-                        controller.text); // Call the passed function
+                    confirmCodeFunction(controller.text);
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: highlightColor,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12), // Button padding
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                   ),
                   child: const Text("Send Code"),
                 ),
             ],
           ),
         ),
+        if (stateText != null && stateText.isNotEmpty)
+          // Show SnackBar after the widget has built
+          _ShowSnackBar(
+              stateText: stateText, labelText: labelText, context: context),
       ],
     );
+  }
+}
+
+class _ShowSnackBar extends StatelessWidget {
+  final String stateText;
+  final BuildContext context;
+  final String labelText;
+
+  const _ShowSnackBar(
+      {required this.stateText,
+      required this.context,
+      required this.labelText});
+
+  @override
+  Widget build(BuildContext context) {
+    // Delay the SnackBar to allow the UI to update
+    Future.delayed(Duration(milliseconds: 50), () {
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: stateText == "Updated"
+              ? Text("$labelText: $stateText")
+              : Text(stateText),
+          backgroundColor: stateText == "Updated" ? highlightColor : Colors.red,
+        ),
+      );
+    });
+    return Container();
   }
 }

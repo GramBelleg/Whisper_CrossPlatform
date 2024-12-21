@@ -358,12 +358,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(
-          chat:widget.chat,
+          chat: widget.chat,
           isSelected: isSelectedList,
           //userImage: widget.chat.avatarUrl,
           //userName: widget.chat.userName,
           clearSelection: clearIsSelected,
-         // chatId: widget.chat.chatId,
+          // chatId: widget.chat.chatId,
           chatViewModel: ChatViewModel(),
           deleteDisable:
               widget.chat.type == "CHANNEL" && widget.chat.isAdmin == false,
@@ -376,7 +376,7 @@ class _ChatPageState extends State<ChatPage> {
                           .firstWhere((msg) => msg.id == message.id)
                           .type ==
                       "TEXT"),
-         // chatType: widget.chat.type,
+          // chatType: widget.chat.type,
         ),
         body: BlocProvider<MessagesCubit>.value(
           value: GlobalCubitProvider.messagesCubit,
@@ -435,7 +435,8 @@ class _ChatPageState extends State<ChatPage> {
                                   handleOncancelReply();
                                 },
                               ),
-                              (!widget.chat.isAdmin && widget.chat.type == "CHANNEL")
+                              (!widget.chat.isAdmin &&
+                                      widget.chat.type == "CHANNEL")
                                   ? Container()
                                   : Row(
                                       mainAxisAlignment:
@@ -491,10 +492,12 @@ class _ChatPageState extends State<ChatPage> {
                                                           _toggleGifPicker,
                                                       toggleStickerPicker:
                                                           _toggleStickerPicker,
-                                                      chatId: widget.chat.chatId,
+                                                      chatId:
+                                                          widget.chat.chatId,
                                                       senderId:
                                                           widget.senderId!,
-                                                      userName: widget.chat.userName,
+                                                      userName:
+                                                          widget.chat.userName,
                                                       parentMessage:
                                                           _replyingTo,
                                                       isReplying: _isReplying,

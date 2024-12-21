@@ -16,7 +16,7 @@ class SettingsLoaded extends SettingsState {
   late TextEditingController usernameController;
   late TextEditingController emailController;
   late TextEditingController bioController;
-  late TextEditingController phoneController;
+  late CustomPhoneController phoneController = CustomPhoneController();
 
   String nameState;
   String usernameState;

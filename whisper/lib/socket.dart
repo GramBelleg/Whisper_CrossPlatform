@@ -60,15 +60,4 @@ class SocketService {
     socket?.disconnect();
     socket = null;
   }
-
-  void sendStory(String content, String blobName, String type) {
-    print("send  story");
-    socket
-        ?.emit('story', {"content": content, "media": blobName, "type": type});
-  }
-
-  void deleteStory(int storyId) {
-    print("delete storyyy");
-    socket?.emit('deleteStory', {"storyId": storyId});
-  }
 }

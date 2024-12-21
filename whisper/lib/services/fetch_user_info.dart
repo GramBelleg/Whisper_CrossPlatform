@@ -43,7 +43,7 @@ Future<UserState?> fetchUserInfo() async {
         profilePic: mediaUrl,
         lastSeen: data['lastSeen'] ?? '',
         status: data['status'] ?? 'offline',
-        phoneNumber: data['phoneNumber'] ?? 'Not provided',
+        phoneNumber: data['phoneNumber'].substring(1) ?? 'Not provided',
         autoDownloadSize: data['autoDownloadSize'] ?? 0,
         lastSeenPrivacy: data['lastSeenPrivacy'] ?? 'default',
         pfpPrivacy: data['pfpPrivacy'] ?? 'default',

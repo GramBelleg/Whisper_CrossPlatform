@@ -3,14 +3,14 @@ import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/settings_page_keys.dart';
 
-class ProfileSection extends StatelessWidget {
+class ProfileSection extends StatefulWidget {
   final bool isEditing;
   final bool hasStory;
   final String? profilePic;
   final String name;
   final String status;
 
-  final Function()? showImageSourceDialog;
+  final Future<bool> Function()? showImageSourceDialog;
   final Function()? showProfileOrStatusOptions;
 
   const ProfileSection({
@@ -25,6 +25,25 @@ class ProfileSection extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _ProfileSectionState createState() => _ProfileSectionState();
+}
+
+class _ProfileSectionState extends State<ProfileSection> {
+  bool isLoading = false;
+
+  Future<void> _handleProfilePicChange() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await widget.showImageSourceDialog!();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
@@ -33,12 +52,11 @@ class ProfileSection extends StatelessWidget {
           Stack(
             alignment: Alignment.center,
             children: [
-              // Circle with border if a story exists
               Container(
-                padding: const EdgeInsets.all(3), // Border thickness
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: !isEditing && hasStory
+                  gradient: !widget.isEditing && widget.hasStory
                       ? const LinearGradient(
                           colors: [Colors.purple, Colors.orange],
                           begin: Alignment.topLeft,
@@ -49,13 +67,13 @@ class ProfileSection extends StatelessWidget {
                 child: InkWell(
                   // key: SettingsPageKeys.onTapProfilePic,
                   onTap: () {
-                    if (isEditing) {
-                      showImageSourceDialog!();
+                    if (widget.isEditing) {
+                      _handleProfilePicChange();
                     } else {
-                      if (hasStory) {
-                        showProfileOrStatusOptions!();
+                      if (widget.hasStory) {
+                        widget.showProfileOrStatusOptions!();
                       } else {
-                        viewProfilePhoto(context, profilePic);
+                        viewProfilePhoto(context, widget.profilePic);
                       }
                     }
                   },
@@ -64,40 +82,42 @@ class ProfileSection extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 70,
                     backgroundColor: Colors.grey,
-                    child: profilePic == null
-                        ? Text(
-                            name.length >= 2
-                                ? name.substring(0, 2).toUpperCase()
-                                : name.toUpperCase(),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        : ClipOval(
-                            child: ColorFiltered(
-                              colorFilter: isEditing
-                                  ? const ColorFilter.mode(
-                                      Colors.grey, BlendMode.saturation)
-                                  : const ColorFilter.mode(
-                                      Colors.transparent, BlendMode.saturation),
-                              child: Image.network(
-                                profilePic!,
-                                fit: BoxFit.cover,
-                                width: 140,
-                                height: 140,
+                    child: ClipOval(
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.mode(
+                          Colors.transparent,
+                          BlendMode.saturation,
+                        ),
+                        child: Image.network(
+                          widget.profilePic,
+                          fit: BoxFit.cover,
+                          width: 140,
+                          height: 140,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                    secondNeutralColor),
                               ),
-                            ),
-                          ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-              // Camera icon overlay with action when in editing mode
-              if (isEditing)
+              if (widget.isEditing)
                 Positioned(
                   child: InkWell(
-                    onTap: showImageSourceDialog,
+                    onTap: _handleProfilePicChange,
                     splashColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     child: Icon(
@@ -110,17 +130,18 @@ class ProfileSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (!isEditing) ...[
+          if (!widget.isEditing) ...[
             Text(
-              name,
+              widget.name,
               style: TextStyle(color: secondNeutralColor, fontSize: 20),
             ),
             const SizedBox(height: 4),
             Text(
-              status == "Online" ? "Online" : "Offline",
+              widget.status == "Online" ? "Online" : "Offline",
               style: TextStyle(
-                color:
-                    status == "Online" ? const Color(0xFF4CB9CF) : Colors.grey,
+                color: widget.status == "Online"
+                    ? const Color(0xFF4CB9CF)
+                    : Colors.grey,
               ),
             ),
           ],

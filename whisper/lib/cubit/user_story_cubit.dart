@@ -71,6 +71,7 @@ class UserStoryCubit extends Cubit<UserStoryState> {
       print("send story");
       SocketService.instance.socket
           ?.emit('story', {"content": content, "media": media, "type": type});
+      emit(UserStoryLoaded(users: users, me: myUser));
     } catch (e) {
       print("Error sending story: $e");
     }
@@ -116,24 +117,15 @@ class UserStoryCubit extends Cubit<UserStoryState> {
 
 // Method to receive a new story
   Future<void> receiveStory(Map<String, dynamic> storyJson) async {
-    emit(UserStoryLoading()); // Emit loading state
+    print("receiveStory");
 
     int? myId = await getId();
     final userId = storyJson["userId"];
     String mediaUrl = await generatePresignedUrl(storyJson['media']);
     storyJson['media'] = mediaUrl;
-    print("storyJson['media'] ${storyJson['media']}");
     if (myId == storyJson["userId"]) {
       final story = Story.fromJson(storyJson);
-      if (myUser == null) {
-        // Fetch user if myUser is null
-        final user = await fetchUserById(userId); // to do api get user by id
-        if (user != null) {
-          user.stories.add(story);
-        }
-      } else {
-        myUser!.stories.add(story); // Add story to myUser
-      }
+      myUser!.stories.add(story); // Add story to myUser
     } else {
       // Check if the user already exists in the users list
       final existingUser = users.firstWhere(
@@ -151,7 +143,6 @@ class UserStoryCubit extends Cubit<UserStoryState> {
           final story = Story.fromJson(storyJson);
           user.stories.add(story); // Add story to the new user
           users.add(user); // Add user to the users list
-// Save the new user data
         }
       }
     }
@@ -221,6 +212,7 @@ class UserStoryCubit extends Cubit<UserStoryState> {
     // Listen for story updates via socket
     SocketService.instance.socket?.on('story', (data) {
       print("receive my story $data");
+      receiveStory(data);
     });
     SocketService.instance.socket?.on('viewStory', (data) {
       receiveViewStory(data);
