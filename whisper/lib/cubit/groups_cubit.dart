@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/groups_cubit_state.dart';
 import 'package:whisper/models/friend.dart';
@@ -88,7 +89,7 @@ class GroupsCubit extends Cubit<GroupsState> {
         profilePic: data['user']['profilePic'],
         isAdmin: false,
         hasStory: false,
-        lastSeen: data['lastSeen'] as DateTime ?? DateTime.now(),
+        lastSeen: DateTime.parse(data['user']['lastSeen']).toLocal(),
       );
       emit(UserAddedToGroup(user));
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:whisper/cubit/groups_cubit.dart';
 import 'package:whisper/cubit/groups_cubit_state.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/models/group_member.dart';
+import 'package:whisper/pages/group_user_permissions_page.dart';
 import 'package:whisper/services/fetch_chat_members.dart';
 import 'package:whisper/models/user.dart'; // Ensure this import points to your User model
 import 'package:whisper/services/shared_preferences.dart';
@@ -104,7 +105,34 @@ class _GroupMembersState extends State<GroupMembers> {
           ),
           onTap: () {
             // Implement logic for changing permissions
-            print("Change Permissions");
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    GroupUserPermissionsPage(
+                  chatId: widget.chatId,
+                  userId: member.id,
+                  userName: member.userName,
+                  profilePic: member.profilePic,
+                  lastSeen: _formatLastSeen(member.lastSeen),
+                ),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0); // Start from bottom
+                  const end = Offset.zero; // End at original position
+                  const curve = Curves.ease;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+              ),
+            );
           },
         ),
         PopupMenuItem(
@@ -113,7 +141,7 @@ class _GroupMembersState extends State<GroupMembers> {
               Icon(Icons.delete,
                   color: Colors.red), // Icon for Remove from Group
               SizedBox(width: 8),
-              Text("Remove from Group", style: TextStyle(color: Colors.red)),
+              Text("Remove Member", style: TextStyle(color: Colors.red)),
             ],
           ),
           onTap: () {

@@ -4,7 +4,7 @@ class Chat {
   final int chatId;
   final int othersId;
   final String userName;
-  final String avatarUrl;
+  final String? avatarUrl;
   bool hasStory;
   final bool isMuted;
   final bool isAdmin;

@@ -30,9 +30,9 @@ class FriendService {
     final chats = await fetchAddableUsers(groupId); // Existing function
     return chats.map((chat) {
       return Chat(
-        othersId: chat['othersId'],
+        othersId: chat['id'],
         userName: chat['userName'] ?? 'User${chat['id']}',
-        avatarUrl: chat['avatarUrl'],
+        avatarUrl: chat['profilePic'],
         type: "DM",
       );
     }).toList();
