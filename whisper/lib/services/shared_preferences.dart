@@ -22,7 +22,6 @@ Future<void> saveRole(String role) async {
   print('robotToken saved: $role');
 }
 
-
 Future<String?> getRole() async {
   String? role = await _secureStorage.read(key: 'role');
   print('Loaded email: $role');
@@ -93,8 +92,12 @@ Future<void> cacheMessages(int chatId, List<ChatMessage> messages) async {
 
 Future<void> cacheSingleMessage(int chatId, ChatMessage message) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String cachedMessage = jsonEncode(message.toJson());
-  await prefs.setString('cached_message_$chatId', cachedMessage);
+
+  List<String> cachedMessages =
+      prefs.getStringList('cached_messages_$chatId') ?? [];
+  cachedMessages.add(jsonEncode(message.toJson()));
+  await prefs.setStringList('cached_messages_$chatId', cachedMessages);
+
   print('Single message for chatId $chatId cached');
 }
 
@@ -161,8 +164,6 @@ Future<String?> getImageUrl(String blobName) async {
   }
   return null;
 }
-
-
 
 Future<void> saveUsers(List<User> users) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();

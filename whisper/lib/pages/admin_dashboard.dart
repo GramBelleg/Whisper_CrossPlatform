@@ -30,7 +30,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   List<dynamic> users = [];
   List<dynamic> bannedUsers = [];
   List<dynamic> unbannedUsers = [];
-
+  List<dynamic> groups = [];
+  List<dynamic> filterGroups = [];
+  List<dynamic> unfilterGroups = [];
+  bool showUsers = true;
   @override
   void initState() {
     super.initState();
@@ -46,66 +49,146 @@ class _AdminDashboardState extends State<AdminDashboard> {
     });
   }
 
+  Future<void> _fetchGroups() async {
+    final fetchedGroups = await AdminDashboardService.getAllGroups(context);
+    setState(() {
+      if (fetchedGroups != null) groups = fetchedGroups;
+      filterGroups =
+          groups.where((group) => group['filtered'] == true).toList();
+      unfilterGroups =
+          groups.where((group) => group['filtered'] == false).toList();
+    });
+  }
+
   Future<void> _banUser(bool ban, int userId) async {
     await AdminDashboardService.banAUser(context, ban, userId);
     _fetchUsers(); // Refresh the user list after banning/unbanning
+  }
+
+  Future<void> _filterGroup(bool filter, int groupId) async {
+    await AdminDashboardService.filterGroup(context, filter, groupId);
+    _fetchGroups(); // Refresh the group list after filtering/unfiltering
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: firstNeutralColor,
-      appBar: AppBar(title: Text("Users List")),
+      appBar: AppBar(
+        title: Text(showUsers ? "Users List" : "Groups List"),
+        actions: [
+          IconButton(
+            icon: Icon(showUsers ? Icons.group : Icons.person),
+            onPressed: () {
+              setState(() {
+                showUsers = !showUsers;
+                if (!showUsers) {
+                  _fetchGroups();
+                }
+              });
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Unbanned Users:",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: secondNeutralColor),
+            if (showUsers) ...[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Unbanned Users:",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: secondNeutralColor),
+                ),
               ),
-            ),
-            ...unbannedUsers.map((user) => ListTile(
-                  title: Text(
-                    user['userName'],
-                    style: TextStyle(color: secondNeutralColor),
-                  ),
-                  trailing: ElevatedButton(
-                    onPressed: () => _banUser(true, user['id']),
-                    child: Text("Ban",
-                        style: TextStyle(color: secondNeutralColor)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
+              ...unbannedUsers.map((user) => ListTile(
+                    title: Text(
+                      user['userName'],
+                      style: TextStyle(color: secondNeutralColor),
                     ),
-                  ),
-                )),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Banned Users:",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: secondNeutralColor),
+                    trailing: ElevatedButton(
+                      onPressed: () => _banUser(true, user['id']),
+                      child: Text("Ban",
+                          style: TextStyle(color: secondNeutralColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                      ),
+                    ),
+                  )),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Banned Users:",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: secondNeutralColor),
+                ),
               ),
-            ),
-            ...bannedUsers.map((user) => ListTile(
-                  title: Text(user['userName'],
-                      style: TextStyle(color: secondNeutralColor)),
-                  trailing: ElevatedButton(
-                    onPressed: () => _banUser(false, user['id']),
-                    child: Text("Unban",
+              ...bannedUsers.map((user) => ListTile(
+                    title: Text(user['userName'],
                         style: TextStyle(color: secondNeutralColor)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
+                    trailing: ElevatedButton(
+                      onPressed: () => _banUser(false, user['id']),
+                      child: Text("Unban",
+                          style: TextStyle(color: secondNeutralColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                      ),
                     ),
-                  ),
-                )),
+                  )),
+            ] else ...[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "UnFiltered Groups:",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: secondNeutralColor),
+                ),
+              ),
+              ...unfilterGroups.map((group) => ListTile(
+                    title: Text(
+                      group['name'],
+                      style: TextStyle(color: secondNeutralColor),
+                    ),
+                    trailing: ElevatedButton(
+                      onPressed: () => _filterGroup(true, group['chatId']),
+                      child: Text("Filter",
+                          style: TextStyle(color: secondNeutralColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                      ),
+                    ),
+                  )),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Filtered Groups:",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: secondNeutralColor),
+                ),
+              ),
+              ...filterGroups.map((group) => ListTile(
+                    title: Text(group['name'],
+                        style: TextStyle(color: secondNeutralColor)),
+                    trailing: ElevatedButton(
+                      onPressed: () => _filterGroup(false, group['chatId']),
+                      child: Text("unfilter",
+                          style: TextStyle(color: secondNeutralColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                      ),
+                    ),
+                  )),
+            ],
             SizedBox(
               height: 30,
             ),

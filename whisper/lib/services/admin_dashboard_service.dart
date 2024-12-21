@@ -31,7 +31,35 @@ class AdminDashboardService {
       print(e);
     }
   }
-  static Future<void> banAUser(BuildContext context,bool ban, int userId) async {
+
+  static Future<List<dynamic?>?> getAllGroups(BuildContext context) async {
+    final url = Uri.parse('http://$ip:5000/api/admin/groups');
+    final token = await getToken();
+    showLoadingDialog(context);
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      Navigator.pop(context);
+      print("Response:$response");
+      final data = jsonDecode(response.body);
+      print(data);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return data;
+      } else {
+        return data;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> banAUser(
+      BuildContext context, bool ban, int userId) async {
     final url = Uri.parse('http://$ip:5000/api/admin/ban/$ban/user/$userId');
     final token = await getToken();
     showLoadingDialog(context);
@@ -49,9 +77,38 @@ class AdminDashboardService {
       final data = jsonDecode(response.body);
       print(data);
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return ;
+        return;
       } else {
-        return ;
+        return;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> filterGroup(
+      BuildContext context, bool filter, int userId) async {
+    final url =
+        Uri.parse('http://$ip:5000/api/admin/filter/$filter/group/$userId');
+    final token = await getToken();
+    showLoadingDialog(context);
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      Navigator.pop(context);
+      print("Response:$response");
+      final data = jsonDecode(response.body);
+      print(data);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return;
+      } else {
+        return;
       }
     } catch (e) {
       print(e);

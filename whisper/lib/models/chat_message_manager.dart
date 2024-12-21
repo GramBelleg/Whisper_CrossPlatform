@@ -63,19 +63,29 @@ class ChatMessageManager {
         addMessage(state.message);
       }
     } else if (state is MessageReceived) {
-      print("received");
-      handleCancelReply();
-      DateTime receivedTime = state.message.time!.toLocal();
-      int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
+      print("receiveddddddddd${state.message}");
+      int index = 0;
+      if (state.message.isSafe == false) {
+        handleCancelReply();
+        DateTime receivedTime = state.message.sentAt!.toLocal();
+        index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
+      } else {
+        handleCancelReply();
+        DateTime receivedTime = state.message.time!.toLocal();
+        index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
+      }
+      print("index $index");
       if (state.message.chatId == chatId) {
-        if (index!=-1 &&messages[index].isSafe == false) {
+        if (index != -1 && state.message.isSafe == false) {
           messages.removeAt(index);
         } else if (index != -1) {
           messages[index] = state.message;
         } else {
           addMessage(state.message);
         }
-        cacheSingleMessage(chatId, state.message);
+        if (state.message.isSafe == true) {
+          cacheSingleMessage(chatId, state.message);
+        }
       }
     } else if (state is MessagesDeletedSuccessfully) {
       removeMessagesByIds(state.deletedIds);
