@@ -23,7 +23,9 @@ class ChatMessage {
   final String type;
   final ParentMessage? parentMessage;
   final ForwardedFrom? forwardedFrom;
+  final bool ?isSafe;
   final String? extension;
+ 
 
   ChatMessage({
     this.id,
@@ -46,6 +48,7 @@ class ChatMessage {
     required this.type,
     this.parentMessage,
     this.forwardedFrom,
+    this.isSafe,
     this.extension,
   });
 
@@ -77,6 +80,7 @@ class ChatMessage {
       forwardedFrom: json['forwardedFrom'] != null
           ? ForwardedFrom.fromJson(json['forwardedFrom'])
           : null,
+      isSafe: json['isSafe'],    
       extension: json['extension'],
     );
   }
@@ -103,6 +107,7 @@ class ChatMessage {
       'type': type,
       'parentMessage': parentMessage?.toJson(),
       'forwardedFrom': forwardedFrom?.toJson(),
+      'isSafe': isSafe,
       'extension': extension
     };
   }
@@ -130,6 +135,7 @@ class ChatMessage {
         'type: $type, '
         'parentMessage: $parentMessage, '
         'forwardedFrom: $forwardedFrom'
+        'isSafe: $isSafe'
         ')';
   }
 }

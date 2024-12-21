@@ -150,6 +150,7 @@ class MessagesCubit extends Cubit<MessagesState> {
       parentMessage: parentMessage,
       forwardedFrom: forwardedFrom,
       extension: data['extension'],
+      isSafe: data['isSafe'],
     );
   }
 

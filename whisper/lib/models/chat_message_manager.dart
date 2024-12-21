@@ -68,7 +68,9 @@ class ChatMessageManager {
       DateTime receivedTime = state.message.time!.toLocal();
       int index = messages.indexWhere((msg) => msg.sentAt == receivedTime);
       if (state.message.chatId == chatId) {
-        if (index != -1) {
+        if (index!=-1 &&messages[index].isSafe == false) {
+          messages.removeAt(index);
+        } else if (index != -1) {
           messages[index] = state.message;
         } else {
           addMessage(state.message);
