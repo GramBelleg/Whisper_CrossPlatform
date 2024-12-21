@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/keys/settings_page_keys.dart';
-import 'package:whisper/validators/form-validation/validate_email_field.dart';
-import 'package:whisper/validators/form-validation/validate_name_field.dart';
-import 'package:whisper/validators/form-validation/validate_number_field.dart';
-import 'package:whisper/validators/form-validation/validate_user_name_field.dart';
 
 class EditFields extends StatelessWidget {
   final TextEditingController bioController;
@@ -19,8 +14,7 @@ class EditFields extends StatelessWidget {
   final String usernameStateUpdate;
   final String phoneNumberStateUpdate;
   final String emailStateUpdate;
-  final Future<bool> Function(String email)
-      confirmCodeFunction; // Accept function as parameter
+  final Future<bool> Function(String email) confirmCodeFunction;
 
   const EditFields({
     super.key,
@@ -34,7 +28,7 @@ class EditFields extends StatelessWidget {
     required this.usernameStateUpdate,
     required this.phoneNumberStateUpdate,
     required this.emailStateUpdate,
-    required this.confirmCodeFunction, // Pass the function here
+    required this.confirmCodeFunction,
   });
 
   @override
@@ -42,61 +36,32 @@ class EditFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(bioController, 'Bio',
-            stateText: bioStateUpdate,
-            maxLength: 200,
-            validator: null, // Validate bio field
-            setUpdate:
-                GlobalSettingsCubitProvider.settingsCubit.setBioStateUpdate),
-        _buildTextField(nameController, 'Name',
-            stateText: nameStateUpdate,
-            maxLength: 50,
-            validator: (text) => validateNameField(text), // Validate name field
-            setUpdate:
-                GlobalSettingsCubitProvider.settingsCubit.setNameStateUpdate),
-        _buildTextField(usernameController, 'Username',
-            stateText: usernameStateUpdate,
-            maxLength: 20,
-            validator: (text) =>
-                validateUsernameField(text), // Validate username field
-            setUpdate: GlobalSettingsCubitProvider
-                .settingsCubit.setUsernameStateUpdate),
-        _buildTextField(phoneController, 'Phone Number',
-            stateText: phoneNumberStateUpdate,
-            maxLength: 15,
-            keyboardType: TextInputType.phone,
-            validator: (text) =>
-                validateNumberFieldString(text), // Validate phone number field
-            setUpdate: GlobalSettingsCubitProvider
-                .settingsCubit.setPhoneNumberStateUpdate),
-        _buildTextField(emailController, 'Email',
+        _buildTextField(SettingsPageKeys.textFieldBio, bioController, 'Bio',
+            stateText: bioStateUpdate, maxLength: 200, context: context),
+        _buildTextField(SettingsPageKeys.textFieldName, nameController, 'Name',
+            stateText: nameStateUpdate, maxLength: 50, context: context),
+        _buildTextField(
+            SettingsPageKeys.textFieldUserName, usernameController, 'Username',
+            stateText: usernameStateUpdate, maxLength: 30, context: context),
+        _buildTextField(SettingsPageKeys.textFieldPhoneNumber, phoneController,
+            'Phone Number',
+            stateText: phoneNumberStateUpdate, maxLength: 15, context: context),
+        _buildTextField(
+            SettingsPageKeys.textFieldEmail, emailController, 'Email',
             stateText: emailStateUpdate,
             needCode: true,
             maxLength: 100,
-            keyboardType: TextInputType.emailAddress,
-            validator: (text) =>
-                validateEmailField(text), // Validate email field
-            setUpdate:
-                GlobalSettingsCubitProvider.settingsCubit.setEmailStateUpdate),
+            context: context),
       ],
     );
   }
 
   Widget _buildTextField(
-    TextEditingController controller,
-    String labelText, {
-    String? stateText,
-    bool needCode = false,
-    TextInputType keyboardType = TextInputType.text,
-    int? maxLength,
-    String? Function(String?)? validator,
-    Future<void> Function(String)? setUpdate,
-  }) {
-    controller.addListener(() {
-      GlobalSettingsCubitProvider.settingsCubit
-          .setAllStateUpdate(''); // Reset state on text change
-    });
-
+      String textFieldKey, TextEditingController controller, String labelText,
+      {String? stateText,
+      bool needCode = false,
+      int? maxLength,
+      required BuildContext context}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -113,12 +78,10 @@ class EditFields extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Text(
-                  stateText.length > 30
-                      ? '${stateText.substring(0, 30)}...' // Truncate large text
-                      : stateText,
+                  '*', // Show just the dot if the text is too long
                   style: TextStyle(
                     color: stateText == "Updated" ? highlightColor : Colors.red,
-                    fontSize: 14,
+                    fontSize: 20,
                   ),
                   overflow: TextOverflow.ellipsis, // Ensure no overflow
                   maxLines: 1, // Prevent the text from wrapping
@@ -128,6 +91,7 @@ class EditFields extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Container(
+          height: 50,
           decoration: BoxDecoration(
             color: const Color(0xFF0A254A),
             borderRadius: BorderRadius.circular(25),
@@ -136,36 +100,28 @@ class EditFields extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  key: Key("$labelText${SettingsPageKeys.textField}"),
+                  key: Key(textFieldKey),
                   controller: controller,
                   style: TextStyle(color: secondNeutralColor),
-                  textAlign: controller.text.isEmpty
-                      ? TextAlign.center
-                      : TextAlign.start, // Center text when empty
-                  decoration: const InputDecoration(
+                  keyboardType: labelText == 'Phone Number'
+                      ? TextInputType.phone
+                      : TextInputType.text,
+                  inputFormatters: labelText == 'Phone Number'
+                      ? [FilteringTextInputFormatter.digitsOnly]
+                      : null,
+                  decoration: InputDecoration(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     border: InputBorder.none,
                   ),
-                  keyboardType: keyboardType,
-                  maxLength: maxLength,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  minLines: 1,
-                  maxLines: null,
-                  onChanged: (text) {
-                    final errorMessage = validator?.call(text);
-                    if (errorMessage != null) {
-                      setUpdate!(errorMessage);
-                    }
-                  },
+                  maxLength: maxLength, // Add character limit here
                 ),
               ),
               if (needCode)
                 TextButton(
                   key: SettingsPageKeys.sendCodeButton,
                   onPressed: () {
-                    confirmCodeFunction(
-                        controller.text); // Call the passed function
+                    confirmCodeFunction(controller.text);
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: highlightColor,
@@ -176,7 +132,38 @@ class EditFields extends StatelessWidget {
             ],
           ),
         ),
+        if (stateText != null && stateText.isNotEmpty)
+          // Show SnackBar after the widget has built
+          _ShowSnackBar(
+              stateText: stateText, labelText: labelText, context: context),
       ],
     );
+  }
+}
+
+class _ShowSnackBar extends StatelessWidget {
+  final String stateText;
+  final BuildContext context;
+  final String labelText;
+
+  const _ShowSnackBar(
+      {required this.stateText,
+      required this.context,
+      required this.labelText});
+
+  @override
+  Widget build(BuildContext context) {
+    // Delay the SnackBar to allow the UI to update
+    Future.delayed(Duration(milliseconds: 50), () {
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(
+          content: stateText == "Updated"
+              ? Text("$labelText: $stateText")
+              : Text(stateText),
+          backgroundColor: stateText == "Updated" ? highlightColor : Colors.red,
+        ),
+      );
+    });
+    return Container();
   }
 }

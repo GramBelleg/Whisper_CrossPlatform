@@ -31,23 +31,16 @@ class ProfileSection extends StatefulWidget {
 class _ProfileSectionState extends State<ProfileSection> {
   bool isLoading = false;
 
-  // Function to handle profile picture change
   Future<void> _handleProfilePicChange() async {
     setState(() {
-      isLoading = true; // Start loading
+      isLoading = true;
     });
 
-    bool success = await widget.showImageSourceDialog!(); // Call the dialog
+    await widget.showImageSourceDialog!();
 
     setState(() {
-      isLoading = false; // Stop loading after the operation is complete
+      isLoading = false;
     });
-
-    if (success) {
-      // Handle success (optional: show a message)
-    } else {
-      // Handle failure (optional: show an error)
-    }
   }
 
   @override
@@ -59,9 +52,8 @@ class _ProfileSectionState extends State<ProfileSection> {
           Stack(
             alignment: Alignment.center,
             children: [
-              // Circle with border if a story exists
               Container(
-                padding: const EdgeInsets.all(3), // Border thickness
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: !widget.isEditing && widget.hasStory
@@ -76,7 +68,7 @@ class _ProfileSectionState extends State<ProfileSection> {
                   key: SettingsPageKeys.onTapProfilePic,
                   onTap: () {
                     if (widget.isEditing) {
-                      _handleProfilePicChange(); // Show image source dialog
+                      _handleProfilePicChange();
                     } else {
                       if (widget.hasStory) {
                         widget.showProfileOrStatusOptions!();
@@ -93,24 +85,35 @@ class _ProfileSectionState extends State<ProfileSection> {
                     child: ClipOval(
                       child: ColorFiltered(
                         colorFilter: const ColorFilter.mode(
-                            Colors.transparent, BlendMode.saturation),
-                        child: isLoading
-                            ? const CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.transparent,
+                          BlendMode.saturation,
+                        ),
+                        child: Image.network(
+                          widget.profilePic,
+                          fit: BoxFit.cover,
+                          width: 140,
+                          height: 140,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
                                     secondNeutralColor),
-                              ) // Show loading spinner
-                            : Image.network(
-                                widget.profilePic,
-                                fit: BoxFit.cover,
-                                width: 140,
-                                height: 140,
                               ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-              // Camera icon overlay with action when in editing mode
               if (widget.isEditing)
                 Positioned(
                   child: InkWell(

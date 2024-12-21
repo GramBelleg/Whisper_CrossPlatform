@@ -1,7 +1,11 @@
 import 'package:flutter/widgets.dart';
 
 class SettingsPageKeys {
-  static String textField = " textField";
+  static String textFieldEmail = " textFieldEmail";
+  static String textFieldName = " textFieldName";
+  static String textFieldUserName = " textFieldUserName";
+  static String textFieldBio = " textFieldBio";
+  static String textFieldPhoneNumber = " textFieldPhoneNumber";
   static const editButton = Key('editButton');
   static const doneButton = Key('doneButton');
   static const cancelButton = Key('cancelButton');
@@ -18,4 +22,5 @@ class SettingsPageKeys {
   static const addStoryInProfile = Key('addStoryInProfile');
   static const copyRow = Key('copyRow');
   static const onTapProfilePic = Key('onTapProfilePic');
+  static const phoneNumberField = "phoneNumberField";
 }
