@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/keys/login_keys.dart';
 import 'package:whisper/models/login_credentials.dart';
+import 'package:whisper/pages/admin_dashboard.dart';
 import 'package:whisper/pages/forget_password_email.dart';
 import 'package:whisper/pages/sign_up.dart';
 import 'package:whisper/validators/form-validation/validate_email_field.dart';
@@ -29,7 +30,7 @@ class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
 
   final TextEditingController passwordController = TextEditingController();
-  Future<bool?>? loginStatusFuture;
+  Future<String?>? loginStatusFuture;
 
   void _submitForm() async {
     if (formKey.currentState!.validate()) {
@@ -50,7 +51,7 @@ class _LoginState extends State<Login> {
     loginStatusFuture = _checkLoginStatus();
   }
 
-  Future<bool?> _checkLoginStatus() async {
+  Future<String?> _checkLoginStatus() async {
     return await LoginService.checkAlreadyLoggedIn(context);
   }
 
@@ -60,7 +61,7 @@ class _LoginState extends State<Login> {
       future: loginStatusFuture,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.waiting) {
-          if (snap.hasData && snap.data != null && !snap.data!) {
+          if (snap.hasData && snap.data != null && snap.data=='') {
             return Scaffold(
               backgroundColor: firstNeutralColor,
               body: Padding(
@@ -165,10 +166,14 @@ class _LoginState extends State<Login> {
                 ),
               ),
             );
-          } else if (snap.hasData && snap.data != null && snap.data!) {
+          } else if (snap.hasData && snap.data != null && snap.data!!="Admin") {
             return PageState();
             //todo: this should be replaced with the real chat page
           }
+          else if(snap.hasData && snap.data != null && snap.data=="Admin")
+            {
+              return AdminDashboard();
+            }
           return Scaffold(
             body: Center(
               child: Text("Run the backend first"),
