@@ -163,44 +163,58 @@ class _SettingsContentState extends State<SettingsContent> {
                 )
               ]
             : [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        print('Edit tapped');
-                        context.read<SettingsCubit>().toggleEditing();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            right: 8.0), // Add space between Edit and Icon
-                        child: Text(
-                          "Edit",
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
+                GestureDetector(
+                  onTap: () {
+                    print('Edit tapped');
+                    context.read<SettingsCubit>().toggleEditing();
+                  },
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 16,
                     ),
-                    IconButton(
-                      key: SettingsPageKeys.addStoryInProfile,
-                      icon: SizedBox(
-                        width: 23.0,
-                        height: 23.0,
-                        child: Image.asset(
-                          "assets/images/addStoryFirstNeutralColor_Icon.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      onPressed: () {
-                        print('Add Story tapped');
-                        _addStory();
-                      },
+                  ),
+                ),
+                IconButton(
+                  key: SettingsPageKeys.addStoryInProfile,
+                  icon: SizedBox(
+                    width: 23.0,
+                    height: 23.0,
+                    child: Image.asset(
+                      "assets/images/addStoryFirstNeutralColor_Icon.png",
+                      fit: BoxFit.cover,
                     ),
-                  ],
+                  ),
+                  onPressed: () {
+                    print('Add Story tapped');
+                    _addStory();
+                  },
                 ),
               ],
+        title: widget.isEditing
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    key: SettingsPageKeys.cancelButton,
+                    onPressed: () {
+                      context.read<SettingsCubit>().toggleEditing();
+                      context.read<SettingsCubit>().resetStateMessages();
+                    },
+                    child: Text(
+                      "Cancel",
+                      style: TextStyle(
+                        color: secondNeutralColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 60), // Placeholder for alignment
+                ],
+              )
+            : null,
       ),
       body: SingleChildScrollView(
         child: Padding(
