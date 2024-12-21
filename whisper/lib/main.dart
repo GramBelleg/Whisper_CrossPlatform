@@ -35,6 +35,7 @@ import 'dart:io';
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,6 +88,7 @@ class _WhisperState extends State<Whisper> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
+      scaffoldMessengerKey: scaffoldKey,
       debugShowCheckedModeBanner: false,
       initialRoute: Login.id,
       theme: ThemeData(fontFamily: 'ABeeZee'),
