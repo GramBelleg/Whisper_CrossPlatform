@@ -9,6 +9,7 @@ import 'package:whisper/pages/group_info.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 import '../pages/call_page.dart';
+
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
   //final String? userImage;
@@ -273,6 +274,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                         isChannel: widget.chat.type == 'CHANNEL',
                         isChannelAdmin: widget.chat.isAdmin &&
                             widget.chat.type == 'CHANNEL',
+                        isGroupAdmin:
+                            widget.chat.isAdmin && widget.chat.type == 'GROUP',
                         groupName: widget.chat.userName,
                         profilePicture: widget.chat.avatarUrl,
                         groupId: widget.chat.chatId,

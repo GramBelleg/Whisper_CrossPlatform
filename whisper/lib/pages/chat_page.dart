@@ -435,6 +435,7 @@ class _ChatPageState extends State<ChatPage> {
                                   handleOncancelReply();
                                 },
                               ),
+                              // TODO: append to this variable (if user can post)
                               (!widget.chat.isAdmin && widget.chat.type == "CHANNEL")
                                   ? Container()
                                   : Row(
