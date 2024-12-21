@@ -9,6 +9,7 @@ import 'package:whisper/pages/group_info.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:whisper/view-models/custom_app_bar_view_model.dart';
 import '../pages/call_page.dart';
+
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final List<int> isSelected; // List of selected message IDs
   //final String? userImage;
@@ -215,12 +216,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      key: Key(CustomAppBarKeys.popupPin),
-                      value: 'Pin',
-                      child: Text('Pin'),
-                      //todo if messages is pin make text unpin
-                    ),
+                    if (!(widget.chat.type == 'GROUP' && !widget.chat.isAdmin))
+                      const PopupMenuItem(
+                        key: Key(CustomAppBarKeys.popupPin),
+                        value: 'Pin',
+                        child: Text('Pin'),
+                        //todo if messages is pin make text unpin
+                      ),
                     if (widget.editable)
                       const PopupMenuItem(
                         key: Key(CustomAppBarKeys.popupEdit),

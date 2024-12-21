@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:whisper/components/custom_access_button.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/keys/call_page_keys.dart';
 import 'package:whisper/services/calls_service.dart';
 import 'package:whisper/services/shared_preferences.dart';
 class CallStateManager {
@@ -137,6 +138,7 @@ class _CallState extends State<Call> {
               height: 20,
             ),
             CustomAccessButton(
+              key: Key(CallPageKeys.muteButton),
               label: _isMuted ? 'Unmute' : 'Mute',
               onPressed: () {
                 _toggleMute();
@@ -146,6 +148,7 @@ class _CallState extends State<Call> {
               height: 20,
             ),
             CustomAccessButton(
+              key: Key(CallPageKeys.endCallButton),
               label: "End Call",
               onPressed: () async {
                 await _endCall();
