@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:whisper/services/shared_preferences.dart';
 
 class UserState extends Equatable {
   final String name;
@@ -31,9 +30,7 @@ class UserState extends Equatable {
     required this.readReceipts,
     required this.hasStory,
   });
-
-// CopyWith method
-  Future<UserState> copyWith({
+  UserState copyWith({
     String? name,
     String? username,
     String? email,
@@ -47,9 +44,8 @@ class UserState extends Equatable {
     String? pfpPrivacy,
     bool? readReceipts,
     bool? hasStory,
-  }) async {
-    // Create a new instance with the updated values or existing values if none are provided
-    UserState updatedUserState = UserState(
+  }) {
+    return UserState(
       name: name ?? this.name,
       username: username ?? this.username,
       email: email ?? this.email,
@@ -64,12 +60,6 @@ class UserState extends Equatable {
       readReceipts: readReceipts ?? this.readReceipts,
       hasStory: hasStory ?? this.hasStory,
     );
-
-    // Save the updated state after any changes
-    print("saveUserState in copy with in user state");
-    await saveUserState(updatedUserState);
-
-    return updatedUserState; // Return the updated UserState
   }
 
   // From JSON method

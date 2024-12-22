@@ -2,12 +2,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:whisper/components/helpers.dart';
+import 'package:whisper/controllers/custom_phone_controller.dart';
 import 'package:whisper/models/user_state.dart';
 import 'package:whisper/services/fetch_user_info.dart';
 import 'package:whisper/services/send_confirmation_code_email.dart';
 import 'package:whisper/services/verify_email_code.dart';
 import 'package:whisper/services/read_file.dart';
-import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/update_user_field.dart';
 import 'package:whisper/socket.dart';
 part 'setting_state.dart';
@@ -21,8 +21,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   late TextEditingController usernameController;
   late TextEditingController emailController;
   late TextEditingController bioController;
-  late TextEditingController phoneController;
-
+  late CustomPhoneController phoneController;
+  late UserState myUser;
   String nameState = '';
   String usernameState = '';
   String emailState = '';
@@ -38,34 +38,33 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit()
       : nameController = TextEditingController(),
         usernameController = TextEditingController(),
-        phoneController = TextEditingController(),
+        phoneController = CustomPhoneController(),
         emailController = TextEditingController(),
         bioController = TextEditingController(),
         super(SettingsLoading());
 
   // Helper method to update the state
   void _emitUpdatedState() async {
-    final userState = await getUserState();
     emit(SettingsLoaded(
-        userState: userState,
+        userState: myUser,
         isEditing: isEditing,
         nameController: nameController,
         usernameController: usernameController,
         emailController: emailController,
         bioController: bioController,
         phoneController: phoneController,
-        nameState: userState!.name,
-        usernameState: userState.username,
-        emailState: userState.email,
-        phoneNumberState: userState.phoneNumber,
-        bioState: userState.bio,
+        nameState: myUser.name,
+        usernameState: myUser.username,
+        emailState: myUser.email,
+        phoneNumberState: myUser.phoneNumber,
+        bioState: myUser.bio,
         nameStateUpdate: nameStateUpdate,
         usernameStateUpdate: usernameStateUpdate,
         emailStateUpdate: emailStateUpdate,
         phoneNumberStateUpdate: phoneNumberStateUpdate,
         bioStateUpdate: bioStateUpdate,
-        profilePicState: userState.profilePic,
-        hasStory: userState.hasStory));
+        profilePicState: myUser.profilePic,
+        hasStory: myUser.hasStory));
   }
 
   Future<void> receiveMyProfilePic(String? blobName) async {
@@ -73,8 +72,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         ? await generatePresignedUrl(blobName)
         : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(usernameState)}';
     print("changed Profile Pic");
-    final userState = (state as SettingsLoaded).userState;
-    userState?.copyWith(profilePic: imageUrl);
+    myUser = myUser.copyWith(profilePic: imageUrl);
     _emitUpdatedState();
   }
 
@@ -97,14 +95,9 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> loadUserState() async {
     try {
       emit(SettingsLoading());
-      final userState = await fetchUserInfo();
-      if (userState != null) {
-        await saveUserState(userState); // save in shared preferences
-        _populateControllers(userState);
-        _emitUpdatedState();
-      } else {
-        emit(SettingsLoadError("User state not found."));
-      }
+      myUser = (await fetchUserInfo())!;
+      _populateControllers(myUser);
+      _emitUpdatedState();
     } catch (e) {
       emit(SettingsLoadError("Error loading user state: $e"));
     }
@@ -129,15 +122,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     emailStateUpdate = '';
     phoneNumberStateUpdate = '';
     bioStateUpdate = '';
-    _populateControllers(await getUserState() as UserState);
+    _populateControllers(myUser);
     _emitUpdatedState();
   }
 
   Future<void> updateHasStoryUserState() async {
-    final userState = await getUserState();
-    if (!userState!.hasStory) {
-      //remove if condation after update backend this
-      userState.copyWith(hasStory: !userState.hasStory);
+    if (!myUser.hasStory) {
+      //remove if condition after update backend this
+      myUser = myUser.copyWith(hasStory: !myUser.hasStory);
     }
     print("update hasStory");
     _emitUpdatedState();
@@ -182,20 +174,22 @@ class SettingsCubit extends Cubit<SettingsState> {
   // Update user field (generic update function for each field)
   Future<Map<String, dynamic>> updateField(
       String newValue, String field) async {
+    print("the phone is uu $newValue");
+
     final response = await updateUserField(field, newValue);
     final success = response['success'] ?? false;
     final message = response['success'] ? "Updated" : response['message'];
-
+    print("the phone is uu $response");
     if (success) {
-      final userState = (state as SettingsLoaded).userState;
       if (field == 'name') {
-        userState?.copyWith(name: newValue);
+        myUser = myUser.copyWith(name: newValue);
       } else if (field == 'userName') {
-        userState?.copyWith(username: newValue);
+        myUser = myUser.copyWith(username: newValue);
       } else if (field == 'phoneNumber') {
-        userState?.copyWith(phoneNumber: newValue);
+        myUser = myUser.copyWith(phoneNumber: newValue);
       } else if (field == 'bio') {
-        userState?.copyWith(bio: newValue);
+        myUser = myUser.copyWith(bio: newValue);
+        print("bio aaa ${myUser.toJson()}");
       }
       _emitUpdatedState();
     }
@@ -205,8 +199,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateProfilePic(String blobName) async {
     String response = await generatePresignedUrl(blobName);
-    final userState = (state as SettingsLoaded).userState;
-    userState?.copyWith(profilePic: response);
+    myUser = myUser.copyWith(profilePic: response);
     _emitUpdatedState();
   }
 
@@ -221,8 +214,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       String code, String email, BuildContext context) async {
     final response = await verifyEmailCode(code, email, context);
     if (response['success']) {
-      final userState = (state as SettingsLoaded).userState;
-      userState?.copyWith(email: email);
+      myUser = myUser.copyWith(email: email);
       _emitUpdatedState();
     }
     return response;
