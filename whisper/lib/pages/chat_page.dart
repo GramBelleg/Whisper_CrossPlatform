@@ -24,6 +24,7 @@ import 'package:whisper/components/message_list.dart';
 import 'package:whisper/services/fetch_chat_messages.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:whisper/services/group_management_service.dart';
 import 'package:whisper/services/upload_file.dart';
 import 'package:vibration/vibration.dart';
 
@@ -73,9 +74,16 @@ class _ChatPageState extends State<ChatPage> {
   int _editingMessageId = 0;
   late PlayerController globalPlayerController;
 
+  // track permissions and fetch those permissions in the initstate
+  bool iCanPost = true;
+  bool iCanEdit = true;
+  bool iCanDelete = true;
+  bool iCanDownload = true;
+
   @override
   void initState() {
     super.initState();
+    fetchMyPermissions();
     GlobalCubitProvider.messagesCubit.loadMessages(widget.chat.chatId);
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -98,6 +106,32 @@ class _ChatPageState extends State<ChatPage> {
     globalPlayerController.dispose();
     // GlobalChatsCubitProvider.chatListCubit.loadChats();
     super.dispose();
+  }
+
+  void fetchMyPermissions() async {
+    // only if the chat type is group or channel
+
+    print("Fetching permissionssssssss");
+
+
+    if (widget.chat.type == "GROUP") {
+
+      print("Fetching permissions for groupppppp");
+
+      final permissions = await GroupManagementService()
+          .getUserPermissions(widget.chat.chatId, widget.senderId!);
+
+      print("Permissionsssss are $permissions");
+
+      setState(() {
+        iCanPost = permissions['canPost']!;
+        iCanEdit = permissions['canEdit']!;
+        iCanDelete = permissions['canDelete']!;
+        iCanDownload = permissions['canDownload']!;
+      });
+    } else if (widget.chat.type == "CHANNEL") {
+      //TODO
+    }
   }
 
   void _updateTextProperties(String text) {
@@ -358,16 +392,16 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(
-          chat:widget.chat,
+          chat: widget.chat,
           isSelected: isSelectedList,
           //userImage: widget.chat.avatarUrl,
           //userName: widget.chat.userName,
           clearSelection: clearIsSelected,
-         // chatId: widget.chat.chatId,
+          // chatId: widget.chat.chatId,
           chatViewModel: ChatViewModel(),
           deleteDisable:
-              widget.chat.type == "CHANNEL" && widget.chat.isAdmin == false,
-          editable: isSelectedList.length == 1 &&
+              (widget.chat.type == "CHANNEL" && widget.chat.isAdmin == false) || iCanDelete == false,
+          editable: iCanEdit && isSelectedList.length == 1 &&
               isSelectedList.first != null &&
               chatMessageManager.messages.any((message) =>
                   message.id == isSelectedList.first &&
@@ -376,7 +410,7 @@ class _ChatPageState extends State<ChatPage> {
                           .firstWhere((msg) => msg.id == message.id)
                           .type ==
                       "TEXT"),
-         // chatType: widget.chat.type,
+          // chatType: widget.chat.type,
         ),
         body: BlocProvider<MessagesCubit>.value(
           value: GlobalCubitProvider.messagesCubit,
@@ -436,7 +470,8 @@ class _ChatPageState extends State<ChatPage> {
                                 },
                               ),
                               // TODO: append to this variable (if user can post)
-                              (!widget.chat.isAdmin && widget.chat.type == "CHANNEL")
+                              (!widget.chat.isAdmin &&
+                                      widget.chat.type == "CHANNEL") || iCanPost == false
                                   ? Container()
                                   : Row(
                                       mainAxisAlignment:
@@ -492,10 +527,12 @@ class _ChatPageState extends State<ChatPage> {
                                                           _toggleGifPicker,
                                                       toggleStickerPicker:
                                                           _toggleStickerPicker,
-                                                      chatId: widget.chat.chatId,
+                                                      chatId:
+                                                          widget.chat.chatId,
                                                       senderId:
                                                           widget.senderId!,
-                                                      userName: widget.chat.userName,
+                                                      userName:
+                                                          widget.chat.userName,
                                                       parentMessage:
                                                           _replyingTo,
                                                       isReplying: _isReplying,

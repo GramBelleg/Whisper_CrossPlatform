@@ -307,6 +307,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     Text(widget.chat.userName,
                         style:
                             const TextStyle(fontSize: 19, color: Colors.white)),
+                            (widget.chat.type == 'GROUP' || widget.chat.type == 'CHANNEL')  ? Container():
                     Text("last seen today at ${widget.chat.lastSeen}",
                         style: TextStyle(fontSize: 13, color: Colors.white)),
                   ],

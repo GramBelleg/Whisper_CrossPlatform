@@ -62,6 +62,7 @@ class _GroupInfoState extends State<GroupInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: firstNeutralColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: firstNeutralColor, // AppBar color
@@ -74,10 +75,10 @@ class _GroupInfoState extends State<GroupInfo> {
         title: Text(widget.isChannel ? 'Channel Info' : 'Group Info',
             style: TextStyle(color: Colors.white)),
       ),
-      body: Container(
-          color:
-              firstNeutralColor, // Background color for the rest of the screen
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Container(
+            color:
+                firstNeutralColor, // Background color for the rest of the screen
             child: Column(
               children: [
                 Padding(
@@ -91,7 +92,7 @@ class _GroupInfoState extends State<GroupInfo> {
                     status: "6",
                   ),
                 ),
-                if (widget.isChannelAdmin || widget.isGroupAdmin) ...[
+                if (widget.isChannelAdmin || widget.isGroupAdmin || !widget.isChannel) ...[
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -209,24 +210,27 @@ class _GroupInfoState extends State<GroupInfo> {
                                             child: Column(
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(16.0),
+                                                  padding: const EdgeInsets.all(
+                                                      16.0),
                                                   child: TextField(
                                                     style: TextStyle(
                                                         color: Colors.white),
                                                     keyboardType:
                                                         TextInputType.number,
                                                     decoration: InputDecoration(
-                                                      labelText: 'Group Max Size',
+                                                      labelText:
+                                                          'Group Max Size',
                                                       // input text color is white
                                                       border:
                                                           OutlineInputBorder(),
                                                     ),
-                                                    onSubmitted: (String value) {
+                                                    onSubmitted:
+                                                        (String value) {
                                                       int? newSize =
                                                           int.tryParse(value);
                                                       if (newSize != null) {
-                                                        setgroupMaxSize(newSize);
+                                                        setgroupMaxSize(
+                                                            newSize);
                                                       }
                                                       Navigator.pop(context);
                                                     },
@@ -258,8 +262,8 @@ class _GroupInfoState extends State<GroupInfo> {
                   ),
                 ],
               ],
-            ),
-          )),
+            )),
+      ),
     );
   }
 }
