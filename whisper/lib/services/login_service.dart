@@ -48,7 +48,6 @@ class LoginService {
       );
       Navigator.pop(context);
       var data = jsonDecode(response.body);
-      print("role: ${data['user']['role']}");
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print("Before");
         try {
@@ -75,10 +74,11 @@ class LoginService {
           Navigator.pushNamedAndRemoveUntil(
             context,
             AdminDashboard.id,
-                (Route<dynamic> route) => false,
+            (Route<dynamic> route) => false,
           );
         }
       } else {
+        print("ERRRRRRRRROR");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Something went wrong: ${data['message']}"),

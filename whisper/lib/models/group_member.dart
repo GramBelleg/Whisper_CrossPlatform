@@ -4,7 +4,7 @@ class GroupMember {
   final String? profilePic;
   bool isAdmin;
   final bool hasStory;
-  final DateTime lastSeen;
+  final DateTime? lastSeen;
 
   GroupMember({
     required this.id,
@@ -33,7 +33,7 @@ class GroupMember {
       'profilePic': profilePic,
       'isAdmin': isAdmin,
       'hasStory': hasStory,
-      'lastSeen': lastSeen.toIso8601String(),
+      'lastSeen': lastSeen ?? DateTime.now().toIso8601String(),
     };
   }
 

@@ -114,7 +114,7 @@ class _GroupMembersState extends State<GroupMembers> {
                   userId: member.id,
                   userName: member.userName,
                   profilePic: member.profilePic,
-                  lastSeen: _formatLastSeen(member.lastSeen),
+                  lastSeen: _formatLastSeen(member.lastSeen!),
                 ),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
@@ -218,7 +218,7 @@ class _GroupMembersState extends State<GroupMembers> {
                                               profilePic: member.profilePic,
                                               hasStory: member.hasStory,
                                               lastSeen: _formatLastSeen(member
-                                                  .lastSeen), // Format lastSeen here
+                                                  .lastSeen!), // Format lastSeen here
                                             ),
                                             // Add a Divider after each member card
                                           ],
