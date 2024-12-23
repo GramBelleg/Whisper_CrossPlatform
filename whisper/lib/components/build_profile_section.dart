@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/constants/colors.dart';
-import 'package:whisper/keys/settings_page_keys.dart';
 
 class ProfileSection extends StatefulWidget {
   final bool isEditing;

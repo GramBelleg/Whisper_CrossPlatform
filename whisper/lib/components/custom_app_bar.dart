@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:whisper/components/build_profile_section.dart';
+import 'package:whisper/components/helpers.dart';
+import 'package:whisper/components/profile_dm_chat.dart';
 import 'package:whisper/constants/colors.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/models/chat.dart';
@@ -255,7 +258,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   backgroundColor: Colors.blueGrey,
                   backgroundImage: widget.chat.avatarUrl != null
                       ? NetworkImage(widget.chat.avatarUrl!)
-                      : null,
+                      : NetworkImage(
+                          "https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${widget.chat.userName}"),
                   child: widget.chat.avatarUrl == null
                       ? const Icon(Icons.person)
                       : null,
@@ -297,6 +301,50 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       },
                     ),
                   );
+                } else {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          Scaffold(
+                        appBar: AppBar(
+                          title: Text(
+                            'Profile',
+                            style: TextStyle(
+                              fontSize: 18, // Change font size
+                              fontWeight: FontWeight.bold, // Make the text bold
+                              letterSpacing: 1.2, // Add letter spacing
+                              color: Colors.white, // Set text color
+                            ),
+                          ),
+                          backgroundColor:
+                              firstSecondaryColor, // Your app bar background color
+                          centerTitle: true, // This will center the title
+                          iconTheme: IconThemeData(
+                            color: Colors.white, // Set the icon color to white
+                          ),
+                        ),
+                        body: ProfileDMChat(
+                          id: widget.chat.othersId,
+                        ),
+                      ),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(0.0, 1.0); // Start from bottom
+                        const end = Offset.zero; // End at original position
+                        const curve = Curves.ease;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
                 }
               },
               child: Container(
@@ -307,9 +355,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     Text(widget.chat.userName,
                         style:
                             const TextStyle(fontSize: 19, color: Colors.white)),
-                            widget.chat.type == 'DM' ?
-                    Text("last seen today at ${widget.chat.lastSeen}",
-                        style: TextStyle(fontSize: 13, color: Colors.white)) : Container(),
+                    widget.chat.type == 'DM'
+                        ? Text("last seen today at ${widget.chat.lastSeen}",
+                            style: TextStyle(fontSize: 13, color: Colors.white))
+                        : Container(),
                   ],
                 ),
               ),

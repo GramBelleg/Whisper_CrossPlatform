@@ -25,12 +25,7 @@ Future<UserState?> fetchUserInfo() async {
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
       var data = jsonDecode(response.body) ?? {}; // Access 'data' key safely
-      print('User Info: $data');
-      if (data['profilePic'] == '') {
-        print("receiveMyProfilePic   ${data['profilePic']}");
-      }
       String? mediaUrl = data['profilePic'] != null
           ? await generatePresignedUrl(data['profilePic'])
           : 'https://ui-avatars.com/api/?background=0a122f&size=1500&color=fff&name=${formatName(data['userName'])}';
@@ -50,6 +45,45 @@ Future<UserState?> fetchUserInfo() async {
         readReceipts: data['readReceipts'] ?? false,
         hasStory: data['hasStory'] ?? false,
       );
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+      return null; // Handle error cases as needed
+    }
+  } catch (e) {
+    print('Something went wrong: $e');
+    return null; // Handle error cases as needed
+  }
+}
+
+Future<Map<String, dynamic>?> fetchProfileData(int id) async {
+  // Replace with your actual API endpoint
+  final url = Uri.parse('http://$ip:5000/api/user/$id/info'); // API endpoint
+  String? token = await getToken(); // Retrieve token
+
+  if (token == null) {
+    print('Token is null, cannot fetch user info.');
+    return null; // Handle this case as needed
+  }
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body) ?? {}; // Safely parse the response
+      String? mediaUrl = data['profilePic'] != null
+          ? await generatePresignedUrl(data['profilePic'])
+          : 'https://ui-avatars.com/api/?background=0a122f&size=1500&color=fff&name=${formatName(data['userName'])}';
+
+      // Add the mediaUrl to the data if it's available
+      data['profilePicUrl'] = mediaUrl;
+
+      return data; // Return the data as a map
     } else {
       print('Error: ${response.statusCode}, ${response.body}');
       return null; // Handle error cases as needed
