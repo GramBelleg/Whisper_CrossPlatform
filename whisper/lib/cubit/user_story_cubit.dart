@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
+import 'package:whisper/components/helpers.dart';
 import 'package:whisper/models/story.dart';
 import 'package:whisper/cubit/user_story_state.dart';
 import 'package:whisper/models/user.dart';
@@ -207,6 +207,42 @@ class UserStoryCubit extends Cubit<UserStoryState> {
       users[storyId].stories.removeWhere((story) => story.id == storyId);
       emit(UserStoryLoaded(users: users, me: myUser));
     }
+  }
+
+  Future<void> receiveUserProfilePic(String? blobName, int id) async {
+    String imageUrl = blobName != null
+        ? await generatePresignedUrl(blobName)
+        : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=us';
+
+    print("Changed Profile Pic");
+
+    // Find and update the user with the same id
+    User? updatedUser;
+    users.removeWhere((user) {
+      if (user.id == id) {
+        updatedUser =
+            user.copyWith(profilePic: imageUrl); // Create updated user
+        return true;
+      }
+      return false;
+    });
+
+    // Add the updated user back to the list
+    if (updatedUser != null) {
+      users.add(updatedUser!);
+    }
+
+    // Emit the updated state
+    emit(UserStoryLoaded(users: users, me: myUser));
+  }
+
+  Future<void> receiveMyProfilePic(String? blobName) async {
+    String imageUrl = blobName != null
+        ? await generatePresignedUrl(blobName)
+        : 'https://ui-avatars.com/api/?background=0a122f&size=100&color=fff&name=${formatName(myUser!.userName)}';
+    print("changed Profile Pic");
+    myUser = myUser!.copyWith(profilePic: imageUrl);
+    emit(UserStoryLoaded(users: users, me: myUser));
   }
 
   // Setup all socket listeners

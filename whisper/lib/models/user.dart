@@ -28,6 +28,17 @@ class User {
     );
   }
 
+  bool isValidUrl(String? profilePic) {
+    if (profilePic == null || profilePic.isEmpty) return false;
+
+    try {
+      final uri = Uri.parse(profilePic);
+      return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+    } catch (e) {
+      return false;
+    }
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],

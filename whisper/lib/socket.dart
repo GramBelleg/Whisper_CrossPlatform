@@ -37,8 +37,12 @@ class SocketService {
       if (data['userId'] == await getId()) {
         GlobalSettingsCubitProvider.settingsCubit
             .receiveMyProfilePic(data['profilePic']);
+        GlobalUserStoryCubitProvider.userStoryCubit
+            .receiveMyProfilePic(data['profilePic']);
       } else {
         // to do receive another pfp
+        GlobalUserStoryCubitProvider.userStoryCubit
+            .receiveUserProfilePic(data['profilePic'], data['userId']);
       }
     });
   }
