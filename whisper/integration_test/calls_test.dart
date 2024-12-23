@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -15,7 +13,7 @@ import 'utils/test_common_functions.dart';
 import 'package:whisper/keys/forward_menu_keys.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  group('Channels E2E Tests', ()
+  group('Calls E2E Tests', ()
   {
     late Finder email_field;
     late Finder password_field;
