@@ -335,22 +335,83 @@ void main() {
       //expect to find the delete icon as one is selected
       expect(find.byKey(const ValueKey(CustomAppBarKeys.deleteIcon)), findsOneWidget);
     });
-    // testWidgets('Forward Message', (WidgetTester tester) async {
-    //   await openChat(tester, chats_page, friendUsername);
-    //   final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
-    //   String message_to_be_sent=generateRandomString(10);
-    //   await tester.enterText(chat_textbox, message_to_be_sent);
-    //   await tester.pumpAndSettle();
-    //   final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
-    //   await tester.tap(chat_send_button);
-    //   await tester.pumpAndSettle();
-    //   final message = find.textContaining(message_to_be_sent);
-    //   await tester.longPress(message);
-    //   await tester.pumpAndSettle();
-    //   final forward_icon= find.byKey(const ValueKey(CustomAppBarKeys.forwardIcon));
-    //   await tester.tap(forward_icon);
-    //   await tester.pumpAndSettle();
-    //   expect(find.textContaining(message_to_be_sent), findsOneWidget);
-    // });
+    testWidgets('Forward Message', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
+      String message_to_be_sent=generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent);
+      await tester.pumpAndSettle();
+      final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      final message = find.textContaining(message_to_be_sent);
+      await tester.longPress(message);
+      await tester.pumpAndSettle();
+      final forward_icon= find.byKey(const ValueKey(CustomAppBarKeys.forwardIcon));
+      await tester.tap(forward_icon);
+      await tester.pumpAndSettle();
+      expect(find.textContaining(message_to_be_sent), findsOneWidget);
+    });
+    //ADVANCED FEATURES
+    testWidgets('Self Destructing Messages (based on telegram)', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      final friend_finder=find.textContaining(friendUsername);
+      await tester.tap(friend_finder);
+      await tester.pumpAndSettle();
+      //expect to find 3 dots
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      //expect to find the self destructing messages option
+      await tester.tap(find.text('Auto Delete'));
+      await tester.pumpAndSettle();
+      //expect to find the 1 day ,1 week,1 moth,custom
+      expect(find.text('1 day'), findsOneWidget);
+      expect(find.text('1 week'), findsOneWidget);
+      expect(find.text('1 month'), findsOneWidget);
+      expect(find.text('Custom'), findsOneWidget);
+    });
+    testWidgets('Draft Messages', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
+      String message_to_be_sent=generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent);
+      await tester.pumpAndSettle();
+      //press Back Button
+      await tester.tap(find.byKey(const ValueKey(CustomAppBarKeys.backButton)));
+      await tester.pumpAndSettle();
+      //expect to find the draft message
+      expect(find.textContaining(message_to_be_sent), findsOneWidget);
+      //go inside again and sent it
+      await openChat(tester, chats_page, friendUsername);
+      await tester.pumpAndSettle();
+      final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      expect(find.textContaining(message_to_be_sent), findsOneWidget);
+    });
+    testWidgets('Search Within chat', (WidgetTester tester) async {
+      await openChat(tester, chats_page, friendUsername);
+      //send message
+      final chat_textbox = find.byKey(const ValueKey(ChatPageKeys.textField));
+      String message_to_be_sent=generateRandomString(10);
+      await tester.enterText(chat_textbox, message_to_be_sent);
+      await tester.pumpAndSettle();
+      final chat_send_button = find.byKey(const ValueKey(ChatPageKeys.sendButton));
+      await tester.tap(chat_send_button);
+      await tester.pumpAndSettle();
+      final search_icon = find.byKey(const ValueKey(CustomAppBarKeys.searchIcon));
+      await tester.tap(search_icon);
+      await tester.pumpAndSettle();
+      //expect to find the search bar
+      final search_field=find.textContaining('Search');
+      //search for the message
+      await tester.enterText(search_field, message_to_be_sent);
+      await tester.pumpAndSettle();
+      final show_as_list=find.textContaining('Show as List');
+      await tester.tap(show_as_list);
+      await tester.pumpAndSettle();
+      //expect to find the message
+      expect(find.textContaining(message_to_be_sent), findsOneWidget);
+    });
   });
 }
