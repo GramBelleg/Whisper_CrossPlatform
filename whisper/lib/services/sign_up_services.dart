@@ -33,6 +33,7 @@ class SignupService {
       var data = jsonDecode(response.body);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         await saveEmail(user.email!);
+
         Navigator.pushReplacementNamed(context, ConfirmationCode.id);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,6 +123,7 @@ class SignupService {
         } catch (e) {
           print(e);
         }
+        await saveRole("User");
         Navigator.pushNamedAndRemoveUntil(
           context,
           PageState.id,

@@ -56,7 +56,7 @@ class _GroupInfoState extends State<GroupInfo> {
   @override
   void initState() {
     super.initState();
-    getGroupConfig();
+    widget.isChannel ? () {} : getGroupConfig();
   }
 
   @override
@@ -91,7 +91,9 @@ class _GroupInfoState extends State<GroupInfo> {
                     status: "6",
                   ),
                 ),
-                if (widget.isChannelAdmin || widget.isGroupAdmin || !widget.isChannel) ...[
+                if (widget.isChannelAdmin ||
+                    widget.isGroupAdmin ||
+                    !widget.isChannel) ...[
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -106,7 +108,8 @@ class _GroupInfoState extends State<GroupInfo> {
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 15, horizontal: 20),
                       width: double.infinity, // Full width
                       color: Colors.transparent, // Background color
                       child: Row(
@@ -141,8 +144,10 @@ class _GroupInfoState extends State<GroupInfo> {
                                 title: Text('Set group privacy'),
                                 titleTextStyle: TextStyle(
                                     color: secondNeutralColor, fontSize: 16),
-                                subtitle: Text(isPrivate ? 'Private' : 'Public'),
-                                subtitleTextStyle: TextStyle(color: primaryColor),
+                                subtitle:
+                                    Text(isPrivate ? 'Private' : 'Public'),
+                                subtitleTextStyle:
+                                    TextStyle(color: primaryColor),
                                 onTap: () {
                                   showModalBottomSheet(
                                     context: context,
@@ -180,7 +185,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                   );
                                 },
                               ),
-            
+
                               // then set group max size using a slider
                               ListTile(
                                 leading: Icon(Icons.group, color: primaryColor),
@@ -188,7 +193,8 @@ class _GroupInfoState extends State<GroupInfo> {
                                 titleTextStyle: TextStyle(
                                     color: secondNeutralColor, fontSize: 16),
                                 subtitle: Text(groupMaxSize.toString()),
-                                subtitleTextStyle: TextStyle(color: primaryColor),
+                                subtitleTextStyle:
+                                    TextStyle(color: primaryColor),
                                 onTap: () {
                                   showModalBottomSheet(
                                     context: context,
@@ -205,24 +211,27 @@ class _GroupInfoState extends State<GroupInfo> {
                                             child: Column(
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(16.0),
+                                                  padding: const EdgeInsets.all(
+                                                      16.0),
                                                   child: TextField(
                                                     style: TextStyle(
                                                         color: Colors.white),
                                                     keyboardType:
                                                         TextInputType.number,
                                                     decoration: InputDecoration(
-                                                      labelText: 'Group Max Size',
+                                                      labelText:
+                                                          'Group Max Size',
                                                       // input text color is white
                                                       border:
                                                           OutlineInputBorder(),
                                                     ),
-                                                    onSubmitted: (String value) {
+                                                    onSubmitted:
+                                                        (String value) {
                                                       int? newSize =
                                                           int.tryParse(value);
                                                       if (newSize != null) {
-                                                        setgroupMaxSize(newSize);
+                                                        setgroupMaxSize(
+                                                            newSize);
                                                       }
                                                       Navigator.pop(context);
                                                     },

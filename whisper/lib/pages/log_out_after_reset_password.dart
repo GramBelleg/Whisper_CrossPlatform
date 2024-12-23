@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whisper/components/custom_highlight_text.dart';
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/services/log_out_service.dart';
+import 'package:whisper/services/shared_preferences.dart';
 import '../constants/colors.dart';
 
 class LogoutAfterResetPassword extends StatelessWidget {
@@ -44,6 +45,7 @@ class LogoutAfterResetPassword extends StatelessWidget {
                   CustomHighlightText(
                     callToActionText: "No",
                     onTap: () async {
+                      await saveRole("User");
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         PageState.id,

@@ -7,21 +7,15 @@ import '../models/friend.dart';
 class FriendService {
   Future<List<Chat>> fetchFriends() async {
     final chats = await fetchChats(); // Existing function
-    return chats.map((chat) {
+    return chats
+        .where((chat) => chat['type'] != 'CHANNEL') // Exclude channels
+        .map((chat) {
       return Chat(
-        othersId: chat['othersId'],
-        userName: chat['userName'] ?? 'User${chat['id']}',
-        avatarUrl: chat['avatarUrl'] ?? 'assets/images/el-gayar.jpg',
+        othersId: chat['id'],
+        userName: chat['name'] ?? 'User${chat['id']}',
+        avatarUrl: chat['picture'] ?? 'assets/images/el-gayar.jpg',
         type: chat['type'],
-        chatId: chat['chatId'],
-        hasStory: chat['hasStory'],
-        isMuted: chat['isMuted'],
-        isAdmin: chat['isAdmin'],
-        status: chat['status'],
-        lastSeen: chat['lastSeen'],
-        isOnline: chat['isOnline'],
-        time: chat['time'],
-        unreadMessageCount: chat['unreadMessageCount'],
+        chatId: chat['id'],
       );
     }).toList();
   }

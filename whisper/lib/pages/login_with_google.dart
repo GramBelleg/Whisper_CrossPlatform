@@ -88,6 +88,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
                     } catch (e) {
                       print(e);
                     }
+                    await saveRole("User");
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       PageState.id,

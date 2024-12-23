@@ -83,7 +83,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
 
       for (final index in _selectedFriendIndexes) {
         final friend = _friends[index];
-
+        print("aaaaaaaaaaaay 7aga");
         // Forward all selected messages to the current friend
         await _forwardMessagesToFriend(
           friend: friend,
@@ -121,7 +121,8 @@ class _ForwardMenuState extends State<ForwardMenu> {
             media: message.media,
             type: message.type,
             extension: message.extension);
-        debugPrint("Message ${widget.text}ed to: ${friend.userName}");
+        debugPrint(
+            "Message  forwareded ${widget.text}ed to: ${friend.userName}");
       } catch (e) {
         debugPrint(
             'Failed to ${widget.text} message $messageId to ${friend.userName}: $e');

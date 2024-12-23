@@ -76,14 +76,15 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                   if (data['status'] == 'success') {
                     await saveToken(data['userToken']);
                     await saveId(data['user']['id']);
-                    try{
-                      String? firebaseToken = await FirebaseMessaging.instance.getToken();
-                      await LoginService.registerFCMToken(firebaseToken, data['userToken'], context);
-                    }
-                   catch(e)
-                    {
+                    try {
+                      String? firebaseToken =
+                          await FirebaseMessaging.instance.getToken();
+                      await LoginService.registerFCMToken(
+                          firebaseToken, data['userToken'], context);
+                    } catch (e) {
                       print(e);
                     }
+                    await saveRole("User");
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       PageState.id,

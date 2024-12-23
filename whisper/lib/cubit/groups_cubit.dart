@@ -73,7 +73,7 @@ class GroupsCubit extends Cubit<GroupsState> {
       'userId': userId,
       'chatId': groupId,
     };
-
+    print("add admin $adminData");
     try {
       socket?.emit('addAdmin', adminData);
     } catch (e) {

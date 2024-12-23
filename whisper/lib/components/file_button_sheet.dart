@@ -95,7 +95,7 @@ class FileButtonSheet extends StatelessWidget {
       String uploadResult = await uploadFile(filePath);
 
       if (uploadResult != 'Failed') {
-        print("File uploaded successfullyy: $uploadResult");
+        print("File uploaded successfullyy: $type");
         GlobalCubitProvider.messagesCubit.sendMessage(
             content: content,
             chatId: chatId,
@@ -300,7 +300,7 @@ class FileButtonSheet extends StatelessWidget {
       height: MediaQuery.of(context).size.height / 3,
       width: MediaQuery.of(context).size.width,
       child: Card(
-        margin: const EdgeInsets.all(18),
+        margin: const EdgeInsets.all(10),
         color: firstSecondaryColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
