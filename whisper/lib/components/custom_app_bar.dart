@@ -4,6 +4,7 @@ import 'package:whisper/components/build_profile_section.dart';
 import 'package:whisper/components/helpers.dart';
 import 'package:whisper/components/profile_dm_chat.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/global_cubits/global_search_chat_cubit.dart';
 import 'package:whisper/keys/custom_app_bar_keys.dart';
 import 'package:whisper/models/chat.dart';
 import 'package:whisper/pages/forward_menu.dart';
@@ -365,9 +366,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
-                icon: const FaIcon(FontAwesomeIcons.magnifyingGlass),
-              ),
+                  onPressed: () {
+                    GlobalSearchChatProvider.searchChatCubit.toggleSearch();
+                  },
+                  icon:
+                      !GlobalSearchChatProvider.searchChatCubit.getStateSearch()
+                          ? FaIcon(FontAwesomeIcons.magnifyingGlass)
+                          : Icon(Icons.close)),
               IconButton(
                 key: Key(CustomAppBarKeys.phoneIcon),
                 onPressed: () async {

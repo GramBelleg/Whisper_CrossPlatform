@@ -1,9 +1,11 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:whisper/constants/colors.dart';
+import 'package:whisper/cubit/search_chat_cubit.dart';
 import 'package:whisper/keys/message_list_keys.dart';
 import 'package:whisper/components/audio_message_card.dart';
 import 'package:whisper/components/own-message/forwarded_audio_message_card.dart';
@@ -51,6 +53,7 @@ import 'package:whisper/components/receive-message/replied-received-message-card
 import 'package:whisper/components/receive-message/video_received_message_card.dart';
 
 class MessageList extends StatefulWidget {
+  final bool isSearch;
   final List<ChatMessage> messages;
   final ValueChanged<ChatMessage> onLongPress;
   final ValueChanged<ChatMessage> onTap;
@@ -59,8 +62,9 @@ class MessageList extends StatefulWidget {
   final int senderId;
   final PlayerController playerController;
   final Function(String) onPlay;
-  final bool isChannel ;
+  final bool isChannel;
   const MessageList({
+    this.isSearch = false,
     required this.messages,
     required this.onLongPress,
     required this.onTap,
@@ -79,71 +83,104 @@ class MessageList extends StatefulWidget {
 class _MessageListState extends State<MessageList> {
   late List<ChatMessage> previousMessages;
   ItemScrollController itemScrollController = ItemScrollController();
-  @override
-  void initState() {
-    super.initState();
-    previousMessages = List.from(widget.messages);
-  }
+  String searchQuery = '';
+  List<int> searchResults = [];
+  int currentSearchIndex = -1;
 
-  @override
-  void didUpdateWidget(covariant MessageList oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void searchMessages(String query) {
+    setState(() {
+      searchQuery = query.toLowerCase();
+      searchResults = query.isEmpty
+          ? []
+          : widget.messages
+              .asMap()
+              .entries
+              .where((entry) =>
+                  entry.value.content.toLowerCase().contains(searchQuery))
+              .map((entry) => entry.key)
+              .toList();
+      currentSearchIndex = searchResults.isNotEmpty ? 0 : -1;
+    });
 
-    // Detect if a new message was added
-    if (widget.messages.length > previousMessages.length) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (itemScrollController.isAttached) {
-          itemScrollController.jumpTo(
-            index: 0, // Scroll to the first item (most recent message)
-          );
-        }
-      });
-
-      // Update the previousMessages list
-      previousMessages = List.from(widget.messages);
+    if (searchResults.isNotEmpty) {
+      itemScrollController.scrollTo(
+        index: searchResults[currentSearchIndex],
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ScrollablePositionedList.builder(
-      reverse: true,
-      itemScrollController: itemScrollController,
-      itemCount: widget.messages.length,
-      itemBuilder: (context, index) {
-        final messageData = widget.messages[index];
-        return SwipeTo(
-          key: ValueKey('${MessageListKeys.swipeKeyPrefix}${messageData.id}'),
-          iconColor: primaryColor,
-          onRightSwipe: (details) {
-            widget.onRightSwipe(messageData);
-          },
-          child: GestureDetector(
-            key: ValueKey('${MessageListKeys.tapKeyPrefix}${messageData.id}'),
-            onLongPress: () => widget.onLongPress(messageData),
-            onTap: () {
-              if (messageData.parentMessage?.id != null &&
-                  widget.isSelectedList.isEmpty) {
-                int parentIndex = widget.messages.indexWhere(
-                  (message) => message.id == messageData.parentMessage?.id,
-                );
+    return Column(
+      children: [
+        BlocBuilder<SearchChatCubit, SearchChatState>(
+            builder: (context, state) {
+          return state.isSearch
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search messages...',
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: primaryColor,
+                      ),
+                      hintStyle: TextStyle(color: primaryColor),
+                    ),
+                    style: TextStyle(color: primaryColor),
+                    onChanged: searchMessages,
+                  ),
+                )
+              : Container();
+        }),
+        Expanded(
+          child: ScrollablePositionedList.builder(
+            reverse: true,
+            itemScrollController: itemScrollController,
+            itemCount: widget.messages.length,
+            itemBuilder: (context, index) {
+              final messageData = widget.messages[index];
+              return SwipeTo(
+                key: ValueKey(
+                    '${MessageListKeys.swipeKeyPrefix}${messageData.id}'),
+                iconColor: primaryColor,
+                onRightSwipe: (details) {
+                  widget.onRightSwipe(messageData);
+                },
+                child: GestureDetector(
+                  key: ValueKey(
+                      '${MessageListKeys.tapKeyPrefix}${messageData.id}'),
+                  onLongPress: () => widget.onLongPress(messageData),
+                  onTap: () {
+                    if (messageData.parentMessage?.id != null &&
+                        widget.isSelectedList.isEmpty) {
+                      int parentIndex = widget.messages.indexWhere(
+                        (message) =>
+                            message.id == messageData.parentMessage?.id,
+                      );
 
-                if (parentIndex != -1) {
-                  itemScrollController.scrollTo(
-                    index: parentIndex,
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                }
-              }
-              widget.onTap(messageData);
+                      if (parentIndex != -1) {
+                        itemScrollController.scrollTo(
+                          index: parentIndex,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    }
+                    widget.onTap(messageData);
+                  },
+                  child: messageData.sender!.id == widget.senderId &&
+                          !widget.isChannel
+                      ? _buildSenderMessage(messageData)
+                      : _buildReceiverMessage(messageData),
+                ),
+              );
             },
-            child: messageData.sender!.id == widget.senderId&& !widget.isChannel
-                ? _buildSenderMessage(messageData)
-                : _buildReceiverMessage(messageData),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 

@@ -11,6 +11,7 @@ import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
 import 'package:whisper/global_cubits/global_chats_cubit.dart';
+import 'package:whisper/global_cubits/global_search_chat_cubit.dart';
 import 'package:whisper/global_cubits/global_setting_cubit.dart';
 import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/pages/admin_dashboard.dart';
@@ -68,6 +69,7 @@ void main() async {
     BlocProvider(
         create: (context) =>
             GroupUserPermissionsCubit(GroupManagementService())),
+    BlocProvider(create: (context) => GlobalSearchChatProvider.searchChatCubit),
   ], child: Whisper()));
 }
 

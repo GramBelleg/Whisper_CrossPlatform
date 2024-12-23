@@ -11,6 +11,7 @@ import 'package:whisper/components/sticker_picker.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/messages_state.dart';
 import 'package:whisper/global_cubits/global_chats_cubit.dart';
+import 'package:whisper/global_cubits/global_search_chat_cubit.dart';
 // import 'package:whisper/global_cubit_provider.dart';
 import 'package:whisper/keys/chat_page_keys.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
@@ -96,7 +97,8 @@ class _ChatPageState extends State<ChatPage> {
     focusNode.dispose();
     recorderController.dispose();
     globalPlayerController.dispose();
-    // GlobalChatsCubitProvider.chatListCubit.loadChats();
+    GlobalChatsCubitProvider.chatListCubit.loadChats();
+    GlobalSearchChatProvider.searchChatCubit.toggleSearchCloseChat();
     super.dispose();
   }
 
