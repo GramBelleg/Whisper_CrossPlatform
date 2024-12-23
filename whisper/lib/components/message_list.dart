@@ -232,7 +232,7 @@ class _MessageListState extends State<MessageList> {
         children: [
           IconButton(
             icon: Icon(Icons.arrow_upward, color: primaryColor),
-            onPressed: () => navigateToResult(-1),
+            onPressed: () => navigateToResult(1),
             tooltip: 'Previous result',
           ),
           Container(
@@ -244,7 +244,7 @@ class _MessageListState extends State<MessageList> {
           ),
           IconButton(
             icon: Icon(Icons.arrow_downward, color: primaryColor),
-            onPressed: () => navigateToResult(1),
+            onPressed: () => navigateToResult(-1),
             tooltip: 'Next result',
           ),
         ],
