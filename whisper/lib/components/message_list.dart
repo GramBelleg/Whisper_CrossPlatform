@@ -62,6 +62,7 @@ class MessageList extends StatefulWidget {
   final PlayerController playerController;
   final Function(String) onPlay;
   final bool isChannel;
+
   const MessageList({
     required this.messages,
     required this.onLongPress,
@@ -78,59 +79,213 @@ class MessageList extends StatefulWidget {
   State<MessageList> createState() => _MessageListState();
 }
 
+// Extension to capitalize the first letter of a string
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
+  }
+}
+
 class _MessageListState extends State<MessageList> {
   late List<ChatMessage> previousMessages;
   ItemScrollController itemScrollController = ItemScrollController();
   String searchQuery = '';
   List<int> searchResults = [];
   int currentSearchIndex = -1;
+  String selectedMediaType = 'all';
+  TextEditingController searchController = TextEditingController();
+  bool wasSearchOpen = false;
+
   @override
   void initState() {
     super.initState();
     previousMessages = List.from(widget.messages);
   }
 
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void resetSearch() {
+    searchQuery = '';
+    searchResults = [];
+    currentSearchIndex = -1;
+    selectedMediaType = 'all';
+    searchController.clear();
+  }
+
   void searchMessages(String query) {
     setState(() {
       searchQuery = query.toLowerCase();
+      // Store results in chronological order
       searchResults = query.isEmpty
           ? []
           : widget.messages
               .asMap()
               .entries
-              .where((entry) =>
-                  entry.value.content.toLowerCase().contains(searchQuery))
+              .where((entry) {
+                bool matchesQuery =
+                    entry.value.content.toLowerCase().contains(searchQuery);
+                bool matchesType = selectedMediaType == 'all' ||
+                    entry.value.type.toLowerCase() == selectedMediaType;
+                return matchesQuery && matchesType;
+              })
               .map((entry) => entry.key)
               .toList();
+
+      // Sort results by message timestamp
+      searchResults.sort((a, b) {
+        DateTime timeA = widget.messages[a].sentAt ?? DateTime.now();
+        DateTime timeB = widget.messages[b].sentAt ?? DateTime.now();
+        return timeB.compareTo(timeA); // Newest first
+      });
+
       currentSearchIndex = searchResults.isNotEmpty ? 0 : -1;
     });
 
     if (searchResults.isNotEmpty) {
+      scrollToCurrentResult();
+    }
+  }
+
+  void scrollToCurrentResult() {
+    if (currentSearchIndex >= 0 && currentSearchIndex < searchResults.length) {
       itemScrollController.scrollTo(
         index: searchResults[currentSearchIndex],
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
+        alignment: 0.3, // Position the message 30% from the top
       );
     }
   }
 
-  @override
-  void didUpdateWidget(covariant MessageList oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void navigateToResult(int direction) {
+    if (searchResults.isEmpty) return;
 
-    // Detect if a new message was added
-    if (widget.messages.length > previousMessages.length) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (itemScrollController.isAttached) {
-          itemScrollController.jumpTo(
-            index: 0, // Scroll to the first item (most recent message)
-          );
-        }
-      });
+    setState(() {
+      currentSearchIndex =
+          (currentSearchIndex + direction) % searchResults.length;
+      if (currentSearchIndex < 0) currentSearchIndex = searchResults.length - 1;
+    });
 
-      // Update the previousMessages list
-      previousMessages = List.from(widget.messages);
-    }
+    scrollToCurrentResult();
+  }
+
+  Widget _buildMessageItem(ChatMessage messageData, int index) {
+    bool isSearchResult = searchResults.contains(index);
+    bool isCurrentResult =
+        searchResults.isNotEmpty && index == searchResults[currentSearchIndex];
+
+    return Container(
+      decoration: BoxDecoration(
+        border: isCurrentResult
+            ? Border.all(color: primaryColor, width: 2.0)
+            : null,
+        borderRadius: BorderRadius.circular(8.0),
+        color: isSearchResult && !isCurrentResult
+            ? primaryColor.withOpacity(0.1)
+            : null,
+      ),
+      child: SwipeTo(
+        key: ValueKey('${MessageListKeys.swipeKeyPrefix}${messageData.id}'),
+        iconColor: primaryColor,
+        onRightSwipe: (details) {
+          widget.onRightSwipe(messageData);
+        },
+        child: GestureDetector(
+          key: ValueKey('${MessageListKeys.tapKeyPrefix}${messageData.id}'),
+          onLongPress: () => widget.onLongPress(messageData),
+          onTap: () {
+            if (messageData.parentMessage?.id != null &&
+                widget.isSelectedList.isEmpty) {
+              int parentIndex = widget.messages.indexWhere(
+                (message) => message.id == messageData.parentMessage?.id,
+              );
+
+              if (parentIndex != -1) {
+                itemScrollController.scrollTo(
+                  index: parentIndex,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            }
+            widget.onTap(messageData);
+          },
+          child: messageData.sender!.id == widget.senderId && !widget.isChannel
+              ? _buildSenderMessage(messageData)
+              : _buildReceiverMessage(messageData),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchNavigation() {
+    if (searchResults.isEmpty) return Container();
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_upward, color: primaryColor),
+            onPressed: () => navigateToResult(-1),
+            tooltip: 'Previous result',
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text(
+              '${currentSearchIndex + 1} of ${searchResults.length}',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_downward, color: primaryColor),
+            onPressed: () => navigateToResult(1),
+            tooltip: 'Next result',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterButton(String type, IconData icon) {
+    bool isSelected = selectedMediaType == type;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: FilterChip(
+        selected: isSelected,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? Colors.white : primaryColor,
+            ),
+            SizedBox(width: 4),
+            Text(
+              type.capitalize(),
+              style: TextStyle(
+                color: isSelected ? Colors.white : primaryColor,
+              ),
+            ),
+          ],
+        ),
+        selectedColor: primaryColor,
+        backgroundColor: Colors.transparent,
+        side: BorderSide(color: primaryColor),
+        onSelected: (bool selected) {
+          setState(() {
+            selectedMediaType = selected ? type : 'all';
+            searchMessages(searchQuery);
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -138,67 +293,82 @@ class _MessageListState extends State<MessageList> {
     return Column(
       children: [
         BlocBuilder<SearchChatCubit, SearchChatState>(
-            builder: (context, state) {
-          return state.isSearch
-              ? Padding(
+          builder: (context, state) {
+            if (state.isSearch != wasSearchOpen) {
+              wasSearchOpen = state.isSearch;
+              if (!state.isSearch) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    resetSearch();
+                  });
+                });
+              }
+            }
+
+            if (!state.isSearch) {
+              return Container();
+            }
+
+            return Column(
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: Row(
+                    children: [
+                      _buildFilterButton('text', Icons.text_fields),
+                      _buildFilterButton('image', Icons.image),
+                      _buildFilterButton('video', Icons.video_library),
+                    ],
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    controller: searchController,
                     decoration: InputDecoration(
                       hintText: 'Search messages...',
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: primaryColor,
-                      ),
+                      prefixIcon: Icon(Icons.search, color: primaryColor),
+                      suffixIcon: searchResults.isNotEmpty
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.arrow_upward,
+                                      color: primaryColor),
+                                  onPressed: () => navigateToResult(-1),
+                                  tooltip: 'Previous result',
+                                ),
+                                Text(
+                                  '${currentSearchIndex + 1}/${searchResults.length}',
+                                  style: TextStyle(color: primaryColor),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.arrow_downward,
+                                      color: primaryColor),
+                                  onPressed: () => navigateToResult(1),
+                                  tooltip: 'Next result',
+                                ),
+                              ],
+                            )
+                          : null,
                       hintStyle: TextStyle(color: primaryColor),
                     ),
                     style: TextStyle(color: primaryColor),
                     onChanged: searchMessages,
                   ),
-                )
-              : Container();
-        }),
+                ),
+              ],
+            );
+          },
+        ),
         Expanded(
           child: ScrollablePositionedList.builder(
             reverse: true,
             itemScrollController: itemScrollController,
             itemCount: widget.messages.length,
             itemBuilder: (context, index) {
-              final messageData = widget.messages[index];
-              return SwipeTo(
-                key: ValueKey(
-                    '${MessageListKeys.swipeKeyPrefix}${messageData.id}'),
-                iconColor: primaryColor,
-                onRightSwipe: (details) {
-                  widget.onRightSwipe(messageData);
-                },
-                child: GestureDetector(
-                  key: ValueKey(
-                      '${MessageListKeys.tapKeyPrefix}${messageData.id}'),
-                  onLongPress: () => widget.onLongPress(messageData),
-                  onTap: () {
-                    if (messageData.parentMessage?.id != null &&
-                        widget.isSelectedList.isEmpty) {
-                      int parentIndex = widget.messages.indexWhere(
-                        (message) =>
-                            message.id == messageData.parentMessage?.id,
-                      );
-
-                      if (parentIndex != -1) {
-                        itemScrollController.scrollTo(
-                          index: parentIndex,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    }
-                    widget.onTap(messageData);
-                  },
-                  child: messageData.sender!.id == widget.senderId &&
-                          !widget.isChannel
-                      ? _buildSenderMessage(messageData)
-                      : _buildReceiverMessage(messageData),
-                ),
-              );
+              return _buildMessageItem(widget.messages[index], index);
             },
           ),
         ),
