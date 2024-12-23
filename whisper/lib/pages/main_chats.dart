@@ -366,7 +366,21 @@ class _MainChatsState extends State<MainChats> {
                 ),
               ],
             )
-          : null,
+          : ActionPane(
+              motion: const DrawerMotion(),
+              children: [
+                SlidableAction(
+                  key: Key(MainChatsKeys.deleteButton),
+                  onPressed: (_) {
+                    setState(() {});
+                  },
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: 'Block',
+                ),
+              ],
+            ),
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [

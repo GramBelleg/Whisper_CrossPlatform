@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/global_cubits/global_user_story_cubit_provider.dart';
 import 'package:whisper/models/story.dart';
 import 'package:whisper/cubit/user_story_state.dart';
 import 'package:whisper/models/user.dart';
@@ -199,6 +200,7 @@ class UserStoryCubit extends Cubit<UserStoryState> {
 
     if (myId == data['userId']) {
       myUser!.stories.removeWhere((story) => story.id == storyId);
+      print("whaaattt");
 
       emit(UserStoryLoaded(users: users, me: myUser));
     } else {

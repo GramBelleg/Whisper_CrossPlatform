@@ -6,7 +6,6 @@ import 'package:flutter_recaptcha_v2_compat/flutter_recaptcha_v2_compat.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whisper/cubit/blocked_users_cubit.dart';
 import 'package:whisper/components/page_state.dart';
-import 'package:whisper/cubit/groups_cubit.dart';
 import 'package:whisper/cubit/group_user_permissions_cubit.dart';
 import 'package:whisper/cubit/messages_cubit.dart';
 import 'package:whisper/cubit/visibility_cubit.dart';

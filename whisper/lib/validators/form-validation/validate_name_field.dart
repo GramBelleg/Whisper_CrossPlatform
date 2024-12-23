@@ -2,7 +2,7 @@ import 'package:whisper/validators/form-validation/longest_repteated_letter.dart
 
 String? validateNameField(String? data) {
   if (data == null || data.isEmpty) {
-    return 'This field is required';
+    return 'name is required';
   }
   if (data.length > 50) {
     return 'name should be at most 50 characters';

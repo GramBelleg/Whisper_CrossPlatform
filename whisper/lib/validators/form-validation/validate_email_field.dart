@@ -1,6 +1,6 @@
 String? validateEmailField(String? data) {
   if (data == null || data.isEmpty) {
-    return 'This field is required';
+    return 'email is required';
   }
 
   if (data.length > 50) {

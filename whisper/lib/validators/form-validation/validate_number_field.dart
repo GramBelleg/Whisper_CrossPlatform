@@ -24,7 +24,7 @@ String? validateNumberField(PhoneNumber? data) {
 
 String? validateNumberFieldString(String? number) {
   if (number == null || number.isEmpty) {
-    return 'This field is required';
+    return 'phone number is required';
   }
 
   if (!RegExp(r'^\d+$').hasMatch(number)) {

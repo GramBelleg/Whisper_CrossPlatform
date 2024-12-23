@@ -1,6 +1,6 @@
 String? validateUsernameField(String? username) {
   if (username == null || username.isEmpty) {
-    return 'This field is required';
+    return 'username is required';
   }
 
   if (username.length < 6) {

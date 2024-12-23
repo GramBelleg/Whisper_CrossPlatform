@@ -62,81 +62,100 @@ class EditFields extends StatelessWidget {
       bool needCode = false,
       int? maxLength,
       required BuildContext context}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    return StatefulBuilder(
+      builder: (context, setState) {
+        int currentLength = controller.text.length;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              labelText,
-              style: TextStyle(
-                color: primaryColor,
-                fontSize: 15,
+            Row(
+              children: [
+                Text(
+                  labelText,
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 15,
+                  ),
+                ),
+                if (stateText != null && stateText.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      '*',
+                      style: TextStyle(
+                        color: stateText == "Updated"
+                            ? highlightColor
+                            : Colors.red,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                const Spacer(),
+                if (maxLength != null)
+                  Text(
+                    '$currentLength/$maxLength',
+                    style: TextStyle(
+                      color: secondNeutralColor,
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Container(
+              constraints: BoxConstraints(
+                minHeight: 50,
+                maxHeight: 150,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0A254A),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      key: Key(textFieldKey),
+                      controller: controller,
+                      style: TextStyle(color: secondNeutralColor),
+                      keyboardType: labelText == 'Phone Number'
+                          ? TextInputType.phone
+                          : TextInputType.multiline,
+                      maxLines: null,
+                      minLines: 1,
+                      inputFormatters: labelText == 'Phone Number'
+                          ? [FilteringTextInputFormatter.digitsOnly]
+                          : null,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        border: InputBorder.none,
+                        counterText: '',
+                      ),
+                      maxLength: maxLength,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  if (needCode)
+                    TextButton(
+                      key: SettingsPageKeys.sendCodeButton,
+                      onPressed: () => confirmCodeFunction(controller.text),
+                      style: TextButton.styleFrom(
+                        foregroundColor: highlightColor,
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      child: const Text("Send Code"),
+                    ),
+                ],
               ),
             ),
             if (stateText != null && stateText.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Text(
-                  '*', // Show just the dot if the text is too long
-                  style: TextStyle(
-                    color: stateText == "Updated" ? highlightColor : Colors.red,
-                    fontSize: 20,
-                  ),
-                  overflow: TextOverflow.ellipsis, // Ensure no overflow
-                  maxLines: 1, // Prevent the text from wrapping
-                ),
-              ),
+              _ShowSnackBar(
+                  stateText: stateText, labelText: labelText, context: context),
           ],
-        ),
-        const SizedBox(height: 5),
-        Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0A254A),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  key: Key(textFieldKey),
-                  controller: controller,
-                  style: TextStyle(color: secondNeutralColor),
-                  keyboardType: labelText == 'Phone Number'
-                      ? TextInputType.phone
-                      : TextInputType.text,
-                  inputFormatters: labelText == 'Phone Number'
-                      ? [FilteringTextInputFormatter.digitsOnly]
-                      : null,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: InputBorder.none,
-                  ),
-                  maxLength: maxLength, // Add character limit here
-                ),
-              ),
-              if (needCode)
-                TextButton(
-                  key: SettingsPageKeys.sendCodeButton,
-                  onPressed: () {
-                    confirmCodeFunction(controller.text);
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: highlightColor,
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                  child: const Text("Send Code"),
-                ),
-            ],
-          ),
-        ),
-        if (stateText != null && stateText.isNotEmpty)
-          // Show SnackBar after the widget has built
-          _ShowSnackBar(
-              stateText: stateText, labelText: labelText, context: context),
-      ],
+        );
+      },
     );
   }
 }

@@ -17,7 +17,4 @@ String longestRepeatedLetter(String name) {
   }
 
   return maxCount > 2 ? maxChar * maxCount : '';
-  // I couldn't think of a real name that contains a repeated letter
-  // more than 2 letters, ex: Muhammed, Aaron, Elliot, Hannah
-  // todo: ask my colleagues for names that break this rule
 }
