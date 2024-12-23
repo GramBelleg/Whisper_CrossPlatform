@@ -53,7 +53,6 @@ import 'package:whisper/components/receive-message/replied-received-message-card
 import 'package:whisper/components/receive-message/video_received_message_card.dart';
 
 class MessageList extends StatefulWidget {
-  final bool isSearch;
   final List<ChatMessage> messages;
   final ValueChanged<ChatMessage> onLongPress;
   final ValueChanged<ChatMessage> onTap;
@@ -64,7 +63,6 @@ class MessageList extends StatefulWidget {
   final Function(String) onPlay;
   final bool isChannel;
   const MessageList({
-    this.isSearch = false,
     required this.messages,
     required this.onLongPress,
     required this.onTap,
@@ -86,6 +84,11 @@ class _MessageListState extends State<MessageList> {
   String searchQuery = '';
   List<int> searchResults = [];
   int currentSearchIndex = -1;
+  @override
+  void initState() {
+    super.initState();
+    previousMessages = List.from(widget.messages);
+  }
 
   void searchMessages(String query) {
     setState(() {
@@ -108,6 +111,25 @@ class _MessageListState extends State<MessageList> {
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant MessageList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Detect if a new message was added
+    if (widget.messages.length > previousMessages.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (itemScrollController.isAttached) {
+          itemScrollController.jumpTo(
+            index: 0, // Scroll to the first item (most recent message)
+          );
+        }
+      });
+
+      // Update the previousMessages list
+      previousMessages = List.from(widget.messages);
     }
   }
 
