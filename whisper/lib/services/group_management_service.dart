@@ -14,10 +14,13 @@ class GroupManagementService {
     }
   }
 
-  Future<Map<String, dynamic>> getGroupSettings(int chatId) async {
+  Future<Map<String, dynamic>> getSettings(int chatId, bool isChannel) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/groups/$chatId/settings');
+      final Uri url = isChannel
+          ? Uri.parse('http://$ip:5000/api/channels/$chatId/settings')
+          : Uri.parse('http://$ip:5000/api/groups/$chatId/settings');
+
       final response = await http.get(
         url,
         headers: {
@@ -30,14 +33,14 @@ class GroupManagementService {
         return jsonDecode(response.body);
       } else {
         throw Exception(
-            'Failed to load group settings. Status code: ${response.statusCode}');
+            'Failed to load group/channel settings. Status code: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Failed to load group settings: $e');
     }
   }
 
-  Future<bool> setGroupPrivacy(int chatId, bool isPrivate) async {
+  Future<bool> setPrivacy(int chatId, bool isPrivate) async {
     await _ensureToken();
     try {
       final Uri url = Uri.parse('http://$ip:5000/api/chats/$chatId/privacy');
@@ -52,13 +55,13 @@ class GroupManagementService {
 
       if (response.statusCode != 200) {
         throw Exception(
-            'Failed to update group privacy. Status code: ${response.statusCode}');
+            'Failed to update group/channel privacy. Status code: ${response.statusCode}');
       }
 
-      if (kDebugMode) print('Updated group privacy to $isPrivate');
+      if (kDebugMode) print('Updated group/channel privacy to $isPrivate');
       return true;
     } catch (e) {
-      throw Exception('Failed to update group privacy: $e');
+      throw Exception('Failed to update group/channel privacy: $e');
     }
   }
 

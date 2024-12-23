@@ -28,19 +28,30 @@ class GroupInfo extends StatefulWidget {
 class _GroupInfoState extends State<GroupInfo> {
   bool isPrivate = false;
   int groupMaxSize = 0;
+  String inviteLink = '';
 
   // function to get group privacy
   void getGroupConfig() async {
-    Map<String, dynamic> groupConfig =
-        await GroupManagementService().getGroupSettings(widget.groupId);
+    Map<String, dynamic> groupConfig = await GroupManagementService()
+        .getSettings(widget.groupId, widget.isChannel);
     setState(() {
       isPrivate = groupConfig['public'] == false;
       groupMaxSize = groupConfig['maxSize'];
     });
   }
 
-  void setGroupPrivacy(bool isPrivate) {
-    GroupManagementService().setGroupPrivacy(widget.groupId, isPrivate);
+  void getChannelConfig() async {
+    Map<String, dynamic> channelConfig = await GroupManagementService()
+        .getSettings(widget.groupId, widget.isChannel);
+    setState(() {
+      isPrivate = channelConfig['public'] == false;
+      inviteLink = channelConfig['inviteLink'];
+    });
+    print("CHANNEL CONFIG: $channelConfig");
+  }
+
+  void setPrivacy(bool isPrivate) {
+    GroupManagementService().setPrivacy(widget.groupId, isPrivate);
     setState(() {
       this.isPrivate = isPrivate;
     });
@@ -56,7 +67,7 @@ class _GroupInfoState extends State<GroupInfo> {
   @override
   void initState() {
     super.initState();
-    getGroupConfig();
+    widget.isChannel ? getChannelConfig() : getGroupConfig();
   }
 
   @override
@@ -92,7 +103,9 @@ class _GroupInfoState extends State<GroupInfo> {
                     status: "6",
                   ),
                 ),
-                if (widget.isChannelAdmin || widget.isGroupAdmin || !widget.isChannel) ...[
+                if (widget.isChannelAdmin ||
+                    widget.isGroupAdmin ||
+                    !widget.isChannel) ...[
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -128,7 +141,9 @@ class _GroupInfoState extends State<GroupInfo> {
                       ),
                     ),
                   ),
-                  widget.isGroupAdmin
+                  (widget.isGroupAdmin ||
+                          widget
+                              .isChannelAdmin) // Only group admins can change group settings
                       ? Container(
                           padding: EdgeInsets.symmetric(horizontal: 5),
                           child: Column(
@@ -140,7 +155,9 @@ class _GroupInfoState extends State<GroupInfo> {
                                 leading: Icon(
                                     isPrivate ? Icons.lock : Icons.public,
                                     color: primaryColor),
-                                title: Text('Set group privacy'),
+                                title: Text(widget.isChannel
+                                    ? 'Set Channel Privacy'
+                                    : "Set Group Privacy"),
                                 titleTextStyle: TextStyle(
                                     color: secondNeutralColor, fontSize: 16),
                                 subtitle:
@@ -162,7 +179,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                                 title: Text('Public'),
                                                 textColor: secondNeutralColor,
                                                 onTap: () {
-                                                  setGroupPrivacy(false);
+                                                  setPrivacy(false);
                                                   Navigator.pop(context);
                                                 },
                                               ),
@@ -172,7 +189,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                                 title: Text('Private'),
                                                 textColor: secondNeutralColor,
                                                 onTap: () {
-                                                  setGroupPrivacy(true);
+                                                  setPrivacy(true);
                                                   Navigator.pop(context);
                                                 },
                                               ),
@@ -185,7 +202,9 @@ class _GroupInfoState extends State<GroupInfo> {
                                 },
                               ),
 
+                              widget.isGroupAdmin ?
                               // then set group max size using a slider
+                              
                               ListTile(
                                 leading: Icon(Icons.group, color: primaryColor),
                                 title: Text('Set group max size'),
@@ -244,7 +263,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                     },
                                   );
                                 },
-                              ),
+                              ) : Container(),
                             ],
                           ),
                         )
