@@ -186,7 +186,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       } else if (field == 'userName') {
         myUser = myUser.copyWith(username: newValue);
       } else if (field == 'phoneNumber') {
-        myUser = myUser.copyWith(phoneNumber: newValue);
+        myUser = myUser.copyWith(phoneNumber: newValue.replaceAll('+', ''));
       } else if (field == 'bio') {
         myUser = myUser.copyWith(bio: newValue);
         print("bio aaa ${myUser.toJson()}");

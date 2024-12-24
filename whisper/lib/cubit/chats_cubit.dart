@@ -50,7 +50,7 @@ class ChatListCubit extends Cubit<List<Chat>> {
     // Prepare the payload
     final payload = {
       'type': type,
-      'name': name,
+      'name': name == '' ? type : name,
       'picture': pictureBlobName, // Use the updated pictureUrl variable
       'senderKey': senderKey,
       'users': usersId, // List of user IDs, with myID at the beginning
