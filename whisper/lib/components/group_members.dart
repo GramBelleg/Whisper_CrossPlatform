@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whisper/constants/colors.dart';
 import 'package:whisper/cubit/groups_cubit.dart';
 import 'package:whisper/cubit/groups_cubit_state.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
@@ -25,8 +26,12 @@ class GroupMembers extends StatefulWidget {
 class _GroupMembersState extends State<GroupMembers> {
   bool _isLoading = true;
   List<GroupMember> _membersList = [];
+  List<GroupMember> _filteredMembers =
+      []; // Add this list to hold filtered members
   String _errorMessage = '';
   bool _isAdmin = false;
+
+  final TextEditingController _searchController = TextEditingController();
 
   // Async function to load members
   Future<void> _loadMembers() async {
@@ -36,6 +41,8 @@ class _GroupMembersState extends State<GroupMembers> {
       int? id = await getId();
       setState(() {
         _isLoading = false;
+        _filteredMembers =
+            _membersList; // Set filtered members to all members initially
         for (var member in _membersList) {
           if (member.id == id && member.isAdmin == true) {
             _isAdmin = true;
@@ -51,10 +58,23 @@ class _GroupMembersState extends State<GroupMembers> {
     }
   }
 
+  // Function to filter members based on search query
+  void _filterMembers() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredMembers = _membersList
+          .where((member) =>
+              member.userName.toLowerCase().contains(query) ||
+              member.id.toString().contains(query))
+          .toList();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _loadMembers(); // Call the async method to load the members when the widget is initialized
+    _searchController.addListener(_filterMembers); // Listen for search input
   }
 
   // Helper function to format lastSeen time as hours and minutes
@@ -161,8 +181,9 @@ class _GroupMembersState extends State<GroupMembers> {
       _membersList.add(state.member);
     } else if (state is UserRemovedFromGroup) {
       _membersList.removeWhere((member) => member.id == state.user.id);
-    }else if (state is AdminAdded) {
-      _membersList.firstWhere((member) => member.id == state.userId).isAdmin = true;
+    } else if (state is AdminAdded) {
+      _membersList.firstWhere((member) => member.id == state.userId).isAdmin =
+          true;
     }
     setState(() {});
   }
@@ -191,70 +212,94 @@ class _GroupMembersState extends State<GroupMembers> {
                             handleMembersState(state);
                           });
                         },
-                        child: ListView.builder(
-                          itemCount: _membersList.length,
-                          itemBuilder: (context, index) {
-                            final member = _membersList[index];
-                            final GlobalKey key = GlobalKey();
-                            return GestureDetector(
-                              onLongPress: () {
-                                if (!member.isAdmin && _isAdmin) {
-                                  _showPopupMenu(context, member,
-                                      key); // Show menu if not an admin
-                                }
-                              },
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
+                        child: Column(
+                          children: [
+                            Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Search members',
+                                    border: OutlineInputBorder(),
+                                    suffixIcon: Icon(Icons.search),
+                                  ),
+                                  style: TextStyle(
+                                    color:
+                                        primaryColor, // Set the text color here
+                                  ),
+                                )),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: _filteredMembers.length,
+                                itemBuilder: (context, index) {
+                                  final member = _filteredMembers[index];
+                                  final GlobalKey key = GlobalKey();
+                                  return GestureDetector(
+                                    onLongPress: () {
+                                      if (!member.isAdmin && _isAdmin) {
+                                        _showPopupMenu(context, member,
+                                            key); // Show menu if not an admin
+                                      }
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            GroupMemberCard(
-                                              key: key,
-                                              id: member.id,
-                                              userName: member.userName,
-                                              profilePic: member.profilePic,
-                                              hasStory: member.hasStory,
-                                              lastSeen: _formatLastSeen(member
-                                                  .lastSeen!), // Format lastSeen here
+                                            Expanded(
+                                              child: Column(
+                                                children: [
+                                                  GroupMemberCard(
+                                                    key: key,
+                                                    id: member.id,
+                                                    userName: member.userName,
+                                                    profilePic:
+                                                        member.profilePic,
+                                                    hasStory: member.hasStory,
+                                                    lastSeen: _formatLastSeen(member
+                                                        .lastSeen!), // Format lastSeen here
+                                                  ),
+                                                  // Add a Divider after each member card
+                                                ],
+                                              ),
                                             ),
-                                            // Add a Divider after each member card
-                                          ],
-                                        ),
-                                      ),
-                                      // Show isAdmin at the end of the line
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 16.0,
-                                            left: 16.0,
-                                            bottom: 8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              member.isAdmin ? 'Admin' : '',
-                                              style: TextStyle(
-                                                color:
-                                                    Colors.blue, // Make it blue
-                                                fontWeight: FontWeight.bold,
+                                            // Show isAdmin at the end of the line
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 16.0,
+                                                  left: 16.0,
+                                                  bottom: 8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    member.isAdmin
+                                                        ? 'Admin'
+                                                        : '',
+                                                    style: TextStyle(
+                                                      color: Colors
+                                                          .blue, // Make it blue
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Divider(
-                                    color: Colors.grey.shade300,
-                                    thickness: .25,
-                                  ),
-                                ],
+                                        Divider(
+                                          color: Colors.grey.shade300,
+                                          thickness: .25,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ),
                     ),

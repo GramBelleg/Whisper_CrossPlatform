@@ -127,6 +127,19 @@ Future<void> removeCachedMessagesByIds(int chatId, List<int> messageIds) async {
   }
 }
 
+Future<void> removeCachedMessagesByChatId(int chatId) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  // Remove cached messages for the given chatId
+  bool removed = await prefs.remove('cached_messages_$chatId');
+
+  if (removed) {
+    print('Cached messages for chatId $chatId have been removed.');
+  } else {
+    print('No cached messages found for chatId $chatId.');
+  }
+}
+
 Future<void> editCachedMessageContentById(
     int chatId, int id, String newContent) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();

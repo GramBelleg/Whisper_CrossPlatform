@@ -16,10 +16,15 @@ String formatName(String fullName) {
   }
 }
 
-bool isValidUrl(String str) {
-  final urlPattern = r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$';
-  final result = RegExp(urlPattern).hasMatch(str);
-  return result;
+bool isValidUrl(String? profilePic) {
+  if (profilePic == null || profilePic.isEmpty) return false;
+
+  try {
+    final uri = Uri.parse(profilePic);
+    return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+  } catch (e) {
+    return false;
+  }
 }
 
 void viewProfilePhoto(BuildContext context, String? photoUrl) {

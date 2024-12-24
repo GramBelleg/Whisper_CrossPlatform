@@ -134,7 +134,6 @@ class EditFields extends StatelessWidget {
                         counterText: '',
                       ),
                       maxLength: maxLength,
-                      onChanged: (_) => setState(() {}),
                     ),
                   ),
                   if (needCode)

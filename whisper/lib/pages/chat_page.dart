@@ -412,7 +412,6 @@ class _ChatPageState extends State<ChatPage> {
                               padding: EdgeInsets.only(
                                   bottom: paddingSpaceForReplay),
                               child: MessageList(
-                                // scrollController: _scrollController2,
                                 messages: chatMessageManager.messages,
                                 onLongPress: handleLongPressSelection,
                                 onTap: handleOnTapSelection,

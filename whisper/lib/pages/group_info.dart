@@ -71,8 +71,11 @@ class _GroupInfoState extends State<GroupInfo> {
             Navigator.pop(context); // Return to the previous screen
           },
         ),
-        title: Text(widget.isChannel ? 'Channel Info' : 'Group Info',
-            style: TextStyle(color: Colors.white)),
+        centerTitle: true, // Centers the title
+        title: Text(
+          widget.isChannel ? 'Channel Info' : 'Group Info',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Container(
           color:
