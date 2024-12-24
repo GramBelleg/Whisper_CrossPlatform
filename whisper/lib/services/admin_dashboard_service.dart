@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/show_loading_dialog.dart';
 
 class AdminDashboardService {
   static Future<List<dynamic?>?> getAllUsers(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/admin/users');
+    final url = Uri.parse('$domain_name/admin/users');
     final token = await getToken();
     showLoadingDialog(context);
     try {
@@ -33,7 +34,7 @@ class AdminDashboardService {
   }
 
   static Future<List<dynamic?>?> getAllGroups(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/admin/groups');
+    final url = Uri.parse('$domain_name/admin/groups');
     final token = await getToken();
     showLoadingDialog(context);
     try {
@@ -60,7 +61,7 @@ class AdminDashboardService {
 
   static Future<void> banAUser(
       BuildContext context, bool ban, int userId) async {
-    final url = Uri.parse('http://$ip:5000/api/admin/ban/$ban/user/$userId');
+    final url = Uri.parse('$domain_name/admin/ban/$ban/user/$userId');
     final token = await getToken();
     showLoadingDialog(context);
 
@@ -89,7 +90,7 @@ class AdminDashboardService {
   static Future<void> filterGroup(
       BuildContext context, bool filter, int userId) async {
     final url =
-        Uri.parse('http://$ip:5000/api/admin/filter/$filter/group/$userId');
+        Uri.parse('$domain_name/admin/filter/$filter/group/$userId');
     final token = await getToken();
     showLoadingDialog(context);
 

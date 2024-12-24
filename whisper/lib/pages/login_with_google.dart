@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/page_state.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 import '../services/login_service.dart';
@@ -61,7 +62,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
               if (code != null) {
                 debugPrint("Authorization code: $code");
                 try {
-                  final url = Uri.parse('http://$ip:5000/api/auth/google');
+                  final url = Uri.parse('$domain_name/auth/google');
                   showLoadingDialog(context);
                   final response = await http.post(
                     url,

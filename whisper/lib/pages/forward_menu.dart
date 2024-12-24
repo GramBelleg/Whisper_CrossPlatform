@@ -134,6 +134,7 @@ class _ForwardMenuState extends State<ForwardMenu> {
     if (_selectedFriendIndexes.length == 1 && _friends.length != 1) {
       final friend = _friends[_selectedFriendIndexes.first];
       Navigator.pop(context);
+      Navigator.pop(context);
       //i think it should be twice
       Navigator.push(
         context,

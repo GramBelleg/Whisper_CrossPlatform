@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/read_file.dart';
 
 import '../constants/ip_for_services.dart';
@@ -16,7 +17,7 @@ class StickersService {
     _token = await getToken();
 
     try {
-      final Uri url = Uri.parse("http://$ip:5000/api/stickers");
+      final Uri url = Uri.parse("$domain_name/stickers");
       final response = await http.get(
         url,
         headers: {
@@ -43,7 +44,7 @@ class StickersService {
 
   Future<List<String>> getPresignedURLforUploadingStickers() async {
     // 1. Get the presigned URL from /media/write
-    final String apiUrl = 'http://$ip:5000/api/media/write';
+    final String apiUrl = '$domain_name/media/write';
     String? token = await getToken();
 
     if (token == null) {

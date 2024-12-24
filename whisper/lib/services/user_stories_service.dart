@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
 import 'package:whisper/components/helpers.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/models/story.dart';
 import 'package:whisper/models/user.dart';
 import 'package:whisper/constants/ip_for_services.dart';
@@ -13,7 +14,7 @@ import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/socket.dart';
 
 // Define the base URL within the class as a constant
-const String baseUrl = 'http://$ip:5000/api';
+const String baseUrl = '$domain_name';
 final socket = SocketService.instance.socket;
 Future<Tuple2<List<User>, User?>> fetchUsersWithStories() async {
   final url = Uri.parse('$baseUrl/user/story');
@@ -105,7 +106,7 @@ Future<Tuple2<List<User>, User?>> fetchUsersWithStories() async {
 
 // Function to retrieve user info by ID
 Future<User?> fetchUserById(int userId) async {
-  const String baseUrl = 'http://$ip:5000/api';
+  const String baseUrl = '$domain_name';
   final String endpoint = '/user/$userId/info';
   final Uri url = Uri.parse('$baseUrl$endpoint');
   String? token = await getToken();

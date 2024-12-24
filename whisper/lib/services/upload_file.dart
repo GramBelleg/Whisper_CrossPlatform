@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 
@@ -9,7 +10,7 @@ Future<String> uploadFile(String filePath) async {
   print("Uploading file: $filePath");
   String fileExtension = p.extension(filePath);
   print("File extension: $fileExtension");
-  final String apiUrl = 'http://$ip:5000/api/media/write';
+  final String apiUrl = '$domain_name/media/write';
   String? token = await getToken();
 
   if (token == null) {

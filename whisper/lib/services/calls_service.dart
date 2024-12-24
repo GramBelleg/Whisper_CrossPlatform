@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/pages/call_page.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared_preferences.dart';
@@ -113,7 +114,7 @@ class CallsService {
   }
 
   static Future<void> leaveCall(int? chatId,String? endStatus, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/call/leave/$chatId');
+    final url = Uri.parse('$domain_name/call/leave/$chatId');
     final token = await getToken();
     print("BEFORE");
     try{
@@ -135,7 +136,7 @@ class CallsService {
     }
   }
   static Future<void> joinCall(int? chatId) async {
-    final url = Uri.parse('http://$ip:5000/api/call/join/$chatId');
+    final url = Uri.parse('$domain_name/call/join/$chatId');
     final token = await getToken();
     print("BEFORE");
 
@@ -204,7 +205,7 @@ class CallsService {
   }
 
   static Future<String> makeACall(BuildContext context, int id) async {
-    final url = Uri.parse('http://$ip:5000/api/call/$id');
+    final url = Uri.parse('$domain_name/call/$id');
     final token = await getToken();
     print("BEFORE");
     showLoadingDialog(context);

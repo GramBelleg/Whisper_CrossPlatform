@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/page_state.dart';
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/models/sign_up_credentials.dart';
 import 'package:whisper/pages/confirmation_code.dart';
 import 'package:whisper/services/login_service.dart';
@@ -14,7 +15,7 @@ class SignupService {
   static Future<void> signup(
       BuildContext context, SignupCredentials? user) async {
     String? robotToken = await getRobotToken();
-    final url = Uri.parse('http://$ip:5000/api/auth/signup');
+    final url = Uri.parse('$domain_name/auth/signup');
     final userMap = user!.toMap();
     print("number is :${userMap['phoneNumber']}");
     userMap.addAll({"robotToken": robotToken});
@@ -54,7 +55,7 @@ class SignupService {
 
   static Future<void> sendConfirmationCode(
       String email, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/resendConfirmCode');
+    final url = Uri.parse('$domain_name/auth/resendConfirmCode');
 
     try {
       showLoadingDialog(context);
@@ -93,7 +94,7 @@ class SignupService {
   }
 
   static Future<void> confirmCode(String code, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/confirmEmail');
+    final url = Uri.parse('$domain_name/auth/confirmEmail');
     final email = await getEmail();
     showLoadingDialog(context);
     try {

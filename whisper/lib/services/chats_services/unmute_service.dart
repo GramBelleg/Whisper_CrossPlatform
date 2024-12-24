@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 Future<bool> unmuteChatService(int chatId) async {
-  String url = 'http://$ip:5000/api/chats/$chatId/unmuteChat';
+  String url = '$domain_name/chats/$chatId/unmuteChat';
   String? token = await getToken();
 
   try {

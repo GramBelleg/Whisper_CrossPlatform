@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
@@ -7,7 +8,7 @@ import '../constants/ip_for_services.dart';
 Future<Map<String, dynamic>> updateUserField(String field, String value) async {
   String? token = await getToken();
   final url =
-      Uri.parse('http://$ip:5000/api/user/$field'); // Your update API endpoint
+      Uri.parse('$domain_name/user/$field'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   if (token == null) {

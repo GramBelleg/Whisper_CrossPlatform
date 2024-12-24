@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/pages/login.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/services/show_loading_dialog.dart';
@@ -9,7 +10,7 @@ import 'package:whisper/socket.dart';
 
 class LogoutService {
   static Future<void> logoutFromAllDevices(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/user/logoutAll');
+    final url = Uri.parse('$domain_name/user/logoutAll');
     final token = await getToken();
 
     showLoadingDialog(context);
@@ -50,7 +51,7 @@ class LogoutService {
   }
 
   static Future<void> logoutFromThisDevice(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/user/logoutOne');
+    final url = Uri.parse('$domain_name/user/logoutOne');
     final token = await getToken();
     showLoadingDialog(context);
     try {

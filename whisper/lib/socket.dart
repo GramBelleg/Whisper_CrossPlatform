@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/global_cubits/global_chats_cubit.dart';
 import 'package:whisper/global_cubits/global_cubit_provider.dart';
 import 'package:whisper/global_cubits/global_groups_provider.dart';
@@ -48,7 +49,9 @@ class SocketService {
   }
 
   void _initializeSocket(String? token) {
-    socket = IO.io("http://$ip:5000", <String, dynamic>{
+    final ip_address = domain_name.substring(0, domain_name.length - 4);
+    print("ip_address: $ip_address");
+    socket = IO.io(ip_address, <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}

@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
 Future<List<dynamic>> fetchAddableUsers(int chatId) async {
-  final String url = 'http://$ip:5000/api/chats/$chatId/addableUsers';
+  final String url = '$domain_name/chats/$chatId/addableUsers';
   String? token = await getToken();
 
   try {

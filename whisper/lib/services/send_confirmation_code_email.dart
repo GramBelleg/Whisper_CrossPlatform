@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 import '../constants/ip_for_services.dart';
 
 Future<Map<String, dynamic>> sendConfirmationCodeEmail(
     String email, BuildContext context) async {
-  final url = Uri.parse('http://$ip:5000/api/user/emailcode');
+  final url = Uri.parse('$domain_name/user/emailcode');
   String? token = await getToken();
   // Ensure token is not null before making the request
   if (token == null) {

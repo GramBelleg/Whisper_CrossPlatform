@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/helpers.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/models/user_state.dart';
 import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
 Future<UserState?> fetchUserInfo() async {
-  final url = Uri.parse('http://$ip:5000/api/user/info'); // API endpoint
+  final url = Uri.parse('$domain_name/user/info'); // API endpoint
   String? token = await getToken(); // Retrieve token
 
   if (token == null) {

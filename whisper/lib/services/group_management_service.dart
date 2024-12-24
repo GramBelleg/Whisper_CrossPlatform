@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:whisper/constants/ip_for_services.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,7 +18,7 @@ class GroupManagementService {
   Future<Map<String, dynamic>> getGroupSettings(int chatId) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/groups/$chatId/settings');
+      final Uri url = Uri.parse('$domain_name/groups/$chatId/settings');
       final response = await http.get(
         url,
         headers: {
@@ -40,7 +41,7 @@ class GroupManagementService {
   Future<bool> setGroupPrivacy(int chatId, bool isPrivate) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/chats/$chatId/privacy');
+      final Uri url = Uri.parse('$domain_name/chats/$chatId/privacy');
       final response = await http.post(
         url,
         headers: {
@@ -66,7 +67,7 @@ class GroupManagementService {
     await _ensureToken();
     try {
       final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/size/$maxSize');
+          Uri.parse('$domain_name/$chatId/size/$maxSize');
       final response = await http.put(
         url,
         headers: {
@@ -91,7 +92,7 @@ class GroupManagementService {
     await _ensureToken();
     try {
       final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/$userId/permissions');
+          Uri.parse('$domain_name/groups/$chatId/$userId/permissions');
       final response = await http.get(
         url,
         headers: {
@@ -117,7 +118,7 @@ class GroupManagementService {
     await _ensureToken();
     try {
       final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/$userId/permissions');
+          Uri.parse('$domain_name/groups/$chatId/$userId/permissions');
       final response = await http.post(
         url,
         headers: {

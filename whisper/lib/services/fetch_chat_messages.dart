@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/models/chat_message.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
@@ -10,7 +11,7 @@ class ChatViewModel {
   List<ChatMessage> get messages => _messages;
 
   Future<void> fetchChatMessages(int chatId) async {
-    final url = Uri.parse('http://$ip:5000/api/messages/$chatId');
+    final url = Uri.parse('$domain_name/messages/$chatId');
     String? token = await getToken();
     if (token == null) {
       print('Authorization token is missing');

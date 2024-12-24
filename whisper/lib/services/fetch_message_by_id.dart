@@ -1,12 +1,13 @@
 // services/fetch_message.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/models/chat_message.dart'; // Ensure this import points to your ChatMessage model
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
 Future<ChatMessage> fetchMessage(int messageId) async {
-  final url = Uri.parse('http://$ip:5000/api/messages/$messageId/getMessage');
+  final url = Uri.parse('$domain_name/messages/$messageId/getMessage');
   String? token = await getToken();
 
   if (token == null) {

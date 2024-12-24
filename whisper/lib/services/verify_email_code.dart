@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
@@ -8,7 +9,7 @@ Future<Map<String, dynamic>> verifyEmailCode(
     String code, String email, BuildContext context) async {
   String? token = await getToken();
   final url =
-      Uri.parse('http://$ip:5000/api/user/email'); // Your update API endpoint
+      Uri.parse('$domain_name/user/email'); // Your update API endpoint
 
   // Ensure token is not null before making the request
   print(code + "      " + email);

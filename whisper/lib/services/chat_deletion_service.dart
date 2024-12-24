@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
+import 'package:whisper/constants/url.dart';
+
 class ChatDeletionService {
   Future<void> deleteMessages(int chatId, List<int> messageIds) async {
     // Build the URL with chatId in the path and message IDs as query parameters with square brackets
@@ -10,8 +12,8 @@ class ChatDeletionService {
           '[${messageIds.join(',')}]', // Convert list of IDs to a comma-separated string with square brackets
     };
 
-    final url = Uri.http(
-        '$ip:5000', '/api/messages/$chatId/deleteForMe', queryParameters);
+    final url = Uri.parse(
+        '$domain_name/messages/$chatId/deleteForMe?Ids=${queryParameters['Ids']}');
 
     // Print the constructed URL to verify it's correct
     print('Constructed URL: ${url.toString()}');

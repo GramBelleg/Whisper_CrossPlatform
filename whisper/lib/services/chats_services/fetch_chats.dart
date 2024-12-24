@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:whisper/components/helpers.dart';
+import 'package:whisper/constants/url.dart';
 import 'package:whisper/services/read_file.dart';
 import 'package:whisper/services/shared_preferences.dart';
 import '../../constants/ip_for_services.dart';
 
 Future<List<dynamic>> fetchChats() async {
-  final String url = 'http://$ip:5000/api/chats';
+  final String url = '$domain_name/chats';
   String? token = await getToken(); // Retrieve token
-
+  print("url $url");
   try {
     final response = await http.get(
       Uri.parse(url),
