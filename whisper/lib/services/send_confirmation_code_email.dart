@@ -7,7 +7,7 @@ import '../constants/ip_for_services.dart';
 
 Future<Map<String, dynamic>> sendConfirmationCodeEmail(
     String email, BuildContext context) async {
-  final url = Uri.parse('http://$ip:5000/api/user/emailcode');
+  final url = Uri.parse('$ip/user/emailcode');
   String? token = await getToken();
   // Ensure token is not null before making the request
   if (token == null) {

@@ -17,7 +17,7 @@ class GroupManagementService {
   Future<Map<String, dynamic>> getGroupSettings(int chatId) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/groups/$chatId/settings');
+      final Uri url = Uri.parse('$ip/groups/$chatId/settings');
       final response = await http.get(
         url,
         headers: {
@@ -40,7 +40,7 @@ class GroupManagementService {
   Future<bool> setGroupPrivacy(int chatId, bool isPrivate) async {
     await _ensureToken();
     try {
-      final Uri url = Uri.parse('http://$ip:5000/api/chats/$chatId/privacy');
+      final Uri url = Uri.parse('$ip/chats/$chatId/privacy');
       final response = await http.post(
         url,
         headers: {
@@ -65,8 +65,7 @@ class GroupManagementService {
   Future<bool> setGroupMaxSize(int chatId, int maxSize) async {
     await _ensureToken();
     try {
-      final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/size/$maxSize');
+      final Uri url = Uri.parse('$ip/groups/$chatId/size/$maxSize');
       final response = await http.put(
         url,
         headers: {
@@ -90,8 +89,7 @@ class GroupManagementService {
   Future<Map<String, bool>> getUserPermissions(int chatId, int userId) async {
     await _ensureToken();
     try {
-      final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/$userId/permissions');
+      final Uri url = Uri.parse('$ip/groups/$chatId/$userId/permissions');
       final response = await http.get(
         url,
         headers: {
@@ -116,8 +114,7 @@ class GroupManagementService {
       int chatId, int userId, Map<String, bool> permissions) async {
     await _ensureToken();
     try {
-      final Uri url =
-          Uri.parse('http://$ip:5000/api/groups/$chatId/$userId/permissions');
+      final Uri url = Uri.parse('$ip/groups/$chatId/$userId/permissions');
       final response = await http.post(
         url,
         headers: {

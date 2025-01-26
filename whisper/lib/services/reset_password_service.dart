@@ -13,7 +13,7 @@ import 'login_service.dart';
 
 class ResetPasswordService {
   static Future<void> sendResetCode(String email, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/sendResetCode');
+    final url = Uri.parse('$ip/auth/sendResetCode');
     showLoadingDialog(context);
     try {
       final response = await http.post(
@@ -54,7 +54,7 @@ class ResetPasswordService {
 
   static Future<void> resetPassword(
       ResetPasswordCredentials resetPassCred, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/resetPassword');
+    final url = Uri.parse('$ip/auth/resetPassword');
     resetPassCred.email = await getEmail();
     try {
       showLoadingDialog(context);

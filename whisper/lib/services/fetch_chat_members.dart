@@ -6,7 +6,7 @@ import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
 Future<List<GroupMember>> fetchChatMembers(int chatId) async {
-  final url = Uri.parse('http://$ip:5000/api/chats/$chatId/getMembers');
+  final url = Uri.parse('$ip/chats/$chatId/getMembers');
   String? token = await getToken();
 
   if (token == null) {

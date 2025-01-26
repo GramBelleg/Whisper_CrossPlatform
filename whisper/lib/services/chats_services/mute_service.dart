@@ -4,7 +4,7 @@ import 'package:whisper/constants/ip_for_services.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 Future<bool> muteChatService(int chatId, int duration) async {
-  final apiUrl = 'http://$ip:5000/api/chats/$chatId/muteChat';
+  final apiUrl = '$ip/chats/$chatId/muteChat';
   String? token = await getToken();
   print("mute");
   try {

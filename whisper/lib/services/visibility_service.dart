@@ -11,8 +11,8 @@ class VisibilityService {
     _token = await getToken();
 
     try {
-      // final response = await _dio.get("http://$ip:5000/api/user/info");
-      final Uri url = Uri.parse("http://$ip:5000/api/user/info");
+      // final response = await _dio.get("$ip/user/info");
+      final Uri url = Uri.parse("$ip/user/info");
 
       final response = await http.get(
         url,
@@ -36,7 +36,7 @@ class VisibilityService {
     if (key == "readReceipts") {
       // it is a post request here
 
-      final Uri url = Uri.parse("http://$ip:5000/api/user/readReceipts");
+      final Uri url = Uri.parse("$ip/user/readReceipts");
 
       final response = await http.post(
         url,
@@ -56,7 +56,7 @@ class VisibilityService {
       }
     } else {
       // it is a put request here
-      final Uri url = Uri.parse("http://$ip:5000/api/user/$key/privacy");
+      final Uri url = Uri.parse("$ip/user/$key/privacy");
 
       final response = await http.put(
         url,

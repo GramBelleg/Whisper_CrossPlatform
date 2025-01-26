@@ -9,7 +9,7 @@ import 'package:whisper/socket.dart';
 
 class LogoutService {
   static Future<void> logoutFromAllDevices(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/user/logoutAll');
+    final url = Uri.parse('$ip/user/logoutAll');
     final token = await getToken();
 
     showLoadingDialog(context);
@@ -50,7 +50,7 @@ class LogoutService {
   }
 
   static Future<void> logoutFromThisDevice(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/user/logoutOne');
+    final url = Uri.parse('$ip/user/logoutOne');
     final token = await getToken();
     showLoadingDialog(context);
     try {

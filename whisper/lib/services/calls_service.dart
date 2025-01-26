@@ -46,11 +46,12 @@ class CallsService {
       navigatorKey.currentState!.push(
         MaterialPageRoute(
             builder: (context) => Call(),
-            settings: RouteSettings(arguments: {
-              'token': message.data['action'].payload!['token'],
-              'chatId': message.data['action'].payload!['channelName'],
-            },)
-        ),
+            settings: RouteSettings(
+              arguments: {
+                'token': message.data['action'].payload!['token'],
+                'chatId': message.data['action'].payload!['channelName'],
+              },
+            )),
       );
     }
   }
@@ -101,59 +102,56 @@ class CallsService {
       await CallsService.joinCall(chatId);
       navigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => Call(),
-          settings: RouteSettings(arguments: {
-            'token': action.payload!['token'],
-            'chatId': action.payload!['channelName'],
-          },)
-        ),
+            builder: (context) => Call(),
+            settings: RouteSettings(
+              arguments: {
+                'token': action.payload!['token'],
+                'chatId': action.payload!['channelName'],
+              },
+            )),
       );
-
     }
   }
 
-  static Future<void> leaveCall(int? chatId,String? endStatus, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/call/leave/$chatId');
+  static Future<void> leaveCall(
+      int? chatId, String? endStatus, BuildContext context) async {
+    final url = Uri.parse('$ip/call/leave/$chatId');
     final token = await getToken();
     print("BEFORE");
-    try{
+    try {
+      final response = await http.post(url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({'endStatus': endStatus}));
+      var data = jsonDecode(response.body);
+      print(data);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> joinCall(int? chatId) async {
+    final url = Uri.parse('$ip/call/join/$chatId');
+    final token = await getToken();
+    print("BEFORE");
+
+    try {
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'endStatus':endStatus
-        })
       );
       var data = jsonDecode(response.body);
       print(data);
-    }
-    catch (e){
+    } catch (e) {
       print(e);
     }
   }
-  static Future<void> joinCall(int? chatId) async {
-    final url = Uri.parse('http://$ip:5000/api/call/join/$chatId');
-    final token = await getToken();
-    print("BEFORE");
 
-    try{
-      final response = await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-      );
-      var data = jsonDecode(response.body);
-      print(data);
-    }
-    catch (e){
-      print(e);
-    }
-  }
   static Future<void> setListeners() async {
     FirebaseMessaging.onMessage.listen(
       (RemoteMessage message) {
@@ -162,7 +160,7 @@ class CallsService {
         print(message.notification);
         String? title = "${message.data['userName']}";
         String? body = message.notification!.body;
-        if(message.data!['type']=="voice_call") {
+        if (message.data!['type'] == "voice_call") {
           AwesomeNotifications().createNotification(
             content: NotificationContent(
               id: 123,
@@ -204,7 +202,7 @@ class CallsService {
   }
 
   static Future<String> makeACall(BuildContext context, int id) async {
-    final url = Uri.parse('http://$ip:5000/api/call/$id');
+    final url = Uri.parse('$ip/call/$id');
     final token = await getToken();
     print("BEFORE");
     showLoadingDialog(context);

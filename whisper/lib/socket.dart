@@ -48,7 +48,10 @@ class SocketService {
   }
 
   void _initializeSocket(String? token) {
-    socket = IO.io("http://$ip:5000", <String, dynamic>{
+    final ip_address = ip.substring(0, ip.length - 4);
+    print("ip_address: $ip_address");
+
+    socket = IO.io(ip_address, <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
       'query': {'token': "Bearer $token"}

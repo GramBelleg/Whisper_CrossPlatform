@@ -13,7 +13,7 @@ import 'package:whisper/services/show_loading_dialog.dart';
 class LoginService {
   static Future<void> registerFCMToken(
       String? fcmToken, String token, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/notifications/registerFCMToken');
+    final url = Uri.parse('$ip/notifications/registerFCMToken');
     print("BEFORE");
     showLoadingDialog(context);
     try {
@@ -36,7 +36,7 @@ class LoginService {
 
   static Future<void> login(
       LoginCredentials loginCred, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/login');
+    final url = Uri.parse('$ip/auth/login');
     showLoadingDialog(context);
     try {
       final response = await http.post(
@@ -91,7 +91,7 @@ class LoginService {
   }
 
   static Future<String?> checkAlreadyLoggedIn(BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/user');
+    final url = Uri.parse('$ip/user');
     final token = await getToken();
     showLoadingDialog(context);
     try {

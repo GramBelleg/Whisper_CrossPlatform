@@ -16,7 +16,7 @@ class StickersService {
     _token = await getToken();
 
     try {
-      final Uri url = Uri.parse("http://$ip:5000/api/stickers");
+      final Uri url = Uri.parse("$ip/stickers");
       final response = await http.get(
         url,
         headers: {
@@ -43,7 +43,7 @@ class StickersService {
 
   Future<List<String>> getPresignedURLforUploadingStickers() async {
     // 1. Get the presigned URL from /media/write
-    final String apiUrl = 'http://$ip:5000/api/media/write';
+    final String apiUrl = '$ip/media/write';
     String? token = await getToken();
 
     if (token == null) {

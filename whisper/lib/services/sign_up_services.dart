@@ -14,7 +14,7 @@ class SignupService {
   static Future<void> signup(
       BuildContext context, SignupCredentials? user) async {
     String? robotToken = await getRobotToken();
-    final url = Uri.parse('http://$ip:5000/api/auth/signup');
+    final url = Uri.parse('$ip/auth/signup');
     final userMap = user!.toMap();
     print("number is :${userMap['phoneNumber']}");
     userMap.addAll({"robotToken": robotToken});
@@ -54,7 +54,7 @@ class SignupService {
 
   static Future<void> sendConfirmationCode(
       String email, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/resendConfirmCode');
+    final url = Uri.parse('$ip/auth/resendConfirmCode');
 
     try {
       showLoadingDialog(context);
@@ -93,7 +93,7 @@ class SignupService {
   }
 
   static Future<void> confirmCode(String code, BuildContext context) async {
-    final url = Uri.parse('http://$ip:5000/api/auth/confirmEmail');
+    final url = Uri.parse('$ip/auth/confirmEmail');
     final email = await getEmail();
     showLoadingDialog(context);
     try {

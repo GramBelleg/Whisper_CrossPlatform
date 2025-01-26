@@ -7,8 +7,7 @@ import 'package:whisper/services/shared_preferences.dart';
 
 Future<List<dynamic>> chatsGlobalSearch(String query) async {
   final String? token = await getToken(); // Retrieve token from secure storage
-  final Uri url =
-      Uri.parse('http://$ip:5000/api/chats/globalSearch?query=$query');
+  final Uri url = Uri.parse('$ip/chats/globalSearch?query=$query');
 
   try {
     // Simulate a delay of 2 seconds (you can adjust the time as needed)

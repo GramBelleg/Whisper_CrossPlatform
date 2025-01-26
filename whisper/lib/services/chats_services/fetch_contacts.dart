@@ -7,13 +7,12 @@ import 'package:whisper/services/shared_preferences.dart';
 import 'package:whisper/constants/ip_for_services.dart';
 
 Future<List<Contact>> fetchUserContacts() async {
-  final String url =
-      'http://$ip:5000'; // Adjust IP address or endpoint as needed
+  // final String url = ip; // Adjust IP address or endpoint as needed
   String? token =
       await getToken(); // Retrieve the token from shared preferences
 
   final response = await http.get(
-    Uri.parse('$url/api/user/contact'),
+    Uri.parse('$ip/user/contact'),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',

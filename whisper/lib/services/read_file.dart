@@ -4,7 +4,7 @@ import 'package:whisper/constants/ip_for_services.dart';
 import 'package:whisper/services/shared_preferences.dart';
 
 Future<String> generatePresignedUrl(String blobName) async {
-  final String apiUrl = 'http://$ip:5000/api/media/read';
+  final String apiUrl = '$ip/media/read';
   String? token = await getToken();
 
   final response = await http.post(

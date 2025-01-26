@@ -10,7 +10,7 @@ class ChatViewModel {
   List<ChatMessage> get messages => _messages;
 
   Future<void> fetchChatMessages(int chatId) async {
-    final url = Uri.parse('http://$ip:5000/api/messages/$chatId');
+    final url = Uri.parse('$ip/messages/$chatId');
     String? token = await getToken();
     if (token == null) {
       print('Authorization token is missing');

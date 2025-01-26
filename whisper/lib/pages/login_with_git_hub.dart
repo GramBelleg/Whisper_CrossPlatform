@@ -58,7 +58,7 @@ class _LoginWithGithubState extends State<LoginWithGithub> {
                 debugPrint("Authorization code: $code");
                 showLoadingDialog(context);
                 try {
-                  final url = Uri.parse('http://$ip:5000/api/auth/github');
+                  final url = Uri.parse('$ip/auth/github');
                   final response = await http.post(
                     url,
                     headers: {

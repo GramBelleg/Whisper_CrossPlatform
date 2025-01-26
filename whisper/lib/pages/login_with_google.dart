@@ -61,7 +61,7 @@ class _LoginWithGoogleState extends State<LoginWithGoogle> {
               if (code != null) {
                 debugPrint("Authorization code: $code");
                 try {
-                  final url = Uri.parse('http://$ip:5000/api/auth/google');
+                  final url = Uri.parse('$ip/auth/google');
                   showLoadingDialog(context);
                   final response = await http.post(
                     url,

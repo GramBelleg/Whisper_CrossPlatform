@@ -5,7 +5,7 @@ import 'package:whisper/services/shared_preferences.dart';
 import '../constants/ip_for_services.dart';
 
 class BlockedUsersService {
-  final String baseURL = "http://$ip:5000/api/user/blocked";
+  final String baseURL = "$ip/user/blocked";
   String? _token;
 
   Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
@@ -35,7 +35,7 @@ class BlockedUsersService {
   }
 
   Future<void> changeBlock(int userId, bool value) async {
-    final url = Uri.parse("http://$ip:5000/api/user/block");
+    final url = Uri.parse("$ip/user/block");
     final response = await http.put(
       url,
       headers: {
