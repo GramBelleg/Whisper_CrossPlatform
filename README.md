@@ -138,7 +138,7 @@ This project is built as a **Telegram Replica** with modern software design, rob
 
 ## 🎬 Demo
 
-> 📽️ [Watch the demo on YouTube](https://drive.google.com/file/d/1MudCnBPDeZGxED4IJe6tC7L4FGUgJBJb/edit)  
+> 📽️ [Demo](https://drive.google.com/drive/folders/14o2fgZDff0Uxrkb-QJlNwdY3Y2Ng0C_p)  
 
 ---
 
